@@ -1,7 +1,5 @@
 package com.forge.os.presentation.screens.hub
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,7 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.forge.os.presentation.components.*
+import com.forge.os.presentation.theme.forgePalette
 
 private data class ModuleTile(
     val route: String,
@@ -29,7 +27,6 @@ private data class ModuleTile(
     val subtitle: String,
     val section: String,
     val keywords: String = "",
-    val isNew: Boolean = false,
 )
 
 private val MODULES = listOf(
@@ -58,14 +55,14 @@ private val MODULES = listOf(
 
     // Tools
     ModuleTile("browser", Icons.Outlined.Language, "Browser", "Agent-controllable web", "Tools", "browser web"),
-    ModuleTile("alarms", Icons.Outlined.Alarm, "Alarms", "Schedule exact alarms", "Tools", "alarm timer", isNew = true),
-    ModuleTile("server", Icons.Outlined.Storage, "Server", "Local HTTP API", "Tools", "server http api", isNew = true),
+    ModuleTile("alarms", Icons.Outlined.Alarm, "Alarms", "Schedule exact alarms", "Tools", "alarm timer"),
+    ModuleTile("server", Icons.Outlined.Storage, "Server", "Local HTTP API", "Tools", "server http api"),
 
     // Advanced
-    ModuleTile("debugger", Icons.Outlined.BugReport, "Debugger", "Agent replay traces", "Advanced", "debugger snapshot replay trace", isNew = true),
-    ModuleTile("doctor", Icons.Outlined.MedicalServices, "Doctor", "Diagnostics & repair", "Advanced", "doctor diagnostic repair", isNew = true),
-    ModuleTile("channels", Icons.Outlined.Podcasts, "Channels", "Telegram messaging", "Advanced", "channel telegram messaging", isNew = true),
-    ModuleTile("android", Icons.Outlined.PhoneAndroid, "Android", "Device snapshot", "Advanced", "android device battery", isNew = true),
+    ModuleTile("debugger", Icons.Outlined.BugReport, "Debugger", "Agent replay traces", "Advanced", "debugger snapshot replay trace"),
+    ModuleTile("doctor", Icons.Outlined.MedicalServices, "Doctor", "Diagnostics & repair", "Advanced", "doctor diagnostic repair"),
+    ModuleTile("channels", Icons.Outlined.Podcasts, "Channels", "Telegram messaging", "Advanced", "channel telegram messaging"),
+    ModuleTile("android", Icons.Outlined.PhoneAndroid, "Android", "Device snapshot", "Advanced", "android device battery"),
 )
 
 private val SECTION_ORDER = listOf("Core", "Agent", "Data", "Companion", "Tools", "Advanced")
@@ -87,7 +84,6 @@ fun ModernHubScreen(
 ) {
     var query by remember { mutableStateOf("") }
     val pluginTiles by viewModel.pluginTiles.collectAsState()
-    var fabExpanded by remember { mutableStateOf(false) }
 
     val q = query.trim().lowercase()
     val visibleBuiltins = if (q.isEmpty()) MODULES else MODULES.filter {
@@ -110,19 +106,7 @@ fun ModernHubScreen(
                 title = "Modules",
                 subtitle = "${visibleBuiltins.size + visiblePluginTiles.size} available",
                 onBackClick = onBack
-            ) {
-                IconButton(
-                    onClick = { onNavigate("settings") },
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        Icons.Outlined.Settings,
-                        "Settings",
-                        tint = ModernTextPrimary,
-                        modifier = Modifier.size(22.dp)
-                    )
-                }
-            }
+            )
             
             // Search bar
             Surface(
@@ -221,7 +205,6 @@ fun ModernHubScreen(
                                             icon = module.icon,
                                             title = module.title,
                                             subtitle = module.subtitle,
-                                            isNew = module.isNew,
                                             onClick = { onNavigate(module.route) },
                                             modifier = Modifier.weight(1f)
                                         )
@@ -274,62 +257,6 @@ fun ModernHubScreen(
             }
         }
         
-        // Quick Actions FAB
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            AnimatedVisibility(
-                visible = fabExpanded,
-                enter = fadeIn() + slideInVertically { it / 2 },
-                exit = fadeOut() + slideOutVertically { it / 2 }
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    QuickActionButton(
-                        label = "New Chat",
-                        icon = Icons.Outlined.Add,
-                        onClick = {
-                            onNavigate("conversations")
-                            fabExpanded = false
-                        }
-                    )
-                    QuickActionButton(
-                        label = "Diagnostics",
-                        icon = Icons.Outlined.MonitorHeart,
-                        onClick = {
-                            onNavigate("doctor")
-                            fabExpanded = false
-                        }
-                    )
-                }
-            }
-            
-            val rotation by animateFloatAsState(
-                targetValue = if (fabExpanded) 45f else 0f,
-                label = "fab_rotation"
-            )
-            
-            FloatingActionButton(
-                onClick = { fabExpanded = !fabExpanded },
-                containerColor = ModernAccent,
-                contentColor = Color.White,
-                modifier = Modifier.size(56.dp)
-            ) {
-                Icon(
-                    Icons.Outlined.Bolt,
-                    contentDescription = "Quick Actions",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .rotate(rotation)
-                )
-            }
-        }
     }
 }
 
@@ -338,7 +265,6 @@ private fun ModernModuleTile(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    isNew: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -346,48 +272,28 @@ private fun ModernModuleTile(
         onClick = onClick,
         modifier = modifier,
         color = ModernSurface,
-        shape = RoundedCornerShape(18.dp)
+        shape = RoundedCornerShape(18.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, forgePalette.borderSoft)
     ) {
         Column(
             modifier = Modifier.padding(18.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(
+                        ModernAccent.copy(alpha = 0.12f),
+                        RoundedCornerShape(11.dp)
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .background(
-                            ModernAccent.copy(alpha = 0.12f),
-                            RoundedCornerShape(11.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        tint = ModernAccent,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-
-                if (isNew) {
-                    Surface(
-                        color = ModernAccent.copy(alpha = 0.15f),
-                        shape = RoundedCornerShape(4.dp)
-                    ) {
-                        Text(
-                            "NEW",
-                            color = ModernAccent,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
-                    }
-                }
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = ModernAccent,
+                    modifier = Modifier.size(20.dp)
+                )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
@@ -469,35 +375,4 @@ private fun ModernPluginTile(
     }
 }
 
-@Composable
-private fun QuickActionButton(
-    label: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        color = ModernSurface,
-        shape = RoundedCornerShape(12.dp),
-        shadowElevation = 4.dp
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                label,
-                color = ModernTextPrimary,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = ModernAccent,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-    }
-}
+

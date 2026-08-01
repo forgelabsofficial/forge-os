@@ -128,7 +128,9 @@ fun ModernChatScreen(
             // Messages Area
             Box(modifier = Modifier.weight(1f)) {
                 if (messages.isEmpty()) {
-                    EmptyState()
+                    EmptyState(onSuggestionClick = { suggestion ->
+                        viewModel.send(suggestion)
+                    })
                 } else {
                     val renderGroups = remember(messages) { groupMessages(messages) }
                     LazyColumn(
@@ -274,13 +276,11 @@ private fun ModernHeader(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
-                    if (isLoading) {
-                        Text(
-                            "Thinking...",
-                            color = ModernTextSecondary,
-                            fontSize = 12.sp
-                        )
-                    }
+                    Text(
+                        if (isLoading) "Thinking..." else (selectedSpec?.displayLabel ?: "Auto"),
+                        color = ModernTextSecondary,
+                        fontSize = 12.sp
+                    )
                 }
             }
 
@@ -444,7 +444,7 @@ private fun ModernHeader(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun EmptyState() {
+private fun EmptyState(onSuggestionClick: (String) -> Unit = {}) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -481,19 +481,23 @@ private fun EmptyState() {
             ) {
                 QuickActionChip(
                     icon = Icons.Outlined.Code,
-                    label = "Review my code"
+                    label = "Review my code",
+                    onClick = { onSuggestionClick("Review my code") }
                 )
                 QuickActionChip(
                     icon = Icons.Outlined.BugReport,
-                    label = "Fix a bug"
+                    label = "Fix a bug",
+                    onClick = { onSuggestionClick("Fix a bug") }
                 )
                 QuickActionChip(
                     icon = Icons.Outlined.Description,
-                    label = "Explain this file"
+                    label = "Explain this file",
+                    onClick = { onSuggestionClick("Explain this file") }
                 )
                 QuickActionChip(
                     icon = Icons.Outlined.PlayArrow,
-                    label = "Run a script"
+                    label = "Run a script",
+                    onClick = { onSuggestionClick("Run a script") }
                 )
             }
         }
@@ -503,13 +507,14 @@ private fun EmptyState() {
 @Composable
 private fun QuickActionChip(
     icon: ImageVector,
-    label: String
+    label: String,
+    onClick: () -> Unit = {}
 ) {
     Surface(
         modifier = Modifier.clip(RoundedCornerShape(20.dp)),
         color = ModernSurface,
         shape = RoundedCornerShape(20.dp),
-        onClick = { /* TODO: Handle quick action */ }
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
@@ -863,17 +868,27 @@ private fun ModernUserBubble(text: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
     ) {
-        Column(horizontalAlignment = Alignment.End) {
-            Surface(
-                modifier = Modifier
-                    .widthIn(max = 560.dp)
-                    .graphicsLayer { scaleX = scale; scaleY = scale }
-                    .combinedClickable(
-                        onClick = {},
-                        onLongClick = { showSheet = true },
+        Surface(
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .graphicsLayer { scaleX = scale; scaleY = scale }
+                .combinedClickable(
+                    onClick = {},
+                    onLongClick = { showSheet = true },
+                ),
+            color = Color.Transparent,
+            shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp, bottomStart = 22.dp, bottomEnd = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier.background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            forgePalette.orange.copy(alpha = 0.25f),
+                            forgePalette.orange.copy(alpha = 0.12f),
+                        )
                     ),
-                color = ModernAccent.copy(alpha = 0.15f),
-                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 4.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
+                    shape = RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp, bottomStart = 22.dp, bottomEnd = 8.dp)
+                )
             ) {
                 SelectionContainer {
                     Text(
@@ -885,13 +900,6 @@ private fun ModernUserBubble(text: String) {
                     )
                 }
             }
-        }
-        Spacer(Modifier.width(12.dp))
-        Box(
-            modifier = Modifier.size(32.dp).background(ModernSurface, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(Icons.Outlined.Person, "User", tint = ModernTextPrimary, modifier = Modifier.size(18.dp))
         }
     }
 
@@ -1756,7 +1764,7 @@ private fun ModernSideMenu(
                 .fillMaxHeight()
                 .width(280.dp)
                 .clickable(enabled = false) { },
-            color = ModernSurface
+            color = forgePalette.bg
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 com.forge.os.presentation.components.DrawerHeader()

@@ -453,7 +453,7 @@ fun DrawerHeader() {
 fun DrawerSection(label: String) {
     Text(
         label,
-        color = forgePalette.textDim,
+        color = forgePalette.textDim.copy(alpha = 0.6f),
         fontSize = 10.sp,
         fontWeight = FontWeight.SemiBold,
         letterSpacing = 2.sp,
@@ -472,44 +472,60 @@ fun DrawerItem(
     isActive: Boolean,
     onClick: () -> Unit
 ) {
-    val bgColor = if (isActive) forgePalette.accentSoft else Color.Transparent
-    val textColor = if (isActive) ModernTextPrimary else forgePalette.textMuted
-    val iconColor = if (isActive) ModernAccent else forgePalette.textDim
+    val textColor = if (isActive) ModernTextPrimary else forgePalette.textMuted.copy(alpha = 0.7f)
+    val iconColor = if (isActive) ModernAccent else forgePalette.textMuted.copy(alpha = 0.5f)
 
     Surface(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        color = bgColor
+        color = Color.Transparent
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Ember left-border indicator
-            Box(
+        Box {
+            // Active gradient background
+            if (isActive) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(
+                                    forgePalette.orange.copy(alpha = 0.10f),
+                                    forgePalette.orange.copy(alpha = 0.02f),
+                                )
+                            )
+                        )
+                )
+            }
+            Row(
                 modifier = Modifier
-                    .width(2.dp)
-                    .height(20.dp)
-                    .background(
-                        if (isActive) ModernAccent else Color.Transparent
-                    )
-            )
-            Spacer(Modifier.width(18.dp))
-            Icon(
-                icon,
-                contentDescription = label,
-                tint = iconColor,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(Modifier.width(12.dp))
-            Text(
-                label,
-                color = textColor,
-                fontSize = 14.sp,
-                fontWeight = if (isActive) FontWeight.Medium else FontWeight.Normal
-            )
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Ember left-border indicator
+                Box(
+                    modifier = Modifier
+                        .width(2.dp)
+                        .height(20.dp)
+                        .background(
+                            if (isActive) ModernAccent else Color.Transparent
+                        )
+                )
+                Spacer(Modifier.width(22.dp))
+                Icon(
+                    icon,
+                    contentDescription = label,
+                    tint = iconColor,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    label,
+                    color = textColor,
+                    fontSize = 14.sp,
+                    fontWeight = if (isActive) FontWeight.Medium else FontWeight.Normal
+                )
+            }
         }
     }
 }
