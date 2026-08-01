@@ -75,6 +75,7 @@ private val ModernSurfaceElevated: Color
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ModernChatScreen(
+    currentRoute: String = "chat",
     onNavigateToWorkspace: () -> Unit = {},
     onNavigateToSettings: () -> Unit = {},
     onNavigateToStatus: () -> Unit = {},
@@ -193,6 +194,7 @@ fun ModernChatScreen(
         // Side Menu
         if (showMenu) {
             ModernSideMenu(
+                currentRoute = currentRoute,
                 onDismiss = { showMenu = false },
                 onNavigateToWorkspace = { showMenu = false; onNavigateToWorkspace() },
                 onNavigateToSettings = { showMenu = false; onNavigateToSettings() },
@@ -1733,6 +1735,7 @@ private fun InputRequestCard(
 
 @Composable
 private fun ModernSideMenu(
+    currentRoute: String,
     onDismiss: () -> Unit,
     onNavigateToWorkspace: () -> Unit,
     onNavigateToSettings: () -> Unit,
@@ -1755,102 +1758,70 @@ private fun ModernSideMenu(
                 .clickable(enabled = false) { },
             color = ModernSurface
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(vertical = 24.dp)
-            ) {
-                // Header
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ForgeLogo(size = 40.dp)
-                    
-                    Column {
-                        Text(
-                            "Forge OS",
-                            color = ModernTextPrimary,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            "AI Development",
-                            color = ModernTextSecondary,
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-                
-                Spacer(Modifier.height(32.dp))
-                
+            Column(modifier = Modifier.fillMaxSize()) {
+                com.forge.os.presentation.components.DrawerHeader()
+
+                Spacer(Modifier.height(8.dp))
+
                 // Menu items
-                MenuSection("WORKSPACE")
-                MenuItem(Icons.Outlined.Folder, "Files", onNavigateToWorkspace)
-                MenuItem(Icons.Outlined.Apps, "Hub", onNavigateToHub)
-                
-                Spacer(Modifier.height(16.dp))
-                
-                MenuSection("TOOLS")
-                MenuItem(Icons.Outlined.MonitorHeart, "Status", onNavigateToStatus)
-                MenuItem(Icons.Outlined.Language, "Browser", onNavigateToBrowser)
-                
-                Spacer(Modifier.height(16.dp))
-                
-                MenuSection("HISTORY")
-                MenuItem(Icons.Outlined.History, "Conversations", onNavigateToConversations)
-                MenuItem(Icons.Outlined.Chat, "Companion", onNavigateToCompanion)
-                
+                com.forge.os.presentation.components.DrawerSection("WORKSPACE")
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.Chat, "Chat",
+                    isActive = currentRoute == "chat",
+                    onClick = onDismiss
+                )
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.Folder, "Files",
+                    isActive = currentRoute == "workspace",
+                    onClick = onNavigateToWorkspace
+                )
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.Apps, "Hub",
+                    isActive = currentRoute == "hub",
+                    onClick = onNavigateToHub
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                com.forge.os.presentation.components.DrawerSection("TOOLS")
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.MonitorHeart, "Status",
+                    isActive = currentRoute == "status",
+                    onClick = onNavigateToStatus
+                )
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.Language, "Browser",
+                    isActive = currentRoute == "browser",
+                    onClick = onNavigateToBrowser
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                com.forge.os.presentation.components.DrawerSection("HISTORY")
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.History, "Conversations",
+                    isActive = currentRoute == "conversations",
+                    onClick = onNavigateToConversations
+                )
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.Favorite, "Companion",
+                    isActive = currentRoute == "companion",
+                    onClick = onNavigateToCompanion
+                )
+
                 Spacer(Modifier.weight(1f))
-                
-                MenuItem(Icons.Outlined.Settings, "Settings", onNavigateToSettings)
+
+                HorizontalDivider(
+                    color = forgePalette.divider,
+                    thickness = 0.5.dp
+                )
+                com.forge.os.presentation.components.DrawerItem(
+                    Icons.Outlined.Settings, "Settings",
+                    isActive = currentRoute == "settings",
+                    onClick = onNavigateToSettings
+                )
+                Spacer(Modifier.height(8.dp))
             }
-        }
-    }
-}
-
-@Composable
-private fun MenuSection(title: String) {
-    Text(
-        title,
-        color = ModernTextSecondary,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.SemiBold,
-        letterSpacing = 1.sp,
-        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-    )
-}
-
-@Composable
-private fun MenuItem(
-    icon: ImageVector,
-    label: String,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        color = Color.Transparent
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Icon(
-                icon,
-                contentDescription = label,
-                tint = ModernTextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
-            Text(
-                label,
-                color = ModernTextPrimary,
-                fontSize = 14.sp
-            )
         }
     }
 }

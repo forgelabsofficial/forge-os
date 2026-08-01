@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.forge.os.data.sandbox.SandboxManager
@@ -165,7 +166,9 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable("chat") {
+                            val currentRoute by navController.currentBackStackEntryAsState()
                             com.forge.os.presentation.screens.chat.ModernChatScreen(
+                                currentRoute = currentRoute?.destination?.route ?: "chat",
                                 onNavigateToWorkspace = { navController.navigate("workspace") },
                                 onNavigateToSettings = { navController.navigate("settings") },
                                 onNavigateToStatus = { navController.navigate("status") },

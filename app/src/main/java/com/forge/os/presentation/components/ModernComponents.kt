@@ -411,6 +411,157 @@ fun SectionHeader(
     }
 }
 
+// ── Drawer Components (Quiet Power) ─────────────────────────────────────────
+
+/**
+ * Drawer header — logo + app name + subtitle with bottom divider.
+ */
+@Composable
+fun DrawerHeader() {
+    Column {
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = 20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            ForgeLogo(size = 38.dp)
+            Column {
+                Text(
+                    "Forge OS",
+                    color = ModernTextPrimary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    "AI Development",
+                    color = ModernTextSecondary,
+                    fontSize = 12.sp
+                )
+            }
+        }
+        HorizontalDivider(
+            color = forgePalette.divider,
+            thickness = 0.5.dp
+        )
+    }
+}
+
+/**
+ * Drawer section label — uppercase, muted, letter-spaced.
+ */
+@Composable
+fun DrawerSection(label: String) {
+    Text(
+        label,
+        color = forgePalette.textDim,
+        fontSize = 10.sp,
+        fontWeight = FontWeight.SemiBold,
+        letterSpacing = 2.sp,
+        modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+    )
+}
+
+/**
+ * Drawer navigation item with optional active state.
+ * Active: ember left-border + subtle ember tint background.
+ */
+@Composable
+fun DrawerItem(
+    icon: ImageVector,
+    label: String,
+    isActive: Boolean,
+    onClick: () -> Unit
+) {
+    val bgColor = if (isActive) forgePalette.accentSoft else Color.Transparent
+    val textColor = if (isActive) ModernTextPrimary else forgePalette.textMuted
+    val iconColor = if (isActive) ModernAccent else forgePalette.textDim
+
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        color = bgColor
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Ember left-border indicator
+            Box(
+                modifier = Modifier
+                    .width(2.dp)
+                    .height(20.dp)
+                    .background(
+                        if (isActive) ModernAccent else Color.Transparent
+                    )
+            )
+            Spacer(Modifier.width(18.dp))
+            Icon(
+                icon,
+                contentDescription = label,
+                tint = iconColor,
+                modifier = Modifier.size(20.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                label,
+                color = textColor,
+                fontSize = 14.sp,
+                fontWeight = if (isActive) FontWeight.Medium else FontWeight.Normal
+            )
+        }
+    }
+}
+
+/**
+ * Simple header for secondary screens — back arrow + title + optional subtitle.
+ * No surface background or shadow; sits directly on the screen background.
+ */
+@Composable
+fun SimpleHeader(
+    title: String,
+    subtitle: String? = null,
+    onBackClick: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.size(40.dp)
+        ) {
+            Icon(
+                Icons.Default.ArrowBack,
+                "Back",
+                tint = ModernTextPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                title,
+                color = ModernTextPrimary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            if (subtitle != null) {
+                Text(
+                    subtitle,
+                    color = ModernTextSecondary,
+                    fontSize = 12.sp
+                )
+            }
+        }
+        actions()
+    }
+}
+
 /**
  * Animated Gradient Background
  */
