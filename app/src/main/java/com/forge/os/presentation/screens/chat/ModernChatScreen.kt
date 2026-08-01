@@ -119,6 +119,9 @@ fun ModernChatScreen(
                 selectedSpec = selectedSpec,
                 availableSpecs = availableSpecs,
                 onSelectSpec = { viewModel.selectSpec(it) },
+                onNavigateToSettings = onNavigateToSettings,
+                onVoiceMode = { showVoiceMode = true },
+                onClearChat = { viewModel.clearMessages() },
             )
             
             // Messages Area
@@ -126,20 +129,29 @@ fun ModernChatScreen(
                 if (messages.isEmpty()) {
                     EmptyState()
                 } else {
+                    val renderGroups = remember(messages) { groupMessages(messages) }
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 24.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        items(messages, key = { it.id }) { msg ->
-                            ModernMessageBubble(
-                                message = msg,
-                                onRetry = { viewModel.retryLast() },
-                                onSpeak = { text -> voiceVm.speak(text) },
-                            )
+                        items(renderGroups, key = { it.key }) { group ->
+                            when (group) {
+                                is MessageGroup.Single -> ModernMessageBubble(
+                                    message = group.message,
+                                    onRetry = { viewModel.retryLast() },
+                                    onSpeak = { text -> voiceVm.speak(text) },
+                                )
+                                is MessageGroup.AiActivity -> AiActivityMessage(
+                                    steps = group.steps,
+                                    response = group.response,
+                                    isStreaming = group.isStreaming,
+                                    onSpeak = { text -> voiceVm.speak(text) },
+                                )
+                            }
                         }
-                        
+
                         // Loading indicator
                         if (isLoading) {
                             item {
@@ -208,9 +220,13 @@ private fun ModernHeader(
     selectedSpec: com.forge.os.domain.security.ProviderSpec?,
     availableSpecs: List<com.forge.os.domain.security.ProviderSpec>,
     onSelectSpec: (com.forge.os.domain.security.ProviderSpec) -> Unit,
+    onNavigateToSettings: () -> Unit = {},
+    onVoiceMode: () -> Unit = {},
+    onClearChat: () -> Unit = {},
 ) {
     var showModelMenu by remember { mutableStateOf(false) }
-    
+    var showOverflowMenu by remember { mutableStateOf(false) }
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -225,7 +241,7 @@ private fun ModernHeader(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Menu button
+            // Hamburger
             IconButton(
                 onClick = onMenuClick,
                 modifier = Modifier.size(40.dp)
@@ -237,18 +253,18 @@ private fun ModernHeader(
                     modifier = Modifier.size(24.dp)
                 )
             }
-            
+
             Spacer(Modifier.width(12.dp))
-            
-            // Logo and title
+
+            // Logo + title
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
                 ForgeLogo(size = 32.dp)
-                
+
                 Spacer(Modifier.width(12.dp))
-                
+
                 Column {
                     Text(
                         "Forge OS",
@@ -265,20 +281,27 @@ private fun ModernHeader(
                     }
                 }
             }
-            
-            // Model selector
+
+            // Model pill with status dot
             Box {
                 Surface(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(RoundedCornerShape(20.dp))
                         .clickable { showModelMenu = true },
                     color = ModernSurface,
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(20.dp)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        // Green status dot
+                        Box(
+                            modifier = Modifier
+                                .size(6.dp)
+                                .background(forgePalette.success, CircleShape)
+                        )
+                        Spacer(Modifier.width(6.dp))
                         Text(
                             text = selectedSpec?.displayLabel ?: "Auto",
                             color = ModernTextPrimary,
@@ -286,21 +309,14 @@ private fun ModernHeader(
                             fontFamily = FontFamily.Monospace,
                             maxLines = 1
                         )
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            Icons.Default.ArrowDropDown,
-                            contentDescription = null,
-                            tint = ModernTextSecondary,
-                            modifier = Modifier.size(16.dp)
-                        )
                     }
                 }
-                
+
                 DropdownMenu(
                     expanded = showModelMenu,
                     onDismissRequest = { showModelMenu = false },
                     modifier = Modifier
-                        .background(ModernSurface)
+                        .background(ModernSurfaceElevated)
                         .widthIn(min = 200.dp, max = 300.dp)
                 ) {
                     // Auto-route option
@@ -381,12 +397,50 @@ private fun ModernHeader(
                     }
                 }
             }
-            
-            Spacer(Modifier.width(8.dp))
+
+            Spacer(Modifier.width(4.dp))
+
+            // Overflow menu (⋮)
+            Box {
+                IconButton(
+                    onClick = { showOverflowMenu = true },
+                    modifier = Modifier.size(40.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        "More",
+                        tint = ModernTextSecondary,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = showOverflowMenu,
+                    onDismissRequest = { showOverflowMenu = false },
+                    modifier = Modifier.background(ModernSurfaceElevated)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Voice mode", color = ModernTextPrimary, fontSize = 14.sp) },
+                        onClick = { showOverflowMenu = false; onVoiceMode() },
+                        leadingIcon = { Icon(Icons.Filled.Mic, null, tint = ModernTextSecondary, modifier = Modifier.size(20.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Clear chat", color = ModernTextPrimary, fontSize = 14.sp) },
+                        onClick = { showOverflowMenu = false; onClearChat() },
+                        leadingIcon = { Icon(Icons.Outlined.Delete, null, tint = ModernTextSecondary, modifier = Modifier.size(20.dp)) }
+                    )
+                    HorizontalDivider(color = forgePalette.divider)
+                    DropdownMenuItem(
+                        text = { Text("Settings", color = ModernTextPrimary, fontSize = 14.sp) },
+                        onClick = { showOverflowMenu = false; onNavigateToSettings() },
+                        leadingIcon = { Icon(Icons.Outlined.Settings, null, tint = ModernTextSecondary, modifier = Modifier.size(20.dp)) }
+                    )
+                }
+            }
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun EmptyState() {
     Box(
@@ -395,61 +449,49 @@ private fun EmptyState() {
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(horizontal = 40.dp)
         ) {
-            // Animated logo
-            val infiniteTransition = rememberInfiniteTransition(label = "logo_pulse")
-            val scale by infiniteTransition.animateFloat(
-                initialValue = 1f,
-                targetValue = 1.1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(2000, easing = FastOutSlowInEasing),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "scale"
-            )
-            
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                    }
-            ) {
-                ForgeLogo(size = 80.dp, animated = false)
-            }
-            
+            // Static ember logo
+            ForgeLogo(size = 56.dp, animated = false)
+
             Text(
                 "What can I help you build?",
                 color = ModernTextPrimary,
-                fontSize = 24.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold
             )
-            
+
             Text(
-                "Ask anything, or try a suggestion below",
+                "Ask me to write code, debug issues,\nor explore your workspace.",
                 color = ModernTextSecondary,
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
-            
-            Spacer(Modifier.height(24.dp))
-            
-            // Suggestion chips
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+
+            Spacer(Modifier.height(8.dp))
+
+            // Suggestion chips — wrapping row
+            androidx.compose.foundation.layout.FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 QuickActionChip(
                     icon = Icons.Outlined.Code,
-                    label = "Review code"
+                    label = "Review my code"
                 )
                 QuickActionChip(
                     icon = Icons.Outlined.BugReport,
-                    label = "Debug issue"
+                    label = "Fix a bug"
                 )
                 QuickActionChip(
                     icon = Icons.Outlined.Description,
-                    label = "Write docs"
+                    label = "Explain this file"
+                )
+                QuickActionChip(
+                    icon = Icons.Outlined.PlayArrow,
+                    label = "Run a script"
                 )
             }
         }
@@ -462,26 +504,320 @@ private fun QuickActionChip(
     label: String
 ) {
     Surface(
-        modifier = Modifier.clip(RoundedCornerShape(12.dp)),
+        modifier = Modifier.clip(RoundedCornerShape(20.dp)),
         color = ModernSurface,
+        shape = RoundedCornerShape(20.dp),
         onClick = { /* TODO: Handle quick action */ }
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Icon(
                 icon,
                 contentDescription = label,
                 tint = ModernAccent,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(16.dp)
             )
             Text(
                 label,
                 color = ModernTextPrimary,
                 fontSize = 13.sp
             )
+        }
+    }
+}
+
+// ── Message grouping for single-bubble activity pattern ─────────────────────
+
+/** Represents either a standalone message or a grouped AI activity sequence. */
+private sealed class MessageGroup {
+    abstract val key: String
+
+    data class Single(val message: ChatMessage) : MessageGroup() {
+        override val key: String get() = message.id
+    }
+
+    data class AiActivity(
+        val steps: List<ChatMessage>,
+        val response: ChatMessage?,
+        val isStreaming: Boolean,
+        val groupId: String,
+    ) : MessageGroup() {
+        override val key: String get() = groupId
+    }
+}
+
+/**
+ * Groups consecutive tool_call / tool_result messages followed by an assistant
+ * message into a single [MessageGroup.AiActivity]. Standalone messages pass
+ * through as [MessageGroup.Single].
+ */
+private fun groupMessages(messages: List<ChatMessage>): List<MessageGroup> {
+    val groups = mutableListOf<MessageGroup>()
+    val pendingSteps = mutableListOf<ChatMessage>()
+
+    for (msg in messages) {
+        when (msg.role) {
+            "tool_call", "tool_result" -> {
+                pendingSteps.add(msg)
+            }
+            "assistant" -> {
+                if (pendingSteps.isNotEmpty()) {
+                    groups.add(
+                        MessageGroup.AiActivity(
+                            steps = pendingSteps.toList(),
+                            response = msg,
+                            isStreaming = msg.isStreaming,
+                            groupId = pendingSteps.first().id,
+                        )
+                    )
+                    pendingSteps.clear()
+                } else {
+                    groups.add(MessageGroup.Single(msg))
+                }
+            }
+            else -> {
+                if (pendingSteps.isNotEmpty()) {
+                    groups.add(
+                        MessageGroup.AiActivity(
+                            steps = pendingSteps.toList(),
+                            response = null,
+                            isStreaming = false,
+                            groupId = pendingSteps.first().id,
+                        )
+                    )
+                    pendingSteps.clear()
+                }
+                groups.add(MessageGroup.Single(msg))
+            }
+        }
+    }
+
+    if (pendingSteps.isNotEmpty()) {
+        groups.add(
+            MessageGroup.AiActivity(
+                steps = pendingSteps.toList(),
+                response = null,
+                isStreaming = false,
+                groupId = pendingSteps.first().id,
+            )
+        )
+    }
+
+    return groups
+}
+
+// ── AI Activity Message (single-bubble pattern) ─────────────────────────────
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AiActivityMessage(
+    steps: List<ChatMessage>,
+    response: ChatMessage?,
+    isStreaming: Boolean,
+    onSpeak: (String) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
+    var showSheet by remember { mutableStateOf(false) }
+
+    val runningStep = steps.lastOrNull { it.role == "tool_call" }
+    val doneCount = steps.count { it.role == "tool_result" && !it.isError }
+    val hasError = steps.any { it.isError }
+    val isRunning = response == null || isStreaming
+
+    val summaryText = when {
+        isRunning && runningStep != null -> "Running ${runningStep.toolName ?: "tool"}…"
+        isRunning -> "Reasoning…"
+        hasError -> "Completed with errors"
+        else -> "Completed $doneCount step${if (doneCount != 1) "s" else ""}"
+    }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Top,
+    ) {
+        ForgeLogo(size = 32.dp)
+        Spacer(Modifier.width(12.dp))
+
+        Surface(
+            modifier = Modifier.widthIn(max = 600.dp),
+            color = ModernSurface,
+            shape = RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
+        ) {
+            Column {
+                // ── Activity head (collapsible) ──
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { expanded = !expanded }
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    // Status dot
+                    val dotColor = when {
+                        isRunning -> forgePalette.thinking
+                        hasError -> forgePalette.danger
+                        else -> forgePalette.success
+                    }
+                    val dotAlpha by if (isRunning) {
+                        rememberInfiniteTransition(label = "activity_pulse").animateFloat(
+                            initialValue = 0.4f, targetValue = 1f,
+                            animationSpec = infiniteRepeatable(tween(1200), RepeatMode.Reverse),
+                            label = "dot_pulse"
+                        )
+                    } else {
+                        remember { mutableStateOf(1f) }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .background(dotColor.copy(alpha = dotAlpha), CircleShape)
+                    )
+
+                    // Title
+                    Text(
+                        summaryText,
+                        color = ModernTextSecondary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    )
+
+                    // Meta badge
+                    if (isRunning) {
+                        Text(
+                            "live",
+                            color = forgePalette.thinking,
+                            fontSize = 11.sp,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                    }
+
+                    // Chevron
+                    val chevronRotation by animateFloatAsState(
+                        targetValue = if (expanded) 90f else 0f,
+                        animationSpec = tween(200),
+                        label = "chevron"
+                    )
+                    Icon(
+                        Icons.Filled.ChevronRight,
+                        contentDescription = if (expanded) "Collapse" else "Expand",
+                        tint = ModernTextSecondary,
+                        modifier = Modifier
+                            .size(14.dp)
+                            .graphicsLayer { rotationZ = chevronRotation }
+                    )
+                }
+
+                // ── Activity panel (expandable steps) ──
+                AnimatedVisibility(visible = expanded) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp)
+                    ) {
+                        HorizontalDivider(color = forgePalette.divider)
+                        Spacer(Modifier.height(4.dp))
+                        steps.forEach { step ->
+                            ActivityStepRow(step)
+                        }
+                        Spacer(Modifier.height(4.dp))
+                    }
+                }
+
+                // ── AI response text ──
+                if (response != null) {
+                    HorizontalDivider(color = forgePalette.divider)
+                    val displayText = response.content + if (isStreaming) " ▋" else ""
+                    SelectionContainer {
+                        Box(
+                            modifier = Modifier
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = { if (!isStreaming) showSheet = true },
+                                )
+                                .padding(horizontal = 16.dp, vertical = 12.dp)
+                        ) {
+                            com.forge.os.presentation.screens.MarkdownText(
+                                text = displayText,
+                                baseColor = ModernTextPrimary,
+                                baseFontSize = 14f
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Long-press actions
+    if (showSheet && response != null) {
+        BubbleActionsSheet(
+            onDismiss = { showSheet = false },
+            actions = listOf(
+                BubbleAction("📋 Copy", Icons.Outlined.ContentCopy) {
+                    clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(response.content))
+                },
+                BubbleAction("🔊 Speak", Icons.Outlined.VolumeUp) {
+                    onSpeak(response.content)
+                }
+            )
+        )
+    }
+}
+
+/** A single step row inside the activity panel. */
+@Composable
+private fun ActivityStepRow(step: ChatMessage) {
+    val isToolCall = step.role == "tool_call"
+    val isError = step.isError
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 5.dp),
+        verticalAlignment = Alignment.Top,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        // Step dot
+        val stepDotColor = when {
+            isError -> forgePalette.danger
+            isToolCall -> forgePalette.thinking
+            else -> forgePalette.success
+        }
+        Box(
+            modifier = Modifier
+                .padding(top = 6.dp)
+                .size(4.dp)
+                .background(stepDotColor, CircleShape)
+        )
+
+        Column(modifier = Modifier.weight(1f)) {
+            // Step title
+            Text(
+                step.toolName ?: if (isToolCall) "tool_call" else "tool_result",
+                color = if (isError) forgePalette.danger else ModernTextSecondary,
+                fontSize = 12.sp,
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.SemiBold,
+            )
+            // Step preview
+            if (step.content.isNotBlank()) {
+                val preview = if (step.content.length > 120) step.content.take(120) + "…" else step.content
+                Text(
+                    preview,
+                    color = ModernTextSecondary.copy(alpha = 0.6f),
+                    fontSize = 11.sp,
+                    lineHeight = 15.sp,
+                )
+            }
         }
     }
 }
@@ -1189,24 +1525,28 @@ private fun ModernInputBar(
     onClearChat: () -> Unit,
     enabled: Boolean
 ) {
+    // Unified pill composer — +, field, send all in one rounded container
     Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = forgePalette.surfaceGlass,
-        shadowElevation = 0.dp
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        color = ModernSurface,
+        shape = RoundedCornerShape(28.dp),
+        shadowElevation = 4.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 6.dp, vertical = 6.dp),
             verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Plus button — attachments / actions
             var showPlusMenu by remember { mutableStateOf(false) }
             Box {
                 Surface(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
                         .clickable { showPlusMenu = true },
                     color = ModernSurfaceHover,
@@ -1217,7 +1557,7 @@ private fun ModernInputBar(
                             Icons.Filled.Add,
                             "Attach",
                             tint = ModernTextSecondary,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
@@ -1239,71 +1579,64 @@ private fun ModernInputBar(
                 }
             }
 
-            // Input field — grows with content, capped at ~5 lines
-            Surface(
-                modifier = Modifier.weight(1f),
-                color = ModernBg,
-                shape = RoundedCornerShape(20.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, ModernBorder)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.Bottom,
-                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
-                ) {
-                    TextField(
-                        value = value,
-                        onValueChange = onValueChange,
-                        modifier = Modifier
-                            .weight(1f)
-                            .heightIn(min = 40.dp, max = 160.dp),
-                        placeholder = {
-                            Text(
-                                "Message Forge...",
-                                color = ModernTextSecondary,
-                                fontSize = 14.sp
-                            )
-                        },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            disabledIndicatorColor = Color.Transparent,
-                            focusedTextColor = ModernTextPrimary,
-                            unfocusedTextColor = ModernTextPrimary,
-                            cursorColor = ModernAccent
-                        ),
-                        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, lineHeight = 20.sp),
-                        maxLines = 6,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Default,   // allow newlines
-                            capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
-                        ),
+            // Text field — transparent, fills available space
+            TextField(
+                value = value,
+                onValueChange = onValueChange,
+                modifier = Modifier
+                    .weight(1f)
+                    .heightIn(min = 36.dp, max = 160.dp),
+                placeholder = {
+                    Text(
+                        "Message Forge...",
+                        color = ModernTextSecondary,
+                        fontSize = 14.sp
                     )
+                },
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent,
+                    disabledIndicatorColor = Color.Transparent,
+                    focusedTextColor = ModernTextPrimary,
+                    unfocusedTextColor = ModernTextPrimary,
+                    cursorColor = ModernAccent
+                ),
+                textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, lineHeight = 20.sp),
+                maxLines = 6,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Default,
+                    capitalization = androidx.compose.ui.text.input.KeyboardCapitalization.Sentences,
+                ),
+            )
 
-                    // Voice input button
-                    com.forge.os.presentation.screens.voice.VoiceInputButton(
-                        onVoiceInput = { recognizedText -> onValueChange(recognizedText) },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .padding(bottom = 2.dp)
+            // Voice input button (inline mic)
+            com.forge.os.presentation.screens.voice.VoiceInputButton(
+                onVoiceInput = { recognizedText -> onValueChange(recognizedText) },
+                modifier = Modifier
+                    .size(36.dp)
+                    .padding(bottom = 2.dp)
+            )
+
+            // Send button — ember circle when active
+            Surface(
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .clickable(enabled = value.isNotBlank() && enabled) { onSend() },
+                color = if (value.isNotBlank() && enabled) ModernAccent else ModernSurfaceHover,
+                shape = CircleShape,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        Icons.Filled.ArrowUpward,
+                        "Send",
+                        tint = if (value.isNotBlank() && enabled) forgePalette.onAccent else ModernTextSecondary,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
-            }
-
-            // Send button
-            FloatingActionButton(
-                onClick = onSend,
-                containerColor = if (value.isNotBlank() && enabled) ModernAccent else ModernSurface,
-                contentColor = Color.White,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(
-                    if (value.isNotBlank()) Icons.Filled.Send else Icons.Outlined.Send,
-                    "Send",
-                    modifier = Modifier.size(22.dp)
-                )
             }
         }
     }
