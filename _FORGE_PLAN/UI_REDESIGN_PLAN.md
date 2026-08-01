@@ -89,17 +89,19 @@ Skills, Snapshots, MCP, Cost, External API, Alarms, Server, Doctor, Channels, An
 
 ---
 
-## Phase UI-3: Hub Screen Redesign
+## Phase UI-3: Hub Screen + Onboarding Redesign
 
 ### What changes
 - **Tile grid** — Remove per-module accent colors (currently 10+ distinct hues). All tiles use the same neutral surface with a single ember icon. Differentiate by icon shape, not color.
 - **Search bar** — Integrated into the header, not a separate card.
 - **Section headers** — Group tiles: "Core", "Agent", "Data", "Companion", "Tools", "Advanced". Subtle uppercase labels.
-- **Tile design** — Icon + title + subtitle. Consistent 12dp radius. Subtle press feedback (scale + alpha).
+- **Tile design** — Icon + title + subtitle. Consistent 18dp radius. Subtle press feedback (scale + alpha).
+- **Onboarding** — Remove animated gradient background (flat `ModernBg`). Static logo (no pulsing). Neutral feature/capability cards with ember icons only. Reduce capabilities list to 6 key items. Thinner progress bar. Flat bottom bar with divider.
 
 ### Files touched
 - `screens/hub/ModernHubScreen.kt`
 - `screens/hub/HubViewModel.kt` (if tile model changes)
+- `screens/ModernOnboardingScreen.kt`
 
 ---
 
@@ -183,9 +185,9 @@ Each phase is independently shippable. Chat and Hub are the highest-impact.
 
 | Phase | Status | Files | Notes |
 |-------|--------|-------|-------|
-| UI-1 | ⬜ pending | 4 | Design tokens |
-| UI-2 | ⬜ pending | 2 | Chat screen (highest impact) |
-| UI-3 | ⬜ pending | 2 | Hub screen |
+| UI-1 | ✅ done | 4 | Design tokens |
+| UI-2 | ✅ done | 2 | Chat screen — gap fixes + real logo pushed |
+| UI-3 | 🔄 in progress | 3 | Hub + Onboarding |
 | UI-4 | ⬜ pending | 2 | Navigation & headers |
 | UI-5 | ⬜ pending | 2 | Status & Settings |
 | UI-6 | ⬜ pending | 20+ | Color migration sweep |

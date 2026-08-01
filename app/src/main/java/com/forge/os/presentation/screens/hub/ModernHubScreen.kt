@@ -3,12 +3,7 @@ package com.forge.os.presentation.screens.hub
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -17,7 +12,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,46 +27,48 @@ private data class ModuleTile(
     val icon: ImageVector,
     val title: String,
     val subtitle: String,
-    val color: Color,
+    val section: String,
     val keywords: String = "",
     val isNew: Boolean = false,
 )
 
 private val MODULES = listOf(
-    // Core Features
-    ModuleTile("tools", Icons.Outlined.Build, "Tools", "Built-ins & permissions", Color(0xFF8B5CF6), "tool permission audit"),
-    ModuleTile("plugins", Icons.Outlined.Extension, "Plugins", "Install & manage", Color(0xFFEC4899), "plugin install fp"),
-    ModuleTile("cron", Icons.Outlined.Schedule, "Cron", "Scheduled jobs", Color(0xFF06B6D4), "cron scheduled jobs"),
-    ModuleTile("memory", Icons.Outlined.Memory, "Memory", "Daily facts & skills", Color(0xFFEF4444), "memory daily facts"),
-    
-    // Agent Features
-    ModuleTile("agents", Icons.Outlined.SmartToy, "Agents", "Sub-agent transcripts", Color(0xFF10B981), "agent sub-agent"),
-    ModuleTile("projects", Icons.Outlined.Folder, "Projects", "Scoped workspaces", Color(0xFFF59E0B), "project workspace"),
-    ModuleTile("skills", Icons.Outlined.Code, "Skills", "Reusable Python", Color(0xFF3B82F6), "skill python"),
-    ModuleTile("conversations", Icons.Outlined.Chat, "Chats", "Multi-conversation", Color(0xFF8B5CF6), "chat conversations"),
-    
-    // Data & Storage
-    ModuleTile("snapshots", Icons.Outlined.CameraAlt, "Snapshots", "Workspace backups", Color(0xFF06B6D4), "snapshot backup"),
-    ModuleTile("mcp", Icons.Outlined.Hub, "MCP", "External tool servers", Color(0xFFEC4899), "mcp server"),
-    ModuleTile("cost", Icons.Outlined.AttachMoney, "Cost", "Spending & prices", Color(0xFF22C55E), "cost usage price"),
-    ModuleTile("external", Icons.Outlined.Api, "External API", "Other apps using Forge", Color(0xFF3B82F6), "external api intent"),
-    
-    // Companion Features
-    ModuleTile("companion", Icons.Outlined.Favorite, "Companion", "Friend mode chat", Color(0xFFEF4444), "companion friend"),
-    ModuleTile("companionCheckIns", Icons.Outlined.Notifications, "Check-ins", "Proactive reminders", Color(0xFFF59E0B), "checkin reminder"),
-    ModuleTile("companionMemory", Icons.Outlined.Delete, "Companion Memory", "View & delete data", Color(0xFF6B7280), "companion memory delete"),
-    
-    // Tools & Utilities
-    ModuleTile("browser", Icons.Outlined.Language, "Browser", "Agent-controllable web", Color(0xFF3B82F6), "browser web"),
-    ModuleTile("alarms", Icons.Outlined.Alarm, "Alarms", "Schedule exact alarms", Color(0xFFF59E0B), "alarm timer", isNew = true),
-    ModuleTile("server", Icons.Outlined.Storage, "Server", "Local HTTP API", Color(0xFF8B5CF6), "server http api", isNew = true),
-    
-    // Advanced Features
-    ModuleTile("debugger", Icons.Outlined.BugReport, "Debugger", "Agent replay traces", Color(0xFFEF4444), "debugger snapshot replay trace", isNew = true),
-    ModuleTile("doctor", Icons.Outlined.MedicalServices, "Doctor", "Diagnostics & repair", Color(0xFF22C55E), "doctor diagnostic repair", isNew = true),
-    ModuleTile("channels", Icons.Outlined.Podcasts, "Channels", "Telegram messaging", Color(0xFF06B6D4), "channel telegram messaging", isNew = true),
-    ModuleTile("android", Icons.Outlined.PhoneAndroid, "Android", "Device snapshot", Color(0xFF10B981), "android device battery", isNew = true),
+    // Core
+    ModuleTile("tools", Icons.Outlined.Build, "Tools", "Built-ins & permissions", "Core", "tool permission audit"),
+    ModuleTile("plugins", Icons.Outlined.Extension, "Plugins", "Install & manage", "Core", "plugin install fp"),
+    ModuleTile("cron", Icons.Outlined.Schedule, "Cron", "Scheduled jobs", "Core", "cron scheduled jobs"),
+    ModuleTile("memory", Icons.Outlined.Memory, "Memory", "Daily facts & skills", "Core", "memory daily facts"),
+
+    // Agent
+    ModuleTile("agents", Icons.Outlined.SmartToy, "Agents", "Sub-agent transcripts", "Agent", "agent sub-agent"),
+    ModuleTile("projects", Icons.Outlined.Folder, "Projects", "Scoped workspaces", "Agent", "project workspace"),
+    ModuleTile("skills", Icons.Outlined.Code, "Skills", "Reusable Python", "Agent", "skill python"),
+    ModuleTile("conversations", Icons.Outlined.Chat, "Chats", "Multi-conversation", "Agent", "chat conversations"),
+
+    // Data
+    ModuleTile("snapshots", Icons.Outlined.CameraAlt, "Snapshots", "Workspace backups", "Data", "snapshot backup"),
+    ModuleTile("mcp", Icons.Outlined.Hub, "MCP", "External tool servers", "Data", "mcp server"),
+    ModuleTile("cost", Icons.Outlined.AttachMoney, "Cost", "Spending & prices", "Data", "cost usage price"),
+    ModuleTile("external", Icons.Outlined.Api, "External API", "Other apps using Forge", "Data", "external api intent"),
+
+    // Companion
+    ModuleTile("companion", Icons.Outlined.Favorite, "Companion", "Friend mode chat", "Companion", "companion friend"),
+    ModuleTile("companionCheckIns", Icons.Outlined.Notifications, "Check-ins", "Proactive reminders", "Companion", "checkin reminder"),
+    ModuleTile("companionMemory", Icons.Outlined.Delete, "Companion Memory", "View & delete data", "Companion", "companion memory delete"),
+
+    // Tools
+    ModuleTile("browser", Icons.Outlined.Language, "Browser", "Agent-controllable web", "Tools", "browser web"),
+    ModuleTile("alarms", Icons.Outlined.Alarm, "Alarms", "Schedule exact alarms", "Tools", "alarm timer", isNew = true),
+    ModuleTile("server", Icons.Outlined.Storage, "Server", "Local HTTP API", "Tools", "server http api", isNew = true),
+
+    // Advanced
+    ModuleTile("debugger", Icons.Outlined.BugReport, "Debugger", "Agent replay traces", "Advanced", "debugger snapshot replay trace", isNew = true),
+    ModuleTile("doctor", Icons.Outlined.MedicalServices, "Doctor", "Diagnostics & repair", "Advanced", "doctor diagnostic repair", isNew = true),
+    ModuleTile("channels", Icons.Outlined.Podcasts, "Channels", "Telegram messaging", "Advanced", "channel telegram messaging", isNew = true),
+    ModuleTile("android", Icons.Outlined.PhoneAndroid, "Android", "Device snapshot", "Advanced", "android device battery", isNew = true),
 )
+
+private val SECTION_ORDER = listOf("Core", "Agent", "Data", "Companion", "Tools", "Advanced")
 
 /**
  * Modern hub screen - main dashboard for all Forge OS modules.
@@ -187,43 +183,92 @@ fun ModernHubScreen(
                 }
             }
             
-            // Module grid
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+            // Sectioned module list
+            val grouped = remember(visibleBuiltins) {
+                SECTION_ORDER.mapNotNull { section ->
+                    val items = visibleBuiltins.filter { it.section == section }
+                    if (items.isNotEmpty()) section to items else null
+                }
+            }
+
+            androidx.compose.foundation.lazy.LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, bottom = 100.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 100.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
             ) {
-                items(visibleBuiltins) { module ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + scaleIn(initialScale = 0.9f)
-                    ) {
-                        ModernModuleTile(
-                            icon = module.icon,
-                            title = module.title,
-                            subtitle = module.subtitle,
-                            color = module.color,
-                            isNew = module.isNew,
-                            onClick = { onNavigate(module.route) }
+                grouped.forEach { (section, tiles) ->
+                    item(key = "header_$section") {
+                        Text(
+                            section.uppercase(),
+                            color = ModernTextSecondary,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 1.5.sp,
+                            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
                         )
                     }
+
+                    item(key = "grid_$section") {
+                        val rows = tiles.chunked(2)
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            rows.forEach { row ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    row.forEach { module ->
+                                        ModernModuleTile(
+                                            icon = module.icon,
+                                            title = module.title,
+                                            subtitle = module.subtitle,
+                                            isNew = module.isNew,
+                                            onClick = { onNavigate(module.route) },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                                }
+                            }
+                        }
+                    }
                 }
-                
-                items(visiblePluginTiles) { (pluginId, tile) ->
-                    val encoded = java.net.URLEncoder.encode(pluginId, "UTF-8") +
-                        "/" + java.net.URLEncoder.encode(tile.toolName, "UTF-8")
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + scaleIn(initialScale = 0.9f)
-                    ) {
-                        ModernPluginTile(
-                            symbol = tile.symbol,
-                            title = tile.title,
-                            subtitle = tile.subtitle.ifBlank { "plugin: $pluginId" },
-                            onClick = { onNavigate("pluginTile/$encoded") }
+
+                // Plugin tiles
+                if (visiblePluginTiles.isNotEmpty()) {
+                    item(key = "header_plugins") {
+                        Text(
+                            "PLUGINS",
+                            color = ModernTextSecondary,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 1.5.sp,
+                            modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
                         )
+                    }
+
+                    item(key = "grid_plugins") {
+                        val rows = visiblePluginTiles.chunked(2)
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            rows.forEach { row ->
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                                ) {
+                                    row.forEach { (pluginId, tile) ->
+                                        val encoded = java.net.URLEncoder.encode(pluginId, "UTF-8") +
+                                            "/" + java.net.URLEncoder.encode(tile.toolName, "UTF-8")
+                                        ModernPluginTile(
+                                            symbol = tile.symbol,
+                                            title = tile.title,
+                                            subtitle = tile.subtitle.ifBlank { "plugin: $pluginId" },
+                                            onClick = { onNavigate("pluginTile/$encoded") },
+                                            modifier = Modifier.weight(1f)
+                                        )
+                                    }
+                                    if (row.size == 1) Spacer(Modifier.weight(1f))
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -262,14 +307,6 @@ fun ModernHubScreen(
                             fabExpanded = false
                         }
                     )
-                    QuickActionButton(
-                        label = "Clear Trace",
-                        icon = Icons.Outlined.CleaningServices,
-                        onClick = {
-                            onNavigate("debugger")
-                            fabExpanded = false
-                        }
-                    )
                 }
             }
             
@@ -301,14 +338,19 @@ private fun ModernModuleTile(
     icon: ImageVector,
     title: String,
     subtitle: String,
-    color: Color,
     isNew: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    ModernCard(onClick = onClick) {
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        color = ModernSurface,
+        shape = RoundedCornerShape(18.dp)
+    ) {
         Column(
-            modifier = Modifier.height(120.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -317,18 +359,21 @@ private fun ModernModuleTile(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
-                        .background(color.copy(alpha = 0.15f), RoundedCornerShape(8.dp)),
+                        .size(36.dp)
+                        .background(
+                            ModernAccent.copy(alpha = 0.12f),
+                            RoundedCornerShape(11.dp)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         icon,
                         contentDescription = null,
-                        tint = color,
+                        tint = ModernAccent,
                         modifier = Modifier.size(20.dp)
                     )
                 }
-                
+
                 if (isNew) {
                     Surface(
                         color = ModernAccent.copy(alpha = 0.15f),
@@ -344,8 +389,8 @@ private fun ModernModuleTile(
                     }
                 }
             }
-            
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
                     title,
                     color = ModernTextPrimary,
@@ -355,8 +400,8 @@ private fun ModernModuleTile(
                 Text(
                     subtitle,
                     color = ModernTextSecondary,
-                    fontSize = 11.sp,
-                    lineHeight = 14.sp
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
                 )
             }
         }
@@ -368,20 +413,19 @@ private fun ModernPluginTile(
     symbol: String,
     title: String,
     subtitle: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         color = ModernSurface,
-        shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, ModernAccent.copy(alpha = 0.3f))
+        shape = RoundedCornerShape(18.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, ModernAccent.copy(alpha = 0.2f))
     ) {
         Column(
-            modifier = Modifier
-                .height(120.dp)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),

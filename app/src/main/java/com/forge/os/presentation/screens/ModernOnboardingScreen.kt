@@ -16,9 +16,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.forge.os.domain.security.ApiKeyProvider
 import com.forge.os.presentation.components.*
+import com.forge.os.presentation.theme.forgePalette
 
 /**
  * Modern onboarding screen with ChatGPT/Claude-inspired design.
@@ -55,9 +53,6 @@ fun ModernOnboardingScreen(
             .fillMaxSize()
             .background(ModernBg)
     ) {
-        // Animated gradient background
-        AnimatedGradientBackground()
-        
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -140,7 +135,7 @@ private fun ModernOnboardingHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                ForgeLogo(size = 40.dp, animated = true)
+                ForgeLogo(size = 40.dp)
                 
                 Column {
                     Text(
@@ -162,32 +157,20 @@ private fun ModernOnboardingHeader(
             // Progress indicator
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 repeat(totalPages) { index ->
                     val isActive = index <= currentPage
-                    val progress = when {
-                        index < currentPage -> 1f
-                        index == currentPage -> 1f
-                        else -> 0f
-                    }
-                    
+
                     Box(
                         modifier = Modifier
                             .weight(1f)
-                            .height(4.dp)
+                            .height(3.dp)
                             .background(
-                                if (isActive) ModernAccent else ModernBorder,
+                                if (isActive) ModernAccent else forgePalette.divider,
                                 RoundedCornerShape(2.dp)
                             )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(animateFloatAsState(progress, label = "progress").value)
-                                .background(ModernAccent, RoundedCornerShape(2.dp))
-                        )
-                    }
+                    )
                 }
             }
         }
@@ -201,25 +184,8 @@ private fun ModernWelcomePage() {
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         Spacer(Modifier.height(32.dp))
-        
-        // Animated logo
-        val scale by rememberInfiniteTransition(label = "logo").animateFloat(
-            initialValue = 0.95f,
-            targetValue = 1.05f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(2000, easing = FastOutSlowInEasing),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "scale"
-        )
-        
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .scale(scale)
-        ) {
-            ForgeLogo(size = 120.dp)
-        }
+
+        ForgeLogo(size = 100.dp)
         
         Text(
             "Welcome to Forge OS",
@@ -366,23 +332,26 @@ private fun ModernCapabilitiesPage() {
         Spacer(Modifier.height(8.dp))
         
         val capabilities = listOf(
-            Triple(Icons.Outlined.Memory, "Memory", "Three-tier memory system with semantic embeddings for context across sessions"),
-            Triple(Icons.Outlined.Folder, "Workspace", "Sandboxed file system with full file manager UI and device integration"),
-            Triple(Icons.Outlined.Code, "Code Execution", "Run Python and shell commands with timeouts and captured output"),
-            Triple(Icons.Outlined.Schedule, "Scheduling", "Cron jobs and alarms for recurring tasks and notifications"),
-            Triple(Icons.Outlined.Language, "Browser", "Headless and on-screen browsers with viewport control and screenshots"),
-            Triple(Icons.Outlined.Extension, "Plugins", "Install Python plugins that extend the agent's capabilities"),
-            Triple(Icons.Outlined.Hub, "MCP Client", "Connect to Model Context Protocol servers for external tools"),
-            Triple(Icons.Outlined.SmartToy, "Sub-agents", "Spawn focused sub-agents to parallelize work"),
-            Triple(Icons.Outlined.Favorite, "Companion", "Warmer conversation mode with persona and episodic memory"),
-            Triple(Icons.Outlined.CameraAlt, "Snapshots", "Time-travel your workspace with snapshot and restore"),
-            Triple(Icons.Outlined.Api, "External API", "Other apps can call Forge as an on-device LLM service"),
-            Triple(Icons.Outlined.AttachMoney, "Cost Tracking", "Live token and USD spend tracking per call and session")
+            Triple(Icons.Outlined.Memory, "Memory", "Three-tier memory with semantic embeddings for context across sessions"),
+            Triple(Icons.Outlined.Code, "Code Execution", "Run Python and shell commands with captured output"),
+            Triple(Icons.Outlined.Folder, "Workspace", "Sandboxed file system with full file manager"),
+            Triple(Icons.Outlined.Extension, "Plugins", "Install Python plugins to extend capabilities"),
+            Triple(Icons.Outlined.Schedule, "Scheduling", "Cron jobs and alarms for recurring tasks"),
+            Triple(Icons.Outlined.Language, "Browser", "Headless and on-screen browsers with screenshots")
         )
-        
+
         capabilities.forEach { (icon, title, description) ->
             CapabilityCard(icon, title, description)
         }
+
+        Text(
+            "And more: sub-agents, companion mode, snapshots, MCP, cost tracking, external API...",
+            color = ModernTextSecondary,
+            fontSize = 13.sp,
+            lineHeight = 18.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -600,16 +569,22 @@ private fun ModernOnboardingBottomBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = ModernSurface,
-        shadowElevation = 8.dp
+        color = ModernSurface
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(forgePalette.divider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
             // Back button
             if (currentPage > 0) {
                 OutlinedButton(
@@ -664,6 +639,7 @@ private fun ModernOnboardingBottomBar(
                     )
                 }
             }
+        }
         }
     }
 }
