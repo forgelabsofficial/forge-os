@@ -2,73 +2,124 @@ package com.forge.os.presentation.theme
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 /**
- * Per-theme palette for the bespoke "Forge OS" terminal look used by the
- * Settings, Chat, Diagnostics and Status screens (and the shared
- * [com.forge.os.presentation.screens.common.ForgeOsPalette]).
+ * Per-theme palette for the unified Forge Design System.
  *
- * The previous build hard-coded a single dark palette as file-level constants
- * inside each screen, which made the theme switcher in Settings effectively a
- * no-op for everything except the few Material-coloured surfaces. This palette
- * is provided through a CompositionLocal so a screen can fetch the right
- * variant for the active theme via [forgePalette].
+ * Every screen reads colors through [forgePalette] (backed by
+ * [LocalForgePalette]), so flipping the theme switcher repaints the whole app.
+ * The field names are stable — the original set is preserved so all existing
+ * module screens keep compiling — while the values now resolve to the refined
+ * graphite/ember system. New semantic fields (with defaults) expose elevation,
+ * warning and "on-accent" roles that the redesigned components rely on.
  */
 data class ForgePalette(
+    /** Primary brand accent. */
     val orange: Color,
+    /** App background. */
     val bg: Color,
+    /** Default card / sheet surface. */
     val surface: Color,
+    /** Elevated / hover surface. */
     val surface2: Color,
+    /** Hairline border. */
     val border: Color,
+    /** Primary text. */
     val textPrimary: Color,
+    /** Secondary text. */
     val textMuted: Color,
+    /** Tertiary / caption text. */
     val textDim: Color,
     val success: Color,
     val successBg: Color,
     val danger: Color,
     val dangerBg: Color,
     val info: Color,
+    /** Accent used for ambient "pulse" moments (kept for compatibility). */
     val neuralPulse: Color,
+    /** Accent used for "thinking" / in-progress (kept for compatibility). */
     val thinking: Color,
+
+    // ── New semantic roles (defaults keep old call-sites source-compatible) ──
+    /** Sunken / inset surface (input wells, code blocks). */
+    val surfaceSunken: Color = surface2,
+    /** Highest-elevation surface (menus, dialogs). */
+    val surfaceElevated: Color = surface2,
+    /** Softer border for subtle separators. */
+    val borderSoft: Color = border,
+    /** Accent in its pressed/hover state. */
+    val accentPressed: Color = orange,
+    /** Content drawn on top of [orange] (e.g. filled primary button label). */
+    val onAccent: Color = Color(0xFFFFFFFF),
+    /** Translucent accent wash for selected/highlighted backgrounds. */
+    val accentSoft: Color = orange.copy(alpha = 0.14f),
+    val warning: Color = thinking,
+    val warningBg: Color = surface2,
+    val infoBg: Color = surface2,
+    /** Semi-transparent glass overlay for floating elements (composer, sheets). */
+    val surfaceGlass: Color = surface.copy(alpha = 0.82f),
+    /** Softer-than-border divider for subtle separators. */
+    val divider: Color = border.copy(alpha = 0.5f),
 )
 
 val ForgeDarkPalette = ForgePalette(
-    orange = Color(0xFFFF4500),
-    bg = Color(0xFF0a0a0a),
-    surface = Color(0xFF111111),
-    surface2 = Color(0xFF1a1a1a),
-    border = Color(0xFF333333),
-    textPrimary = Color(0xFFe5e5e5),
-    textMuted = Color(0xFF737373),
-    textDim = Color(0xFF404040),
-    success = Color(0xFF4ade80),
-    successBg = Color(0xFF052e16),
-    danger = Color(0xFFef4444),
-    dangerBg = Color(0xFF1a0a0a),
-    info = Color(0xFF818cf8),
-    neuralPulse = Color(0xFFFF4500),
-    thinking = Color(0xFFfbbf24),
+    orange = ForgeEmber,
+    bg = Graphite900,
+    surface = Graphite800,
+    surface2 = Graphite750,
+    border = GraphiteBorder,
+    textPrimary = InkHigh,
+    textMuted = InkMedium,
+    textDim = InkLow,
+    success = SuccessDark,
+    successBg = SuccessDarkBg,
+    danger = DangerDark,
+    dangerBg = DangerDarkBg,
+    info = InfoDark,
+    neuralPulse = ForgeEmber,
+    thinking = WarningDark,
+    surfaceSunken = Graphite850,
+    surfaceElevated = Graphite700,
+    borderSoft = GraphiteBorderSoft,
+    accentPressed = ForgeEmberPressed,
+    onAccent = Color(0xFF1A0D08),
+    accentSoft = ForgeEmber.copy(alpha = 0.14f),
+    warning = WarningDark,
+    warningBg = WarningDarkBg,
+    infoBg = InfoDarkBg,
+    surfaceGlass = Graphite800.copy(alpha = 0.82f),
+    divider = GraphiteBorder.copy(alpha = 0.5f),
 )
 
 val ForgeLightPalette = ForgePalette(
-    orange = Color(0xFFD32F2F),
-    bg = Color(0xFFfafafa),
-    surface = Color(0xFFffffff),
-    surface2 = Color(0xFFf3f4f6),
-    border = Color(0xFFd4d4d8),
-    textPrimary = Color(0xFF111827),
-    textMuted = Color(0xFF52525b),
-    textDim = Color(0xFF9ca3af),
-    success = Color(0xFF15803d),
-    successBg = Color(0xFFdcfce7),
-    danger = Color(0xFFb91c1c),
-    dangerBg = Color(0xFFfee2e2),
-    info = Color(0xFF4338ca),
-    neuralPulse = Color(0xFFD32F2F),
-    thinking = Color(0xFFd97706),
+    orange = ForgeEmberPressed,
+    bg = Paper50,
+    surface = Paper0,
+    surface2 = Paper100,
+    border = PaperBorder,
+    textPrimary = InkLightHigh,
+    textMuted = InkLightMedium,
+    textDim = InkLightLow,
+    success = SuccessLight,
+    successBg = SuccessLightBg,
+    danger = DangerLight,
+    dangerBg = DangerLightBg,
+    info = InfoLight,
+    neuralPulse = ForgeEmberPressed,
+    thinking = WarningLight,
+    surfaceSunken = Paper100,
+    surfaceElevated = Paper0,
+    borderSoft = PaperBorderSoft,
+    accentPressed = ForgeEmber,
+    onAccent = Color(0xFFFFFFFF),
+    accentSoft = ForgeEmberPressed.copy(alpha = 0.12f),
+    warning = WarningLight,
+    warningBg = WarningLightBg,
+    infoBg = InfoLightBg,
+    surfaceGlass = Paper0.copy(alpha = 0.85f),
+    divider = PaperBorder.copy(alpha = 0.5f),
 )
 
 /**

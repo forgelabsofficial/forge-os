@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge OS — Current UI Audit</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:-apple-system,'Segoe UI',Roboto,sans-serif; }
+  body { background:#1a1a1a; padding:40px 20px; color:#fff; }
+  h1 { text-align:center; font-size:22px; margin-bottom:8px; color:#FF4500; font-family:monospace; letter-spacing:2px;}
+  .sub { text-align:center; color:#737373; font-size:13px; margin-bottom:40px; }
+  .row { display:flex; gap:32px; justify-content:center; flex-wrap:wrap; }
+  .phone { width:340px; background:#0a0a0a; border-radius:28px; border:1px solid #333; overflow:hidden; flex-shrink:0; }
+  .phone-label { text-align:center; color:#737373; font-size:12px; margin-top:12px; font-family:monospace; }
+  .screen-header { background:#111; padding:14px 16px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #1a1a1a; }
+  .logo { width:32px; height:32px; background:#FF4500; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .title { font-size:16px; font-weight:600; }
+  .subtitle { font-size:12px; color:#737373; }
+  .spacer { flex:1; }
+  .pill { background:#1a1a1a; border:1px solid #333; border-radius:8px; padding:5px 10px; font-size:12px; font-family:monospace; color:#e5e5e5;}
+  .icon-btn { width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#e5e5e5; font-size:18px; }
+  .chat-body { padding:20px 16px; display:flex; flex-direction:column; gap:16px; min-height:340px; }
+  .msg-user { align-self:flex-end; background:rgba(255,69,0,.15); border-radius:16px 4px 16px 16px; padding:10px 14px; font-size:13px; max-width:75%; color:#e5e5e5;}
+  .msg-ai { align-self:flex-start; background:#111; border-radius:4px 16px 16px 16px; padding:10px 14px; font-size:13px; max-width:80%; color:#e5e5e5; line-height:1.5;}
+  .msg-tool { align-self:flex-start; margin-left:36px; background:rgba(255,69,0,.08); border:1px solid rgba(255,69,0,.25); border-radius:8px; padding:8px 12px; font-size:11px; font-family:monospace; color:#FF4500;}
+  .msg-tool-ok { align-self:flex-start; margin-left:36px; background:#0a1a0a; border:1px solid rgba(34,197,94,.25); border-radius:8px; padding:8px 12px; font-size:11px; font-family:monospace; color:#22c55e;}
+  .input-bar { background:#111; padding:10px 12px; display:flex; gap:10px; align-items:center; border-top:1px solid #1a1a1a; }
+  .input-field { flex:1; background:#0a0a0a; border:1px solid #333; border-radius:20px; padding:10px 14px; color:#737373; font-size:13px; }
+  .send-btn { width:44px; height:44px; background:#1a1a1a; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#737373; font-size:18px;}
+  .fab-col { display:flex; flex-direction:column; gap:10px; align-items:flex-end; padding:12px; }
+  .fab { width:44px; height:44px; background:#111; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#e5e5e5; font-size:16px; box-shadow:0 2px 8px rgba(0,0,0,.5);}
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:16px; }
+  .tile { background:#111; border-radius:12px; padding:14px; height:110px; display:flex; flex-direction:column; justify-content:space-between; }
+  .tile-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .tile-title { font-size:13px; font-weight:600; color:#e5e5e5; }
+  .tile-sub { font-size:10px; color:#737373; }
+  .badge-new { background:rgba(255,69,0,.15); color:#FF4500; font-size:8px; font-weight:700; padding:2px 6px; border-radius:4px; }
+  .search { background:#111; border-radius:12px; margin:12px 16px; padding:10px 14px; color:#737373; font-size:13px; display:flex; gap:10px; align-items:center;}
+  .menu { background:#111; width:240px; height:100%; padding:24px 0; }
+  .menu-header { display:flex; gap:12px; padding:0 20px; align-items:center; margin-bottom:28px;}
+  .menu-section { font-size:10px; color:#737373; letter-spacing:1px; padding:8px 20px; font-weight:600;}
+  .menu-item { display:flex; gap:12px; padding:11px 20px; font-size:13px; color:#e5e5e5; align-items:center;}
+  .menu-item .mi { color:#737373; font-size:16px; }
+  .status-card { background:#111; border-radius:12px; padding:16px; margin:0 16px 14px; }
+  .health-dot { width:10px; height:10px; border-radius:50%; }
+  .mono { font-family:monospace; }
+  .note { background:#111; border:1px solid #333; border-radius:12px; padding:24px; margin:40px auto 0; max-width:1100px; color:#a3a3a3; font-size:13px; line-height:1.7;}
+  .note h3 { color:#FF4500; font-family:monospace; margin-bottom:12px; font-size:14px; letter-spacing:1px;}
+  .note li { margin-left:20px; margin-bottom:6px; }
+  .note b { color:#e5e5e5; }
+</style>
+</head>
+<body>
+  <h1>FORGE OS — CURRENT UI AUDIT</h1>
+  <p class="sub">Visual snapshot of the existing interface before redesign · August 2026</p>
+
+  <div class="row">
+    <!-- CHAT -->
+    <div>
+      <div class="phone">
+        <div class="screen-header">
+          <div class="icon-btn">☰</div>
+          <div class="logo">🔥</div>
+          <div>
+            <div class="title">Forge OS</div>
+            <div class="subtitle">Thinking...</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="pill">gpt-4o ▾</div>
+          <div class="icon-btn" style="color:#FF4500">🎤</div>
+          <div class="icon-btn">⚙️</div>
+        </div>
+        <div class="chat-body">
+          <div class="msg-user">Review the code in my downloads folder</div>
+          <div class="msg-ai">I'll scan your downloads folder and review any code files I find there.</div>
+          <div class="msg-tool">⚙ file_list · path=/storage/.../Download</div>
+          <div class="msg-tool-ok">✓ file_list · Found 14 files (2.3 MB)</div>
+          <div class="msg-ai">I found 3 code files. The function <span class="mono">process_data()</span> has a potential null pointer on line 42...</div>
+        </div>
+        <div class="input-bar">
+          <div class="input-field">Message Forge...</div>
+          <div class="send-btn">➤</div>
+        </div>
+      </div>
+      <div class="phone-label">CHAT — primary screen</div>
+    </div>
+
+    <!-- HUB -->
+    <div>
+      <div class="phone">
+        <div class="screen-header">
+          <div class="icon-btn">←</div>
+          <div>
+            <div class="title">Modules</div>
+            <div class="subtitle">24 available</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="icon-btn">⚙️</div>
+        </div>
+        <div class="search">🔍 Search modules...</div>
+        <div class="grid">
+          <div class="tile"><div class="tile-icon" style="background:rgba(139,92,246,.15);color:#8B5CF6;">🔧</div><div><div class="tile-title">Tools</div><div class="tile-sub">Built-ins & permissions</div></div></div>
+          <div class="tile"><div class="tile-icon" style="background:rgba(236,72,153,.15);color:#EC4899;">🧩</div><div><div class="tile-title">Plugins</div><div class="tile-sub">Install & manage</div></div></div>
+          <div class="tile"><div class="tile-icon" style="background:rgba(6,182,212,.15);color:#06B6D4;">⏰</div><div><div class="tile-title">Cron</div><div class="tile-sub">Scheduled jobs</div></div></div>
+          <div class="tile"><div class="tile-icon" style="background:rgba(239,68,68,.15);color:#EF4444;">🧠</div><div><div class="tile-title">Memory</div><div class="tile-sub">Daily facts & skills</div></div></div>
+          <div class="tile"><div style="display:flex;justify-content:space-between;"><div class="tile-icon" style="background:rgba(16,185,129,.15);color:#10B981;">🤖</div><span class="badge-new">NEW</span></div><div><div class="tile-title">Agents</div><div class="tile-sub">Sub-agent transcripts</div></div></div>
+          <div class="tile"><div class="tile-icon" style="background:rgba(245,158,11,.15);color:#F59E0B;">📁</div><div><div class="tile-title">Projects</div><div class="tile-sub">Scoped workspaces</div></div></div>
+        </div>
+      </div>
+      <div class="phone-label">HUB — 22 tiles, 8 competing accent colors</div>
+    </div>
+
+    <!-- MENU -->
+    <div>
+      <div class="phone">
+        <div style="display:flex; min-height:560px;">
+          <div class="menu">
+            <div class="menu-header">
+              <div class="logo" style="width:40px;height:40px;">🔥</div>
+              <div>
+                <div class="title" style="font-size:17px;">Forge OS</div>
+                <div class="subtitle">AI Development</div>
+              </div>
+            </div>
+            <div class="menu-section">WORKSPACE</div>
+            <div class="menu-item"><span class="mi">📁</span> Files</div>
+            <div class="menu-item"><span class="mi">⊞</span> Hub</div>
+            <div class="menu-section" style="margin-top:14px;">TOOLS</div>
+            <div class="menu-item"><span class="mi">📊</span> Status</div>
+            <div class="menu-item"><span class="mi">🌐</span> Browser</div>
+            <div class="menu-section" style="margin-top:14px;">HISTORY</div>
+            <div class="menu-item"><span class="mi">🕐</span> Conversations</div>
+            <div class="menu-item"><span class="mi">💬</span> Companion</div>
+            <div class="menu-item" style="margin-top:110px;"><span class="mi">⚙️</span> Settings</div>
+          </div>
+          <div style="flex:1; background:rgba(0,0,0,.5);"></div>
+        </div>
+      </div>
+      <div class="phone-label">SIDE MENU — navigation drawer</div>
+    </div>
+
+    <!-- STATUS -->
+    <div>
+      <div class="phone">
+        <div class="screen-header">
+          <div class="icon-btn">←</div>
+          <div>
+            <div class="title">System Status</div>
+            <div class="subtitle">Last check: 14:32</div>
+          </div>
+          <div class="spacer"></div>
+          <div class="pill" style="color:#4ade80; border-color:rgba(74,222,128,.3);">● HEALTHY</div>
+        </div>
+        <div style="padding:16px 0;">
+          <div class="status-card">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+              <div class="health-dot" style="background:#4ade80;"></div>
+              <div class="tile-title">Overall Health</div>
+              <div class="spacer"></div>
+              <span class="mono" style="font-size:11px; color:#737373;">98%</span>
+            </div>
+            <div style="background:#1a1a1a; border-radius:6px; height:6px; overflow:hidden;">
+              <div style="background:#4ade80; width:98%; height:100%;"></div>
+            </div>
+          </div>
+          <div class="menu-section" style="padding:8px 16px;">COMPONENTS</div>
+          <div class="status-card" style="display:flex; align-items:center; gap:12px;">
+            <div class="health-dot" style="background:#4ade80;"></div>
+            <div style="flex:1;"><div class="tile-title" style="font-size:13px;">API Manager</div><div class="tile-sub">3 providers connected</div></div>
+            <span class="mono" style="font-size:10px; color:#4ade80;">OK</span>
+          </div>
+          <div class="status-card" style="display:flex; align-items:center; gap:12px;">
+            <div class="health-dot" style="background:#fbbf24;"></div>
+            <div style="flex:1;"><div class="tile-title" style="font-size:13px;">Memory Store</div><div class="tile-sub">Compaction recommended</div></div>
+            <span class="mono" style="font-size:10px; color:#fbbf24;">WARN</span>
+          </div>
+          <div class="status-card" style="display:flex; align-items:center; gap:12px;">
+            <div class="health-dot" style="background:#4ade80;"></div>
+            <div style="flex:1;"><div class="tile-title" style="font-size:13px;">Sandbox</div><div class="tile-sub">Python 3.11 ready</div></div>
+            <span class="mono" style="font-size:10px; color:#4ade80;">OK</span>
+          </div>
+        </div>
+      </div>
+      <div class="phone-label">STATUS — health dashboard</div>
+    </div>
+  </div>
+
+  <!-- AUDIT NOTES -->
+  <div class="note">
+    <h3>■ DESIGN AUDIT — KEY ISSUES IDENTIFIED</h3>
+    <ul>
+      <li><b>Color chaos:</b> The Hub uses 8+ competing accent colors (purple, pink, cyan, red, green, amber, blue, gray) with no semantic system. The orange brand color (#FF4500) is aggressive and used inconsistently.</li>
+      <li><b>Mixed metaphors:</b> Two parallel design systems exist — the "Modern" Material-ish system (chat/hub/status) and a "terminal/monospace" system (module screens via ForgeOsPalette). They clash.</li>
+      <li><b>Typography:</b> System default font, no distinctive voice. Monospace is overused in non-technical contexts (menu labels, buttons, model picker). Weak hierarchy — titles and body are too close in weight.</li>
+      <li><b>Spacing:</b> Inconsistent padding (10/12/14/16/20/24dp used arbitrarily). No 8pt grid discipline. Cards feel cramped.</li>
+      <li><b>Surfaces:</b> Flat #111 cards on #0a0a0a background — almost no elevation or depth. Borders (#333) are harsh. No glass/depth effects.</li>
+      <li><b>Header clutter:</b> Chat header crams menu + logo + title + status + model pill + mic + settings into 64dp.</li>
+      <li><b>Floating buttons:</b> Two stacked FABs on chat (clear + browser) overlap message content and compete with the send button.</li>
+      <li><b>Icon inconsistency:</b> Mix of emoji (🔥🎤📁), Material icons, and text glyphs (⚙✓☰) at varying sizes.</li>
+      <li><b>Empty/loading states:</b> Generic — pulsing logo + text. No skeleton screens or branded moments.</li>
+      <li><b>Corner radius:</b> Inconsistent — 4/6/8/12/16/20dp used across components with no system.</li>
+      <li><b>Accessibility:</b> #737373 muted text on #0a0a0a background = 4.0:1 contrast (borderline). #FF4500 on dark = poor for small text.</li>
+    </ul>
+    <p style="margin-top:16px; color:#737373;">This mockup is a faithful approximation for design-review purposes. Next step: the redesigned system.</p>
+  </div>
+</body>
+</html>

@@ -27,3 +27,4 @@ Thumbs.db
 # Python cache (Chaquopy)
 __pycache__/
 *.pyc
+.blackboxcli/

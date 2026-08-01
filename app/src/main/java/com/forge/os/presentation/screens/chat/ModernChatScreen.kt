@@ -60,6 +60,8 @@ private val ModernTextSecondary: Color
     @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.textMuted
 private val ModernBorder: Color
     @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.border
+private val ModernSurfaceElevated: Color
+    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.surfaceElevated
 
 /**
  * Modern chat screen with ChatGPT/Claude-inspired design.
@@ -113,12 +115,10 @@ fun ModernChatScreen(
             // Modern Header
             ModernHeader(
                 onMenuClick = { showMenu = true },
-                onSettingsClick = onNavigateToSettings,
                 isLoading = isLoading,
                 selectedSpec = selectedSpec,
                 availableSpecs = availableSpecs,
                 onSelectSpec = { viewModel.selectSpec(it) },
-                onVoiceModeClick = { showVoiceMode = true },
             )
             
             // Messages Area
@@ -173,34 +173,9 @@ fun ModernChatScreen(
                     }
                 },
                 onVoiceMode = { showVoiceMode = true },
+                onClearChat = { viewModel.clearMessages() },
                 enabled = !isLoading
             )
-        }
-        
-        // Floating Action Buttons
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(end = 16.dp, bottom = 100.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            FloatingActionButton(
-                onClick = { viewModel.clearMessages() },
-                containerColor = ModernSurface,
-                contentColor = ModernTextPrimary,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(Icons.Outlined.Delete, "Clear", modifier = Modifier.size(20.dp))
-            }
-            
-            FloatingActionButton(
-                onClick = onNavigateToBrowser,
-                containerColor = ModernSurface,
-                contentColor = ModernTextPrimary,
-                modifier = Modifier.size(48.dp)
-            ) {
-                Icon(Icons.Outlined.Language, "Browser", modifier = Modifier.size(20.dp))
-            }
         }
         
         // Side Menu
@@ -229,12 +204,10 @@ fun ModernChatScreen(
 @Composable
 private fun ModernHeader(
     onMenuClick: () -> Unit,
-    onSettingsClick: () -> Unit,
     isLoading: Boolean,
     selectedSpec: com.forge.os.domain.security.ProviderSpec?,
     availableSpecs: List<com.forge.os.domain.security.ProviderSpec>,
     onSelectSpec: (com.forge.os.domain.security.ProviderSpec) -> Unit,
-    onVoiceModeClick: () -> Unit,
 ) {
     var showModelMenu by remember { mutableStateOf(false) }
     
@@ -242,8 +215,8 @@ private fun ModernHeader(
         modifier = Modifier
             .fillMaxWidth()
             .height(64.dp),
-        color = ModernSurface,
-        shadowElevation = 2.dp
+        color = forgePalette.surfaceGlass,
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
@@ -410,32 +383,7 @@ private fun ModernHeader(
             }
             
             Spacer(Modifier.width(8.dp))
-            
-            // Voice mode button
-            IconButton(
-                onClick = onVoiceModeClick,
-                modifier = Modifier.size(40.dp)
-            ) {
-                Icon(
-                    Icons.Filled.Mic,
-                    "Voice Mode",
-                    tint = ModernAccent,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            // Settings button
-            IconButton(
-                onClick = onSettingsClick,
-                modifier = Modifier.size(40.dp)
-            ) {
-                Icon(
-                    Icons.Outlined.Settings,
-                    "Settings",
-                    tint = ModernTextPrimary,
-                    modifier = Modifier.size(22.dp)
-                )
-            }        }
+        }
     }
 }
 
@@ -473,35 +421,35 @@ private fun EmptyState() {
             }
             
             Text(
-                "How can I help you today?",
+                "What can I help you build?",
                 color = ModernTextPrimary,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold
             )
             
             Text(
-                "Ask me anything or use / for commands",
+                "Ask anything, or try a suggestion below",
                 color = ModernTextSecondary,
                 fontSize = 14.sp
             )
             
             Spacer(Modifier.height(24.dp))
             
-            // Quick actions
+            // Suggestion chips
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 QuickActionChip(
                     icon = Icons.Outlined.Code,
-                    label = "Code Review"
+                    label = "Review code"
                 )
                 QuickActionChip(
-                    icon = Icons.Outlined.Folder,
-                    label = "Projects"
+                    icon = Icons.Outlined.BugReport,
+                    label = "Debug issue"
                 )
                 QuickActionChip(
-                    icon = Icons.Outlined.Memory,
-                    label = "Memory"
+                    icon = Icons.Outlined.Description,
+                    label = "Write docs"
                 )
             }
         }
@@ -698,12 +646,12 @@ private fun ModernErrorBubble(msg: ChatMessage, onRetry: () -> Unit) {
                     onClick = {},
                     onLongClick = { showSheet = true },
                 ),
-            color = Color(0xFF1a0a0a),
+            color = forgePalette.dangerBg,
             shape = RoundedCornerShape(topStart = 4.dp, topEnd = 16.dp, bottomStart = 16.dp, bottomEnd = 16.dp)
         ) {
             SelectionContainer {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                    Text(msg.content, color = Color(0xFFef4444), fontSize = 13.sp, lineHeight = 18.sp)
+                    Text(msg.content, color = forgePalette.danger, fontSize = 13.sp, lineHeight = 18.sp)
                     msg.errorDetail?.let { err ->
                         Spacer(Modifier.height(4.dp))
                         Text(
@@ -712,7 +660,7 @@ private fun ModernErrorBubble(msg: ChatMessage, onRetry: () -> Unit) {
                                 if (err.httpCode > 0) append(" http=${err.httpCode}")
                                 err.providerCode?.let { append(" code=$it") }
                             },
-                            color = Color(0xFF7f1d1d), fontSize = 10.sp, fontFamily = FontFamily.Monospace
+                            color = forgePalette.danger.copy(alpha = 0.6f), fontSize = 10.sp, fontFamily = FontFamily.Monospace
                         )
                     }
                 }
@@ -802,8 +750,8 @@ private fun ModernToolResultBubble(toolName: String, result: String, isError: Bo
     var expanded by remember { mutableStateOf(false) }
     val PREVIEW = 300
 
-    val accentColor = if (isError) Color(0xFFef4444) else Color(0xFF22c55e)
-    val bgColor = if (isError) Color(0xFF1a0a0a) else Color(0xFF0a1a0a)
+    val accentColor = if (isError) forgePalette.danger else forgePalette.success
+    val bgColor = if (isError) forgePalette.dangerBg else forgePalette.successBg
     Row(
         modifier = Modifier.fillMaxWidth().padding(start = 44.dp),
         verticalAlignment = Alignment.Top
@@ -862,10 +810,10 @@ private fun ModernSystemBubble(text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF0f172a), RoundedCornerShape(8.dp))
+            .background(forgePalette.infoBg, RoundedCornerShape(8.dp))
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Text(text, color = Color(0xFF94a3b8), fontSize = 11.sp, fontFamily = FontFamily.Monospace, lineHeight = 16.sp)
+        Text(text, color = forgePalette.info, fontSize = 11.sp, fontFamily = FontFamily.Monospace, lineHeight = 16.sp)
     }
 }
 
@@ -874,13 +822,13 @@ private fun ModernInputRequestBubble(question: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF0c1a0a), RoundedCornerShape(8.dp))
+            .background(forgePalette.successBg, RoundedCornerShape(8.dp))
             .padding(10.dp),
         verticalAlignment = Alignment.Top
     ) {
         Text("❓", fontSize = 14.sp)
         Spacer(Modifier.width(8.dp))
-        Text(question, color = Color(0xFF86efac), fontSize = 12.sp, fontFamily = FontFamily.Monospace, lineHeight = 17.sp)
+        Text(question, color = forgePalette.success, fontSize = 12.sp, fontFamily = FontFamily.Monospace, lineHeight = 17.sp)
     }
 }
 
@@ -1238,12 +1186,13 @@ private fun ModernInputBar(
     onValueChange: (String) -> Unit,
     onSend: () -> Unit,
     onVoiceMode: () -> Unit,
+    onClearChat: () -> Unit,
     enabled: Boolean
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = ModernSurface,
-        shadowElevation = 8.dp
+        color = forgePalette.surfaceGlass,
+        shadowElevation = 0.dp
     ) {
         Row(
             modifier = Modifier
@@ -1252,6 +1201,44 @@ private fun ModernInputBar(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            // Plus button — attachments / actions
+            var showPlusMenu by remember { mutableStateOf(false) }
+            Box {
+                Surface(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .clickable { showPlusMenu = true },
+                    color = ModernSurfaceHover,
+                    shape = CircleShape,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            Icons.Filled.Add,
+                            "Attach",
+                            tint = ModernTextSecondary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                DropdownMenu(
+                    expanded = showPlusMenu,
+                    onDismissRequest = { showPlusMenu = false },
+                    modifier = Modifier.background(ModernSurfaceElevated)
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Clear chat", color = ModernTextPrimary, fontSize = 14.sp) },
+                        onClick = { showPlusMenu = false; onClearChat() },
+                        leadingIcon = { Icon(Icons.Outlined.Delete, null, tint = ModernTextSecondary, modifier = Modifier.size(20.dp)) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Voice mode", color = ModernTextPrimary, fontSize = 14.sp) },
+                        onClick = { showPlusMenu = false; onVoiceMode() },
+                        leadingIcon = { Icon(Icons.Filled.Mic, null, tint = ModernTextSecondary, modifier = Modifier.size(20.dp)) }
+                    )
+                }
+            }
+
             // Input field — grows with content, capped at ~5 lines
             Surface(
                 modifier = Modifier.weight(1f),

@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge OS — Redesigned UI Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(255,107,61,0.08), transparent 28%),
+      radial-gradient(circle at top right, rgba(96,165,250,0.05), transparent 24%),
+      linear-gradient(180deg, #0B0B0E 0%, #09090B 100%);
+    padding:60px 24px; color:#FAFAFA; font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  h1 { text-align:center; font-size:30px; margin-bottom:12px; color:#FAFAFA; font-weight:700; letter-spacing:-0.7px; }
+  h1 span { color:#FF6B3D; }
+  .sub { text-align:center; color:#6B6B73; font-size:14px; margin-bottom:60px; font-weight:400; }
+  .row { display:flex; gap:40px; justify-content:center; flex-wrap:wrap; }
+  .phone {
+    width:360px; background:linear-gradient(180deg, rgba(18,18,21,0.96), rgba(9,9,11,1));
+    border-radius:34px; border:1px solid rgba(255,255,255,0.05); overflow:hidden; flex-shrink:0;
+    box-shadow:0 0 0 1px rgba(255,255,255,0.03), 0 24px 70px rgba(0,0,0,0.45);
+    backdrop-filter:blur(10px);
+    animation:rise .55s cubic-bezier(.2,.8,.2,1) both;
+    position:relative;
+  }
+  .phone > * { position:relative; z-index:1; }
+  .phone-ambient {
+    position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+  }
+  .phone-ambient::before {
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(circle at 20% 85%, rgba(255,107,61,0.06), transparent 24%),
+      radial-gradient(circle at 80% 15%, rgba(255,138,92,0.035), transparent 18%);
+    filter:blur(8px);
+  }
+  .phone-ambient .ember,
+  .phone-ambient .spark { position:absolute; }
+  .phone-ambient .ember {
+    bottom:-30px; width:4px; height:4px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,190,150,0.9) 0%, rgba(255,107,61,0.5) 45%, rgba(255,107,61,0) 100%);
+    box-shadow:0 0 10px rgba(255,107,61,0.28), 0 0 20px rgba(255,107,61,0.12);
+    opacity:0.22;
+    animation:riseEmber 8s linear infinite;
+  }
+  .phone-ambient .spark {
+    bottom:-16px; width:2px; height:8px; border-radius:999px;
+    background:linear-gradient(180deg, rgba(255,220,190,0.75), rgba(255,107,61,0));
+    opacity:0.14;
+    animation:riseSpark 6.5s linear infinite;
+  }
+  .phone-label { text-align:center; color:#5B5B63; font-size:11px; margin-top:16px; font-weight:500; letter-spacing:0.8px; text-transform:uppercase; }
+  .hdr { padding:20px 24px 16px; display:flex; align-items:center; gap:12px; }
+  .logo { width:32px; height:32px; background:linear-gradient(180deg, #FF7A4D, #FF6335); border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; box-shadow:0 8px 20px rgba(255,107,61,0.28); }
+  .ttl { font-size:16px; font-weight:600; letter-spacing:-0.3px; color:#FAFAFA; }
+  .stl { font-size:12px; color:#5B5B63; margin-top:1px; font-weight:400; }
+  .spc { flex:1; }
+  @keyframes rise { from { opacity:0; transform:translateY(14px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+  .pill { background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); border:1px solid rgba(255,255,255,0.06); border-radius:999px; padding:7px 12px; font-size:12px; font-weight:500; color:#B8B8C0; display:flex; align-items:center; gap:6px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); transition:transform .18s ease, border-color .18s ease, background .18s ease; }
+  .pill:hover { transform:translateY(-1px); border-color:rgba(255,255,255,0.10); }
+  .pill.selected { color:#FAFAFA; border-color:rgba(255,107,61,0.28); background:linear-gradient(180deg, rgba(255,107,61,0.12), rgba(255,107,61,0.04)); }
+  .pdot { width:6px; height:6px; border-radius:50%; background:#34D399; box-shadow:0 0 10px rgba(52,211,153,0.45); }
+  .ibtn { width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#9A9AA3; font-size:16px; border-radius:11px; background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); border:1px solid rgba(255,255,255,0.06); box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); transition:transform .18s ease, border-color .18s ease, color .18s ease; }
+  .ibtn:hover { transform:translateY(-1px); color:#FAFAFA; border-color:rgba(255,255,255,0.10); }
+  .ibtn:active, .ibtn.pressed { transform:scale(.96); color:#FF8A5C; border-color:rgba(255,107,61,0.22); }
+  .chat { padding:20px 24px; display:flex; flex-direction:column; gap:16px; min-height:380px; }
+  .mu { align-self:flex-end; background:linear-gradient(180deg, #FF7A4D, #FF6335); border-radius:22px 22px 8px 22px; padding:11px 16px; font-size:14px; line-height:1.5; max-width:80%; color:#fff; box-shadow:0 10px 28px rgba(255,107,61,0.22); animation:msgIn .35s ease both; }
+  .ma { align-self:flex-start; background:#18181B; border-radius:18px 18px 18px 4px; padding:12px 16px; font-size:14px; line-height:1.65; max-width:85%; color:#D4D4D8; }
+  .ma code { background:#27272A; padding:2px 6px; border-radius:5px; font-size:13px; font-family:monospace; color:#FF8A5C; }
+  .tc { align-self:flex-start; margin-left:4px; display:flex; align-items:center; gap:8px; background:#111113; border:1px solid #1C1C1F; border-radius:8px; padding:6px 12px; font-size:11px; font-family:monospace; color:#52525B; }
+  .td { width:5px; height:5px; border-radius:50%; }
+  .tdr { background:#FBBF24; animation:pl 1.5s infinite; }
+  .tdk { background:#34D399; }
+  @keyframes pl { 0%,100%{opacity:1} 50%{opacity:.3} }
+  .typ { align-self:flex-start; display:flex; gap:5px; align-items:center; padding:12px 16px; }
+  .tp { width:5px; height:5px; border-radius:50%; background:#3F3F46; animation:tp 1.4s infinite; }
+  .tp:nth-child(2) { animation-delay:.15s; }
+  .tp:nth-child(3) { animation-delay:.3s; }
+  @keyframes tp { 0%,60%,100%{opacity:.2;transform:scale(1)} 30%{opacity:1;transform:scale(1.3)} }
+  @keyframes msgIn { from { opacity:0; transform:translateY(8px) scale(.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+  .inp { padding:12px 20px 20px; }
+  .iw { background:linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018)); border:1px solid rgba(255,255,255,0.06); border-radius:28px; padding:10px 12px 10px 12px; display:flex; align-items:center; gap:10px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 34px rgba(0,0,0,0.20); }
+  .iw .placeholder { flex:1; color:#5B5B63; font-size:14px; }
+  .composer-plus {
+    width:34px; height:34px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:#B8B8C0; font-size:18px; font-weight:400;
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);
+    transition:transform .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .composer-plus:hover { transform:translateY(-1px); color:#FAFAFA; border-color:rgba(255,255,255,0.10); }
+  .composer-plus:active, .composer-plus.pressed { transform:scale(.96); color:#FF8A5C; border-color:rgba(255,107,61,0.22); }
+  .sb { width:38px; height:38px; background:linear-gradient(180deg, #FF7A4D, #FF6335); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; box-shadow:0 10px 24px rgba(255,107,61,0.30); transition:transform .18s ease, box-shadow .18s ease; }
+  .sb:hover { transform:translateY(-1px) scale(1.02); box-shadow:0 12px 28px rgba(255,107,61,0.34); }
+  .sb:active, .sb.pressed { transform:scale(.96); }
+  .sb.off { background:#26262B; color:#5B5B63; box-shadow:none; }
+  .es { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 40px; gap:24px; text-align:center; }
+  .el { width:56px; height:56px; background:linear-gradient(180deg, #FF7A4D, #FF6335); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:24px; box-shadow:0 10px 28px rgba(255,107,61,0.22); }
+  .et { font-size:22px; font-weight:600; letter-spacing:-0.4px; color:#FAFAFA; }
+  .esub { font-size:14px; color:#52525B; line-height:1.6; }
+  .sugs { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:4px; }
+  .sug { background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); border:1px solid rgba(255,255,255,0.06); border-radius:999px; padding:9px 15px; font-size:13px; color:#B8B8C0; box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); transition:transform .18s ease, border-color .18s ease; }
+  .sug:hover { transform:translateY(-1px); border-color:rgba(255,255,255,0.10); }
+  .sug.selected { color:#FAFAFA; border-color:rgba(255,107,61,0.28); background:linear-gradient(180deg, rgba(255,107,61,0.12), rgba(255,107,61,0.04)); }
+  .hs { margin:0 24px 20px; background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:12px 16px; display:flex; align-items:center; gap:10px; color:#5B5B63; font-size:14px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); }
+  .sec { font-size:11px; font-weight:600; color:#5B5B63; letter-spacing:1.5px; text-transform:uppercase; padding:20px 24px 10px; }
+  .grd { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 24px 20px; }
+  .ti { background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border:1px solid rgba(255,255,255,0.05); border-radius:18px; padding:18px 16px; display:flex; flex-direction:column; gap:14px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.03); transition:transform .18s ease, border-color .18s ease; }
+  .ti:hover { transform:translateY(-2px); border-color:rgba(255,255,255,0.09); }
+  .ti.selected { border-color:rgba(255,107,61,0.24); background:linear-gradient(180deg, rgba(255,107,61,0.08), rgba(255,255,255,0.012)); }
+  .tii { width:36px; height:36px; background:rgba(255,107,61,0.12); border:1px solid rgba(255,107,61,0.12); border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#FF6B3D; }
+  .tit { font-size:14px; font-weight:600; color:#FAFAFA; letter-spacing:-0.1px; }
+  .tis { font-size:12px; color:#52525B; margin-top:2px; }
+  .dwr { background:linear-gradient(180deg, #121214, #0E0E10); width:280px; height:100%; padding:24px 0; display:flex; flex-direction:column; border-right:1px solid #1B1B1F; }
+  .dh { display:flex; gap:12px; padding:0 24px 24px; align-items:center; border-bottom:1px solid #1C1C1F; margin-bottom:12px; }
+  .ds { font-size:10px; font-weight:600; color:#4A4A52; letter-spacing:2px; text-transform:uppercase; padding:20px 24px 8px; }
+  .di { display:flex; align-items:center; gap:12px; padding:10px 24px; font-size:14px; color:#7A7A84; border-left:2px solid transparent; transition:background .18s ease, color .18s ease; }
+  .di:hover { background:rgba(255,255,255,0.02); color:#D4D4D8; }
+  .di.on { border-left-color:#FF6B3D; color:#FAFAFA; background:linear-gradient(90deg, rgba(255,107,61,0.10), rgba(255,107,61,0.02)); font-weight:500; }
+  .dii { font-size:15px; width:20px; text-align:center; opacity:0.7; }
+  .di.on .dii { opacity:1; }
+  .sc { background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border:1px solid rgba(255,255,255,0.05); border-radius:18px; padding:20px; margin:0 24px 12px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.03); }
+  .hb { background:#1C1C1F; border-radius:99px; height:4px; overflow:hidden; margin-top:14px; }
+  .hf { height:100%; border-radius:99px; }
+  .cr { display:flex; align-items:center; gap:12px; padding:16px 0; border-bottom:1px solid #1C1C1F; }
+  .cr:last-child { border-bottom:none; }
+  .hd { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .st { font-size:10px; font-weight:600; font-family:monospace; padding:4px 8px; border-radius:999px; letter-spacing:0.5px; }
+  .stok { background:rgba(52,211,153,0.12); color:#34D399; }
+  .stwn { background:rgba(251,191,36,0.12); color:#FBBF24; }
+  .sr { display:flex; align-items:center; justify-content:space-between; padding:16px 0; border-bottom:1px solid #1C1C1F; }
+  .sr:last-child { border-bottom:none; }
+  .sl { font-size:14px; color:#FAFAFA; font-weight:500; }
+  .sd { font-size:12px; color:#52525B; margin-top:2px; }
+  .tg { width:48px; height:28px; border-radius:999px; background:#26262B; position:relative; border:1px solid rgba(255,255,255,0.06); box-shadow:inset 0 1px 2px rgba(0,0,0,0.25); transition:background .2s ease, border-color .2s ease; }
+  .tg.on { background:linear-gradient(180deg, #FF7A4D, #FF6335); border-color:rgba(255,107,61,0.45); }
+  .tg::after { content:''; width:22px; height:22px; border-radius:50%; background:#fff; position:absolute; top:2px; left:2px; box-shadow:0 2px 6px rgba(0,0,0,0.28); transition:transform .2s cubic-bezier(.2,.8,.2,1); }
+  .tg.on::after { transform:translateX(20px); }
+  .tg:active { transform:scale(.98); }
+  .nt { background:linear-gradient(180deg, #121214, #0E0E10); border:1px solid #1C1C1F; border-radius:18px; padding:32px; margin:60px auto 0; max-width:1200px; color:#A1A1AA; font-size:14px; line-height:1.8; box-shadow:inset 0 1px 0 rgba(255,255,255,0.02); }
+  .nt h3 { color:#FF6B3D; font-family:monospace; margin-bottom:16px; font-size:13px; letter-spacing:1px; }
+  .nt li { margin-left:20px; margin-bottom:8px; }
+  .nt b { color:#FAFAFA; }
+  .dv { height:1px; background:#1C1C1F; margin:0 24px; }
+
+  /* ── AI MESSAGE: ONE BUBBLE WITH ACTIVITY HEAD ── */
+  .ai-msg {
+    align-self:flex-start; max-width:86%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:22px 22px 22px 8px;
+    overflow:hidden;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.03), 0 14px 34px rgba(0,0,0,0.18);
+    animation:msgIn .35s ease both;
+  }
+  .ai-bubble {
+    padding:13px 16px 14px; font-size:14px; line-height:1.65; color:#D4D4D8;
+  }
+  .ai-bubble code { background:#27272A; padding:2px 6px; border-radius:5px; font-size:13px; font-family:monospace; color:#FF8A5C; }
+
+  .activity-head {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 14px;
+    border-bottom:1px solid #24262D;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+    color:#B5B5BD; font-size:12px; font-weight:500;
+    cursor:pointer; user-select:none;
+  }
+  .activity-dot {
+    width:6px; height:6px; border-radius:50%; flex-shrink:0;
+    background:#34D399;
+  }
+  .activity-dot.running { background:#FBBF24; animation:pl 1.5s infinite; box-shadow:0 0 12px rgba(251,191,36,0.45); }
+  .activity-title { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .activity-meta { color:#52525B; font-size:11px; font-family:monospace; }
+  .activity-chevron { color:#3F3F46; font-size:10px; transition:transform .2s; }
+  .ai-msg.open .activity-chevron { transform:rotate(90deg); }
+
+  .activity-panel { max-height:0; overflow:hidden; transition:max-height .24s ease-out; }
+  .ai-msg.open .activity-panel { max-height:260px; }
+  .activity-inner {
+    padding:0 14px 12px;
+    border-bottom:1px solid #24262D;
+    color:#52525B; font-size:12px; line-height:1.55;
+  }
+  .activity-row {
+    display:flex; gap:8px; padding:7px 0;
+    border-bottom:1px solid #24262D;
+  }
+  .activity-row:last-child { border-bottom:none; }
+  .activity-step-dot {
+    width:4px; height:4px; border-radius:50%; margin-top:7px; flex-shrink:0;
+    background:#3F3F46;
+  }
+  .activity-step-dot.done { background:#34D399; }
+  .activity-step-dot.running { background:#FBBF24; animation:pl 1.5s infinite; box-shadow:0 0 10px rgba(251,191,36,0.4); }
+  .activity-text { flex:1; font-family:monospace; }
+  .activity-sub { margin-top:2px; color:#3F3F46; font-size:11px; font-family:'Inter',sans-serif; }
+
+  /* ── SHARED LIST / CARD PATTERNS FOR EXTRA SCREENS ── */
+  .list-card { background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border:1px solid rgba(255,255,255,0.05); border-radius:18px; margin:0 24px 12px; overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,0.03); }
+  .list-row { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,0.04); transition:background .18s ease; }
+  .list-row:hover { background:rgba(255,255,255,0.02); }
+  .list-row.selected { background:linear-gradient(90deg, rgba(255,107,61,0.08), rgba(255,255,255,0.01)); }
+  .list-row:last-child { border-bottom:none; }
+  .row-icon { width:34px; height:34px; border-radius:12px; background:rgba(255,107,61,0.12); border:1px solid rgba(255,107,61,0.14); color:#FF6B3D; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .row-main { flex:1; min-width:0; }
+  .row-title { font-size:14px; font-weight:600; color:#FAFAFA; letter-spacing:-0.1px; }
+  .row-sub { font-size:12px; color:#5B5B63; margin-top:2px; }
+  .row-meta { font-size:11px; color:#4A4A52; font-family:monospace; white-space:nowrap; }
+  .mini-tag { font-size:10px; font-weight:600; font-family:monospace; padding:4px 8px; border-radius:999px; letter-spacing:0.4px; }
+  .mini-tag.ok { background:rgba(52,211,153,0.12); color:#34D399; }
+  .mini-tag.warn { background:rgba(251,191,36,0.12); color:#FBBF24; }
+  .mini-tag.info { background:rgba(96,165,250,0.12); color:#60A5FA; }
+  .mini-tag.neutral { background:#18181B; color:#A1A1AA; border:1px solid #27272A; }
+  .browser-bar {
+    margin:16px 20px 0; padding:12px 14px; border-radius:18px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.018));
+    border:1px solid rgba(255,255,255,0.06);
+    display:flex; align-items:center; gap:10px;
+    color:#A1A1AA; font-size:13px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04), 0 10px 24px rgba(0,0,0,0.16);
+  }
+  .browser-dot { width:8px; height:8px; border-radius:50%; background:#FF6B3D; box-shadow:0 0 10px rgba(255,107,61,0.28); }
+  .browser-preview {
+    margin:16px 20px 0; padding:18px; border-radius:22px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 34px rgba(0,0,0,0.20);
+  }
+  .browser-hero {
+    height:140px; border-radius:18px;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,107,61,0.18), transparent 30%),
+      radial-gradient(circle at 80% 30%, rgba(96,165,250,0.12), transparent 28%),
+      linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.06);
+    margin-bottom:14px;
+  }
+  .browser-lines { display:grid; gap:10px; }
+  .browser-line { height:10px; border-radius:999px; background:rgba(255,255,255,0.06); }
+  .browser-line.short { width:62%; }
+  .browser-line.mid { width:82%; }
+  .metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 24px 20px; }
+  .metric-card { background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.012)); border:1px solid rgba(255,255,255,0.05); border-radius:18px; padding:16px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.03); transition:transform .18s ease, border-color .18s ease; }
+  .metric-card:hover { transform:translateY(-2px); border-color:rgba(255,255,255,0.09); }
+  .metric-card.selected { border-color:rgba(255,107,61,0.24); background:linear-gradient(180deg, rgba(255,107,61,0.08), rgba(255,255,255,0.012)); }
+  .metric-value { font-size:22px; font-weight:600; color:#FAFAFA; letter-spacing:-0.4px; }
+  .metric-label { font-size:12px; color:#5B5B63; margin-top:4px; }
+  .toolbar { display:flex; gap:8px; padding:0 24px 16px; }
+  .toolbar .pill { font-size:11px; padding:6px 10px; }
+
+  .ambient { display:none; }
+  .e1 { left:8%; animation-delay:0s; animation-duration:10s; }
+  .e2 { left:18%; animation-delay:2s; animation-duration:12s; transform:scale(.8); }
+  .e3 { left:32%; animation-delay:4s; animation-duration:9s; transform:scale(.7); }
+  .e4 { left:55%; animation-delay:1s; animation-duration:11s; transform:scale(.9); }
+  .e5 { left:72%; animation-delay:3s; animation-duration:10s; transform:scale(.75); }
+  .e6 { left:86%; animation-delay:5s; animation-duration:13s; transform:scale(.65); }
+  .s1 { left:12%; animation-delay:1s; animation-duration:8s; }
+  .s2 { left:26%; animation-delay:3s; animation-duration:9s; }
+  .s3 { left:48%; animation-delay:2s; animation-duration:7s; }
+  .s4 { left:66%; animation-delay:4s; animation-duration:8.5s; }
+  .s5 { left:81%; animation-delay:0.5s; animation-duration:7.5s; }
+  @keyframes riseEmber {
+    0% { transform:translateY(0) translateX(0) scale(.8); opacity:0; }
+    10% { opacity:.28; }
+    50% { transform:translateY(-45vh) translateX(12px) scale(1); opacity:.22; }
+    100% { transform:translateY(-95vh) translateX(-8px) scale(.6); opacity:0; }
+  }
+  @keyframes riseSpark {
+    0% { transform:translateY(0) translateX(0) rotate(8deg); opacity:0; }
+    12% { opacity:.18; }
+    50% { transform:translateY(-40vh) translateX(-10px) rotate(-6deg); opacity:.14; }
+    100% { transform:translateY(-90vh) translateX(10px) rotate(10deg); opacity:0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+  }
+</style>
+</head>
+<body>
+<h1>Forge <span>OS</span></h1>
+<p class="sub">Redesigned interface preview &middot; August 2026</p>
+<div class="row">
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#9776;</div>
+    <div class="logo">F</div>
+    <div><div class="ttl">Forge OS</div></div>
+    <div class="spc"></div>
+    <div class="pill"><div class="pdot"></div>gpt-4o</div>
+    <div class="ibtn">&#8942;</div>
+  </div>
+  <div class="es">
+    <div class="el">&#128293;</div>
+    <div>
+      <div class="et">What can I help you build?</div>
+      <div class="esub" style="margin-top:8px;">Ask me to write code, debug issues,<br>or explore your workspace.</div>
+    </div>
+    <div class="sugs">
+      <div class="sug">Review my code</div>
+      <div class="sug">Fix a bug</div>
+      <div class="sug">Explain this file</div>
+      <div class="sug">Run a script</div>
+    </div>
+  </div>
+  <div class="inp">
+    <div class="iw">
+      <div class="composer-plus">+</div>
+      <div class="placeholder">Message Forge...</div>
+      <div class="sb off">&#10148;</div>
+    </div>
+  </div>
+</div><div class="phone-label">Chat &mdash; Empty State</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#9776;</div>
+    <div class="logo">F</div>
+    <div><div class="ttl">Forge OS</div><div class="stl">gpt-4o</div></div>
+    <div class="spc"></div>
+    <div class="pill"><div class="pdot"></div>gpt-4o</div>
+    <div class="ibtn">&#8942;</div>
+  </div>
+  <div class="chat">
+    <div class="mu">Review the code in my downloads folder</div>
+
+    <!-- Single assistant response bubble for this turn -->
+    <div class="ai-msg open">
+      <div class="activity-head" onclick="this.parentElement.classList.toggle('open')">
+        <div class="activity-dot running"></div>
+        <div class="activity-title">Reasoning… running file_read</div>
+        <div class="activity-meta">live</div>
+        <div class="activity-chevron">&#9654;</div>
+      </div>
+      <div class="activity-panel">
+        <div class="activity-inner">
+          <div class="activity-row">
+            <div class="activity-step-dot done"></div>
+            <div class="activity-text">reasoning<div class="activity-sub">Plan: list files, identify code files, then review each one.</div></div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-step-dot done"></div>
+            <div class="activity-text">file_list<div class="activity-sub">/storage/emulated/0/Download · Found 14 files</div></div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-step-dot done"></div>
+            <div class="activity-text">script.py<div class="activity-sub">Read 2.4 KB · Python</div></div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-step-dot running"></div>
+            <div class="activity-text">utils.js<div class="activity-sub">Reading 1.8 KB · JavaScript</div></div>
+          </div>
+          <div class="activity-row">
+            <div class="activity-step-dot"></div>
+            <div class="activity-text">config.json<div class="activity-sub">Pending</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-bubble">I'll scan your downloads folder, identify code files, and review each one for issues. I found 3 code files so far and I'm reading <code>utils.js</code> now.</div>
+    </div>
+
+    <div class="typ"><div class="tp"></div><div class="tp"></div><div class="tp"></div></div>
+  </div>
+  <div class="inp">
+    <div class="iw">
+      <div class="composer-plus">+</div>
+      <div class="placeholder">Message Forge...</div>
+      <div class="sb">&#10148;</div>
+    </div>
+  </div>
+</div><div class="phone-label">Chat &mdash; Active</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Modules</div><div class="stl">24 available</div></div>
+    <div class="spc"></div>
+  </div>
+  <div style="padding:16px 0 0;"><div class="hs">&#128269; Search modules...</div></div>
+  <div class="sec">Core</div>
+  <div class="grd">
+    <div class="ti"><div class="tii">&#128296;</div><div><div class="tit">Tools</div><div class="tis">Built-ins &amp; permissions</div></div></div>
+    <div class="ti"><div class="tii">&#129513;</div><div><div class="tit">Plugins</div><div class="tis">Install &amp; manage</div></div></div>
+    <div class="ti"><div class="tii">&#9200;</div><div><div class="tit">Cron</div><div class="tis">Scheduled jobs</div></div></div>
+    <div class="ti"><div class="tii">&#129504;</div><div><div class="tit">Memory</div><div class="tis">Daily facts &amp; skills</div></div></div>
+  </div>
+  <div class="sec">Data</div>
+  <div class="grd">
+    <div class="ti"><div class="tii">&#129302;</div><div><div class="tit">Agents</div><div class="tis">Sub-agent transcripts</div></div></div>
+    <div class="ti"><div class="tii">&#128193;</div><div><div class="tit">Projects</div><div class="tis">Scoped workspaces</div></div></div>
+  </div>
+</div><div class="phone-label">Hub &mdash; Modules</div></div>
+
+<div><div class="phone">
+  <div style="display:flex; min-height:560px;">
+    <div class="dwr">
+      <div class="dh">
+        <div class="logo" style="width:38px;height:38px;">F</div>
+        <div><div class="ttl" style="font-size:16px;">Forge OS</div><div class="stl">AI Development</div></div>
+      </div>
+      <div class="ds">Workspace</div>
+      <div class="di on"><span class="dii">&#128172;</span> Chat</div>
+      <div class="di"><span class="dii">&#128193;</span> Files</div>
+      <div class="di"><span class="dii">&#8862;</span> Hub</div>
+      <div class="ds">Tools</div>
+      <div class="di"><span class="dii">&#128202;</span> Status</div>
+      <div class="di"><span class="dii">&#127760;</span> Browser</div>
+      <div class="ds">History</div>
+      <div class="di"><span class="dii">&#128337;</span> Conversations</div>
+      <div class="di"><span class="dii">&#128150;</span> Companion</div>
+      <div style="flex:1;"></div>
+      <div class="di"><span class="dii">&#9881;&#65039;</span> Settings</div>
+    </div>
+    <div style="flex:1; background:rgba(0,0,0,.5);"></div>
+  </div>
+</div><div class="phone-label">Navigation Drawer</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">System Status</div><div class="stl">Last check: 14:32</div></div>
+    <div class="spc"></div>
+    <div class="st stok" style="font-size:11px; padding:5px 10px;">&#9679; HEALTHY</div>
+  </div>
+  <div style="padding:16px 0;">
+    <div class="sc">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+        <div class="hd" style="background:#34D399;"></div>
+        <div class="tit">Overall Health</div>
+        <div class="spc"></div>
+        <span style="font-family:monospace; font-size:12px; color:#6B7280;">98%</span>
+      </div>
+      <div class="hb"><div class="hf" style="background:#34D399; width:98%;"></div></div>
+    </div>
+    <div class="sec">Components</div>
+    <div class="sc" style="padding:0 18px;">
+      <div class="cr">
+        <div class="hd" style="background:#34D399;"></div>
+        <div style="flex:1;"><div class="tit" style="font-size:13px;">API Manager</div><div class="tis">3 providers connected</div></div>
+        <span class="st stok">OK</span>
+      </div>
+      <div class="cr">
+        <div class="hd" style="background:#FBBF24;"></div>
+        <div style="flex:1;"><div class="tit" style="font-size:13px;">Memory Store</div><div class="tis">Compaction recommended</div></div>
+        <span class="st stwn">WARN</span>
+      </div>
+      <div class="cr">
+        <div class="hd" style="background:#34D399;"></div>
+        <div style="flex:1;"><div class="tit" style="font-size:13px;">Sandbox</div><div class="tis">Python 3.11 ready</div></div>
+        <span class="st stok">OK</span>
+      </div>
+    </div>
+  </div>
+</div><div class="phone-label">Status &mdash; Health</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Settings</div></div>
+    <div class="spc"></div>
+  </div>
+  <div style="padding:8px 0;">
+    <div class="sec">Appearance</div>
+    <div style="padding:0 20px;">
+      <div class="sr">
+        <div><div class="sl">Theme</div><div class="sd">Dark, Light, or System</div></div>
+        <div class="pill">Dark &#9662;</div>
+      </div>
+      <div class="sr">
+        <div><div class="sl">Dynamic Color</div><div class="sd">Use wallpaper colors (API 31+)</div></div>
+        <div class="tg"></div>
+      </div>
+    </div>
+    <div class="sec">Model</div>
+    <div style="padding:0 20px;">
+      <div class="sr">
+        <div><div class="sl">Default Model</div><div class="sd">Used for new conversations</div></div>
+        <div class="pill">gpt-4o &#9662;</div>
+      </div>
+      <div class="sr">
+        <div><div class="sl">Streaming</div><div class="sd">Show responses as they generate</div></div>
+        <div class="tg on"></div>
+      </div>
+      <div class="sr">
+        <div><div class="sl">Temperature</div><div class="sd">Creativity vs precision</div></div>
+        <div class="pill">0.7</div>
+      </div>
+    </div>
+    <div class="sec">Privacy</div>
+    <div style="padding:0 20px;">
+      <div class="sr">
+        <div><div class="sl">Local Only</div><div class="sd">Keep all data on device</div></div>
+        <div class="tg on"></div>
+      </div>
+      <div class="sr">
+        <div><div class="sl">Analytics</div><div class="sd">Share anonymous usage data</div></div>
+        <div class="tg"></div>
+      </div>
+    </div>
+  </div>
+</div><div class="phone-label">Settings</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Files</div><div class="stl">Project workspace</div></div>
+    <div class="spc"></div>
+    <div class="pill">root</div>
+  </div>
+  <div style="padding:16px 0 0;"><div class="hs">&#128269; Search files...</div></div>
+  <div class="sec">Recent</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#128196;</div>
+      <div class="row-main"><div class="row-title">MainActivity.kt</div><div class="row-sub">app/src/main/java/com/forge/os</div></div>
+      <div class="row-meta">2h</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128196;</div>
+      <div class="row-main"><div class="row-title">Theme.kt</div><div class="row-sub">presentation/theme</div></div>
+      <div class="row-meta">4h</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128193;</div>
+      <div class="row-main"><div class="row-title">ui</div><div class="row-sub">12 items</div></div>
+      <div class="row-meta">1d</div>
+    </div>
+  </div>
+  <div class="sec">Quick Actions</div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-value">14</div><div class="metric-label">Open buffers</div></div>
+    <div class="metric-card"><div class="metric-value">3</div><div class="metric-label">Changed files</div></div>
+  </div>
+</div><div class="phone-label">Files</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Conversations</div><div class="stl">Recent sessions</div></div>
+    <div class="spc"></div>
+  </div>
+  <div style="padding:16px 0 0;"><div class="hs">&#128269; Search conversations...</div></div>
+  <div class="sec">Today</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#128172;</div>
+      <div class="row-main"><div class="row-title">Review downloads folder</div><div class="row-sub">Active · 12 messages</div></div>
+      <div class="mini-tag info">NOW</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128172;</div>
+      <div class="row-main"><div class="row-title">Fix Gradle sync issue</div><div class="row-sub">Completed · 8 messages</div></div>
+      <div class="row-meta">09:41</div>
+    </div>
+  </div>
+  <div class="sec">Yesterday</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#128172;</div>
+      <div class="row-main"><div class="row-title">Redesign chat screen</div><div class="row-sub">Completed · 21 messages</div></div>
+      <div class="row-meta">18:22</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128172;</div>
+      <div class="row-main"><div class="row-title">Inspect plugin system</div><div class="row-sub">Archived · 15 messages</div></div>
+      <div class="row-meta">16:03</div>
+    </div>
+  </div>
+</div><div class="phone-label">Conversations</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Tools</div><div class="stl">Built-ins & permissions</div></div>
+    <div class="spc"></div>
+  </div>
+  <div class="toolbar">
+    <div class="pill" style="color:#FAFAFA; border-color:#3A3A41;">All</div>
+    <div class="pill">Enabled</div>
+    <div class="pill">System</div>
+  </div>
+  <div class="sec">Core Tools</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#128296;</div>
+      <div class="row-main"><div class="row-title">file_read</div><div class="row-sub">Read file contents from workspace</div></div>
+      <div class="mini-tag ok">ON</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128296;</div>
+      <div class="row-main"><div class="row-title">shell_exec</div><div class="row-sub">Run shell commands with approval</div></div>
+      <div class="mini-tag warn">ASK</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128296;</div>
+      <div class="row-main"><div class="row-title">browser_open</div><div class="row-sub">Open and inspect web pages</div></div>
+      <div class="mini-tag ok">ON</div>
+    </div>
+  </div>
+  <div class="sec">Permissions</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-main"><div class="row-title">Filesystem access</div><div class="row-sub">Read/write project files</div></div>
+      <div class="tg on"></div>
+    </div>
+    <div class="list-row">
+      <div class="row-main"><div class="row-title">Network access</div><div class="row-sub">Allow external requests</div></div>
+      <div class="tg"></div>
+    </div>
+  </div>
+</div><div class="phone-label">Tools</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Plugins</div><div class="stl">Installed extensions</div></div>
+    <div class="spc"></div>
+  </div>
+  <div style="padding:16px 0 0;"><div class="hs">&#128269; Search plugins...</div></div>
+  <div class="sec">Installed</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#129513;</div>
+      <div class="row-main"><div class="row-title">Git Tools</div><div class="row-sub">Branch, diff, commit helpers</div></div>
+      <div class="mini-tag ok">v1.4</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#129513;</div>
+      <div class="row-main"><div class="row-title">Docker Runner</div><div class="row-sub">Containerized task execution</div></div>
+      <div class="mini-tag neutral">v0.9</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#129513;</div>
+      <div class="row-main"><div class="row-title">API Inspector</div><div class="row-sub">Request builder and response viewer</div></div>
+      <div class="mini-tag info">NEW</div>
+    </div>
+  </div>
+  <div class="sec">Recommended</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#129513;</div>
+      <div class="row-main"><div class="row-title">Database Browser</div><div class="row-sub">Explore SQLite and Postgres</div></div>
+      <div class="pill" style="color:#FAFAFA; border-color:#3A3A41;">Install</div>
+    </div>
+  </div>
+</div><div class="phone-label">Plugins</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Memory</div><div class="stl">Facts, preferences, skills</div></div>
+    <div class="spc"></div>
+  </div>
+  <div class="sec">Overview</div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-value">128</div><div class="metric-label">Saved facts</div></div>
+    <div class="metric-card"><div class="metric-value">12</div><div class="metric-label">Project memories</div></div>
+  </div>
+  <div class="sec">Recent Memory</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#129504;</div>
+      <div class="row-main"><div class="row-title">User prefers concise UI</div><div class="row-sub">Saved from redesign discussion</div></div>
+      <div class="row-meta">2h</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#129504;</div>
+      <div class="row-main"><div class="row-title">Project uses dark zinc palette</div><div class="row-sub">UI convention memory</div></div>
+      <div class="row-meta">1d</div>
+    </div>
+  </div>
+</div><div class="phone-label">Memory</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Projects</div><div class="stl">Scoped workspaces</div></div>
+    <div class="spc"></div>
+  </div>
+  <div class="sec">Active</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#128193;</div>
+      <div class="row-main"><div class="row-title">Forge OS</div><div class="row-sub">Android app · current workspace</div></div>
+      <div class="mini-tag ok">OPEN</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128193;</div>
+      <div class="row-main"><div class="row-title">Prompt Library</div><div class="row-sub">Prompt experiments and notes</div></div>
+      <div class="row-meta">2d</div>
+    </div>
+  </div>
+  <div class="sec">Stats</div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-value">6</div><div class="metric-label">Total projects</div></div>
+    <div class="metric-card"><div class="metric-value">18</div><div class="metric-label">Linked sessions</div></div>
+  </div>
+</div><div class="phone-label">Projects</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Browser</div><div class="stl">Connected session</div></div>
+    <div class="spc"></div>
+    <div class="pill">2 tabs</div>
+  </div>
+  <div class="browser-bar">
+    <div class="browser-dot"></div>
+    <div style="flex:1;">https://docs.blackbox.ai</div>
+    <div style="color:#5B5B63;">&#8635;</div>
+  </div>
+  <div class="browser-preview">
+    <div class="browser-hero"></div>
+    <div class="browser-lines">
+      <div class="browser-line mid"></div>
+      <div class="browser-line"></div>
+      <div class="browser-line short"></div>
+    </div>
+  </div>
+  <div class="sec">Session</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#127760;</div>
+      <div class="row-main"><div class="row-title">Current page</div><div class="row-sub">Docs · API reference</div></div>
+      <div class="mini-tag info">LIVE</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128196;</div>
+      <div class="row-main"><div class="row-title">Extracted content</div><div class="row-sub">Readable text captured for chat context</div></div>
+      <div class="row-meta">1.2 KB</div>
+    </div>
+  </div>
+</div><div class="phone-label">Browser</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Companion</div><div class="stl">Ambient assistant</div></div>
+    <div class="spc"></div>
+    <div class="pill">online</div>
+  </div>
+  <div class="sec">Today</div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-value">4</div><div class="metric-label">Suggestions</div></div>
+    <div class="metric-card"><div class="metric-value">2</div><div class="metric-label">Automations</div></div>
+  </div>
+  <div class="sec">Insights</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#128150;</div>
+      <div class="row-main"><div class="row-title">Summarize unread chats</div><div class="row-sub">Suggested from recent activity</div></div>
+      <div class="mini-tag info">NEW</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#128150;</div>
+      <div class="row-main"><div class="row-title">Review memory drift</div><div class="row-sub">2 stale facts detected</div></div>
+      <div class="mini-tag warn">CHECK</div>
+    </div>
+  </div>
+</div><div class="phone-label">Companion</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Cron</div><div class="stl">Scheduled jobs</div></div>
+    <div class="spc"></div>
+  </div>
+  <div class="sec">Upcoming</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#9200;</div>
+      <div class="row-main"><div class="row-title">Nightly memory compaction</div><div class="row-sub">Runs at 02:00</div></div>
+      <div class="mini-tag ok">ON</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#9200;</div>
+      <div class="row-main"><div class="row-title">Weekly project digest</div><div class="row-sub">Mondays · 09:00</div></div>
+      <div class="mini-tag neutral">PAUSED</div>
+    </div>
+  </div>
+  <div class="sec">Automation</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-main"><div class="row-title">Auto-run safe jobs</div><div class="row-sub">Allow trusted scheduled tasks</div></div>
+      <div class="tg on"></div>
+    </div>
+  </div>
+</div><div class="phone-label">Cron</div></div>
+
+<div><div class="phone">
+  <div class="phone-ambient">
+    <div class="ember e1"></div>
+    <div class="ember e3"></div>
+    <div class="ember e5"></div>
+    <div class="spark s2"></div>
+    <div class="spark s4"></div>
+  </div>
+  <div class="hdr">
+    <div class="ibtn">&#8592;</div>
+    <div><div class="ttl">Agents</div><div class="stl">Sub-agent transcripts</div></div>
+    <div class="spc"></div>
+  </div>
+  <div class="sec">Recent Agents</div>
+  <div class="list-card">
+    <div class="list-row">
+      <div class="row-icon">&#129302;</div>
+      <div class="row-main"><div class="row-title">Code Reviewer</div><div class="row-sub">Analyzed 3 files · 4 findings</div></div>
+      <div class="mini-tag ok">DONE</div>
+    </div>
+    <div class="list-row">
+      <div class="row-icon">&#129302;</div>
+      <div class="row-main"><div class="row-title">Research Agent</div><div class="row-sub">Summarized 5 sources</div></div>
+      <div class="row-meta">1h</div>
+    </div>
+  </div>
+  <div class="sec">Capabilities</div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-value">7</div><div class="metric-label">Active agents</div></div>
+    <div class="metric-card"><div class="metric-value">21</div><div class="metric-label">Transcripts</div></div>
+  </div>
+</div><div class="phone-label">Agents</div></div>
+</div>
+
+<div class="nt">
+  <h3>&#9632; DESIGN SYSTEM — "QUIET POWER"</h3>
+  <ul>
+    <li><b>Inter font:</b> Premium typeface with optical sizing. Clean, modern, highly legible at all sizes.</li>
+    <li><b>Zinc neutral palette:</b> #09090B background, #111113/#18181B surfaces, #27272A borders. Deeper, richer darks than before.</li>
+    <li><b>One accent:</b> Ember #FF6B3D used sparingly — logo, send button, active states, toggles. Never for decoration.</li>
+    <li><b>Softer surfaces:</b> Cards use #111113 on #09090B — barely-there contrast that feels premium, not harsh.</li>
+    <li><b>Generous whitespace:</b> 24px padding on screens, 16-20px between elements. Room to breathe.</li>
+    <li><b>Subtle shadows:</b> Phone frames have soft ambient shadows. Logo and send button have colored glows.</li>
+    <li><b>Refined typography:</b> 600 weight titles, 400 body, 500 labels. Tight letter-spacing (-0.3px) on headings.</li>
+    <li><b>Pill input bar:</b> Fully rounded 24px radius, integrated send button, subtle border.</li>
+    <li><b>Status dots:</b> Tiny 5-6px circles with semantic color. No harsh badges or borders.</li>
+    <li><b>Minimal tool chips:</b> Compact, monospace, muted. Status shown by dot color, not background.</li>
+    <li><b>Drawer active state:</b> Ember left-border + 6% tint background. Clean and unmistakable.</li>
+    <li><b>Toggle switches:</b> Larger 48x28, smooth animation, ember when on.</li>
+    <li><b>No emoji in UI chrome:</b> Emoji only in content (module icons), never in navigation or buttons.</li>
+    <li><b>Accessibility:</b> #A1A1AA on #09090B = 8.9:1 contrast (WCAG AAA). #52525B used only for non-essential text.</li>
+  </ul>
+  <p style="margin-top:20px; color:#52525B;">Implementation plan: <b>UI_REDESIGN_PLAN.md</b></p>
+</div>
+<script>
+  document.querySelectorAll('.tg').forEach(el => {
+    el.addEventListener('click', () => el.classList.toggle('on'));
+  });
+
+  document.querySelectorAll('.pill, .sug, .ti, .list-row, .metric-card').forEach(el => {
+    el.addEventListener('click', () => {
+      if (el.classList.contains('pill') || el.classList.contains('sug')) {
+        const parent = el.parentElement;
+        parent.querySelectorAll('.pill, .sug').forEach(x => x.classList.remove('selected'));
+        el.classList.add('selected');
+      } else {
+        el.classList.toggle('selected');
+      }
+    });
+  });
+
+  document.querySelectorAll('.composer-plus, .sb, .ibtn').forEach(el => {
+    el.addEventListener('click', () => {
+      el.classList.add('pressed');
+      setTimeout(() => el.classList.remove('pressed'), 180);
+    });
+  });
+</script>
+</body>
+</html>

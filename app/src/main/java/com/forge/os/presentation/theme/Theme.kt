@@ -3,7 +3,9 @@ package com.forge.os.presentation.theme
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
@@ -17,29 +19,69 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = ForgeOrange,
-    secondary = ForgeBlue,
-    tertiary = ForgeGreen,
-    background = ForgeSurface,
-    surface = ForgeSurfaceVariant,
-    onBackground = ForgeOnSurface,
-    onSurface = ForgeOnSurface,
-    onSurfaceVariant = ForgeOnSurfaceVariant,
-    error = ForgeError,
-    onPrimary = ForgeOnSurface
+    primary = ForgeEmber,
+    onPrimary = ForgeDarkPalette.onAccent,
+    primaryContainer = ForgeEmber.copy(alpha = 0.16f),
+    onPrimaryContainer = InkHigh,
+    secondary = ForgeSky,
+    onSecondary = InkHigh,
+    secondaryContainer = Graphite750,
+    onSecondaryContainer = InkHigh,
+    tertiary = SuccessDark,
+    onTertiary = Graphite900,
+    background = Graphite900,
+    onBackground = InkHigh,
+    surface = Graphite800,
+    onSurface = InkHigh,
+    surfaceVariant = Graphite750,
+    onSurfaceVariant = InkMedium,
+    surfaceContainerLowest = Graphite850,
+    surfaceContainer = Graphite800,
+    surfaceContainerHigh = Graphite750,
+    surfaceContainerHighest = Graphite700,
+    outline = GraphiteBorder,
+    outlineVariant = GraphiteBorderSoft,
+    error = DangerDark,
+    onError = Graphite900,
+    errorContainer = DangerDarkBg,
+    onErrorContainer = DangerDark,
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = ForgeOrange,
-    secondary = ForgeBlue,
-    tertiary = ForgeGreen,
-    background = ForgeLightSurface,
-    surface = ForgeLightSurfaceVariant,
-    onBackground = ForgeLightOnSurface,
-    onSurface = ForgeLightOnSurface,
-    onSurfaceVariant = ForgeLightOnSurfaceVariant,
-    error = ForgeError,
-    onPrimary = ForgeOnSurface
+    primary = ForgeEmberPressed,
+    onPrimary = ForgeLightPalette.onAccent,
+    primaryContainer = ForgeEmberPressed.copy(alpha = 0.12f),
+    onPrimaryContainer = InkLightHigh,
+    secondary = InfoLight,
+    onSecondary = Paper0,
+    secondaryContainer = Paper100,
+    onSecondaryContainer = InkLightHigh,
+    tertiary = SuccessLight,
+    onTertiary = Paper0,
+    background = Paper50,
+    onBackground = InkLightHigh,
+    surface = Paper0,
+    onSurface = InkLightHigh,
+    surfaceVariant = Paper100,
+    onSurfaceVariant = InkLightMedium,
+    surfaceContainerLowest = Paper100,
+    surfaceContainer = Paper0,
+    surfaceContainerHigh = Paper0,
+    surfaceContainerHighest = Paper100,
+    outline = PaperBorder,
+    outlineVariant = PaperBorderSoft,
+    error = DangerLight,
+    onError = Paper0,
+    errorContainer = DangerLightBg,
+    onErrorContainer = DangerLight,
+)
+
+/** App-wide shape scale mapped from [ForgeRadius]. */
+private val ForgeShapes = Shapes(
+    small = RoundedCornerShape(ForgeRadius.sm),
+    medium = RoundedCornerShape(ForgeRadius.md),
+    large = RoundedCornerShape(ForgeRadius.lg),
+    extraLarge = RoundedCornerShape(ForgeRadius.xl),
 )
 
 @Composable
@@ -77,6 +119,7 @@ fun ForgeTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = ForgeTypography,
+            shapes = ForgeShapes,
             content = content
         )
     }
