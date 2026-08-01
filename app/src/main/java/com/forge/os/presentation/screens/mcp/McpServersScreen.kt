@@ -44,8 +44,7 @@ import com.forge.os.presentation.screens.common.ModuleScaffold
 @Composable
 fun McpServersScreen(
     onBack: () -> Unit,
-    viewModel: McpServersViewModel = hiltViewModel(),
-) {
+    viewModel: McpServersViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var showAdd by remember { mutableStateOf(false) }
     var confirmRemove: McpServer? by remember { mutableStateOf(null) }
@@ -61,26 +60,22 @@ fun McpServersScreen(
         actions = {
             TextButton(onClick = { viewModel.refreshTools() }, enabled = !state.busy) {
                 Text(if (state.busy) "..." else "REFRESH",
-                    color = ForgeOsPalette.Orange, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    color = ForgeOsPalette.Orange, fontSize = 12.sp)
             }
             TextButton(onClick = { showAdd = true }) {
-                Text("+ ADD", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                Text("+ ADD", color = ForgeOsPalette.Orange, fontSize = 12.sp)
             }
         }
     ) {
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(12.dp)) {
             Text(
                 "Forge talks to MCP servers over JSON-RPC HTTP. Add a server URL, hit REFRESH to pull its tools, and the agent can call them as `mcp.<server>.<tool>`.",
-                color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-            )
+                color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             Spacer(Modifier.height(12.dp))
-            Text("SERVERS (${state.servers.size})", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp, letterSpacing = 1.sp)
+            Text("SERVERS (${state.servers.size})", color = ForgeOsPalette.Orange, fontSize = 11.sp, letterSpacing = 1.sp)
             Spacer(Modifier.height(6.dp))
             if (state.servers.isEmpty()) {
-                Text("No MCP servers configured yet.", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("No MCP servers configured yet.", color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             } else {
                 state.servers.forEach { s ->
                     ServerRow(s,
@@ -91,12 +86,12 @@ fun McpServersScreen(
             }
             Spacer(Modifier.height(16.dp))
             Text("DISCOVERED TOOLS (${state.tools.size})",
-                color = ForgeOsPalette.Orange, fontFamily = FontFamily.Monospace,
+                color = ForgeOsPalette.Orange,
                 fontSize = 11.sp, letterSpacing = 1.sp)
             Spacer(Modifier.height(6.dp))
             if (state.tools.isEmpty()) {
                 Text("No tools cached. Tap REFRESH after adding a server.",
-                    color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             } else {
                 state.tools.forEach { (server, spec) ->
                     Column(Modifier.fillMaxWidth()
@@ -104,11 +99,9 @@ fun McpServersScreen(
                         .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
                         .padding(10.dp)) {
                         Text("mcp.${sanitize(server.name)}.${spec.name}",
-                            color = ForgeOsPalette.TextPrimary,
-                            fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                            color = ForgeOsPalette.TextPrimary, fontSize = 12.sp)
                         if (spec.description.isNotBlank()) {
-                            Text(spec.description, color = ForgeOsPalette.TextMuted,
-                                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                            Text(spec.description, color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                         }
                     }
                     Spacer(Modifier.height(6.dp))
@@ -168,23 +161,18 @@ private fun ServerRow(s: McpServer, onToggle: (Boolean) -> Unit, onRemove: () ->
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(12.dp),
-    ) {
+            .padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(s.name, color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 13.sp,
+            Text(s.name, color = ForgeOsPalette.TextPrimary, fontSize = 13.sp,
                 modifier = Modifier.weight(1f))
             Switch(checked = s.enabled, onCheckedChange = onToggle)
         }
-        Text(s.url, color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+        Text(s.url, color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         if (s.authToken != null) {
-            Text("auth: bearer ****", color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("auth: bearer ****", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
         Spacer(Modifier.height(6.dp))
-        Text("REMOVE", color = ForgeOsPalette.Danger,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+        Text("REMOVE", color = ForgeOsPalette.Danger, fontSize = 11.sp,
             modifier = Modifier.clickable { onRemove() })
     }
 }

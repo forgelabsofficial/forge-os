@@ -51,8 +51,7 @@ fun ChannelSessionViewScreen(
     sessionKey: String,
     onBack: () -> Unit,
     onSendReply: (text: String) -> Unit = {},
-    viewModel: ChannelsViewModel = hiltViewModel(),
-) {
+    viewModel: ChannelsViewModel = hiltViewModel()) {
     val sessions by viewModel.sessions.collectAsState()
     val session = sessions[sessionKey]
     var manualText by remember { mutableStateOf("") }
@@ -71,20 +70,17 @@ fun ChannelSessionViewScreen(
 
     ModuleScaffold(
         title = session?.let { "${it.channelType}:${it.displayName}".uppercase() } ?: "SESSION",
-        onBack = onBack,
-    ) {
+        onBack = onBack) {
         if (session == null) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Session ended.", color = forgePalette.textMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                Text("Session ended.", color = forgePalette.textMuted, fontSize = 12.sp)
             }
             return@ModuleScaffold
         }
 
         Column(Modifier.fillMaxSize()) {
             Text("chat ${session.chatId}  ·  ${session.events.size} events",
-                color = forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp,
+                color = forgePalette.textMuted, fontSize = 10.sp,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp))
 
             // ─── Phase U2: inline model picker ─────────────────────────
@@ -94,14 +90,12 @@ fun ChannelSessionViewScreen(
                 onClear = {
                     viewModel.setSessionModel(sessionKey, "", "")
                     sessionOverride = null
-                },
-            )
+                })
 
             LazyColumn(
                 modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp),
                 state = listState,
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 items(session.events.size) { idx ->
                     EventRow(session.events[idx])
                 }
@@ -109,15 +103,13 @@ fun ChannelSessionViewScreen(
             // Manual reply box (lets the user jump in mid-conversation).
             Row(
                 Modifier.fillMaxWidth().padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+                verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = manualText,
                     onValueChange = { manualText = it },
                     placeholder = { Text("Send a manual reply") },
                     modifier = Modifier.weight(1f),
-                    singleLine = false,
-                )
+                    singleLine = false)
                 Spacer(Modifier.width(8.dp))
                 Button(
                     onClick = {
@@ -125,8 +117,7 @@ fun ChannelSessionViewScreen(
                             onSendReply(manualText); manualText = ""
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = forgePalette.orange),
-                ) { Text("SEND", fontFamily = FontFamily.Monospace) }
+                    colors = ButtonDefaults.buttonColors(containerColor = forgePalette.orange)) { Text("SEND") }
             }
         }
     }
@@ -141,8 +132,7 @@ fun ChannelSessionViewScreen(
                 viewModel.setSessionModel(sessionKey, providerKey, model)
                 sessionOverride = if (providerKey.isBlank() || model.isBlank()) null else providerKey to model
                 showModelPicker = false
-            },
-        )
+            })
     }
 }
 
@@ -179,13 +169,11 @@ private fun EventRow(e: SessionEvent) {
         Modifier.fillMaxWidth()
             .background(bg, RoundedCornerShape(4.dp))
             .border(1.dp, forgePalette.border, RoundedCornerShape(4.dp))
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-    ) {
+            .padding(horizontal = 8.dp, vertical = 6.dp)) {
         Row {
-            Text(label, color = fg, fontFamily = FontFamily.Monospace,
+            Text(label, color = fg,
                 fontSize = 10.sp, modifier = Modifier.weight(1f))
-            Text(fmt.format(Date(e.timestamp)), color = forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text(fmt.format(Date(e.timestamp)), color = forgePalette.textMuted, fontSize = 10.sp)
         }
         if (e.content.isNotBlank()) {
             Spacer(Modifier.height(2.dp))
@@ -194,10 +182,8 @@ private fun EventRow(e: SessionEvent) {
             Text(
                 e.content,
                 color = fg,
-                fontFamily = FontFamily.Monospace,
                 fontSize = 11.sp,
-                fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal,
-            )
+                fontStyle = if (isItalic) FontStyle.Italic else FontStyle.Normal)
         }
     }
 }

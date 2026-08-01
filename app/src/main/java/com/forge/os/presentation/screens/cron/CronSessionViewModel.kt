@@ -29,8 +29,7 @@ data class CronSessionUiState(
     val last24hCount: Int = 0,
     val dueCount: Int = 0,
     val activeJobs: Int = 0,
-    val message: String? = null,
-)
+    val message: String? = null)
 
 /**
  * Drives [CronSessionScreen]. Pulls the recent execution history (last 14 days,
@@ -39,8 +38,7 @@ data class CronSessionUiState(
 @HiltViewModel
 class CronSessionViewModel @Inject constructor(
     private val cronManager: CronManager,
-    private val cronRepository: CronRepository,
-) : ViewModel() {
+    private val cronRepository: CronRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(CronSessionUiState())
     val state: StateFlow<CronSessionUiState> = _state.asStateFlow()
@@ -70,8 +68,7 @@ class CronSessionViewModel @Inject constructor(
             avgDurationMs = avg,
             last24hCount = last24,
             dueCount = due,
-            activeJobs = jobs.count { it.enabled },
-        ).let { it.copy(filtered = applyFilters(it)) }
+            activeJobs = jobs.count { it.enabled }).let { it.copy(filtered = applyFilters(it)) }
     }
 
     fun setFilter(f: SessionFilter) {
@@ -100,8 +97,7 @@ class CronSessionViewModel @Inject constructor(
             val exec = cronManager.runJob(job)
             _state.value = _state.value.copy(
                 message = if (exec.success) "✓ '${job.name}' (${exec.durationMs}ms)"
-                          else "✗ '${job.name}': ${exec.error ?: "failed"}",
-            )
+                          else "✗ '${job.name}': ${exec.error ?: "failed"}")
             refresh()
         }
     }
@@ -115,8 +111,7 @@ class CronSessionViewModel @Inject constructor(
     fun exportHistory() {
         val path = cronRepository.exportHistoryAsJson()
         _state.value = _state.value.copy(
-            message = if (path != null) "Exported → $path" else "Export failed",
-        )
+            message = if (path != null) "Exported → $path" else "Export failed")
     }
 
     fun dismissMessage() { _state.value = _state.value.copy(message = null) }

@@ -15,8 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChannelsViewModel @Inject constructor(
-    private val manager: ChannelManager,
-) : ViewModel() {
+    private val manager: ChannelManager) : ViewModel() {
 
     private val _channels = MutableStateFlow<List<ChannelConfig>>(emptyList())
     val channels: StateFlow<List<ChannelConfig>> = _channels
@@ -38,13 +37,11 @@ class ChannelsViewModel @Inject constructor(
         autoReply: Boolean = true,
         parseMode: String = "HTML",
         allowedChatIds: String = "",
-        purpose: String = "personal",
-    ) {
+        purpose: String = "personal") {
         viewModelScope.launch(Dispatchers.IO) {
             manager.createTelegram(
                 displayName, botToken, defaultChatId,
-                autoReply, parseMode, allowedChatIds, purpose,
-            )
+                autoReply, parseMode, allowedChatIds, purpose)
             refresh()
         }
     }

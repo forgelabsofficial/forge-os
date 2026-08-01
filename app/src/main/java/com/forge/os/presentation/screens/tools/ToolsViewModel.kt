@@ -21,16 +21,14 @@ data class ToolRow(
     val isPlugin: Boolean,
     val enabled: Boolean,
     val requiresConfirmation: Boolean,
-    val parametersJson: String = "{}",
-)
+    val parametersJson: String = "{}")
 
 data class ToolsUiState(
     val tools: List<ToolRow> = emptyList(),
     val audit: List<ToolAuditEntry> = emptyList(),
     val testRunning: String? = null,
     val testResult: String? = null,
-    val showAudit: Boolean = false,
-)
+    val showAudit: Boolean = false)
 
 @HiltViewModel
 class ToolsViewModel @Inject constructor(
@@ -38,8 +36,7 @@ class ToolsViewModel @Inject constructor(
     private val permissionManager: PermissionManager,
     private val auditLog: ToolAuditLog,
     private val toolRegistry: ToolRegistry,
-    private val pluginManager: PluginManager,
-) : ViewModel() {
+    private val pluginManager: PluginManager) : ViewModel() {
 
     private val _state = MutableStateFlow(ToolsUiState())
     val state: StateFlow<ToolsUiState> = _state.asStateFlow()
@@ -95,8 +92,7 @@ class ToolsViewModel @Inject constructor(
                 isPlugin = false,
                 enabled = enabledByConfig && !disabledGlobally && (perm?.allowed != false),
                 requiresConfirmation = perm?.requiresConfirmation == true,
-                parametersJson = schemaByName[name] ?: "{}",
-            )
+                parametersJson = schemaByName[name] ?: "{}")
         }
 
         // ── Step 4: plugin tools — all tools from all plugins, always at the bottom.
@@ -111,15 +107,13 @@ class ToolsViewModel @Inject constructor(
                     isPlugin = true,
                     enabled = manifest.enabled && !isUserDisabled,
                     requiresConfirmation = tool.name in config.behaviorRules.confirmDestructive,
-                    parametersJson = schemaByName[tool.name] ?: "{}",
-                )
+                    parametersJson = schemaByName[tool.name] ?: "{}")
             }
         }
 
         _state.value = _state.value.copy(
             tools = systemTools + pluginRows,
-            audit = auditLog.entries.value,
-        )
+            audit = auditLog.entries.value)
     }
 
     fun toggle(name: String, enabled: Boolean) {
@@ -153,8 +147,7 @@ class ToolsViewModel @Inject constructor(
             _state.value = _state.value.copy(
                 testRunning = null,
                 testResult = if (result.isError) "❌ ${result.output}" else "✅ ${result.output}",
-                audit = auditLog.entries.value,
-            )
+                audit = auditLog.entries.value)
         }
     }
 
@@ -337,7 +330,6 @@ class ToolsViewModel @Inject constructor(
             "temp_clear" to "Clear temp files",
             // Misc
             "request_user_input" to "Pause and ask the user a question",
-            "composio_call" to "Call a Composio action (200+ services)",
-        )
+            "composio_call" to "Call a Composio action (200+ services)")
     }
 }

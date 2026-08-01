@@ -50,8 +50,7 @@ import com.forge.os.presentation.theme.forgePalette
 @Composable
 fun ModelRoutingScreen(
     onBack: () -> Unit,
-    viewModel: ModelRoutingViewModel = hiltViewModel(),
-) {
+    viewModel: ModelRoutingViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
 
     Column(
@@ -66,8 +65,7 @@ fun ModelRoutingScreen(
             }
             Spacer(Modifier.width(4.dp))
             Text(
-                "🧭  MODEL ROUTING", color = forgePalette.orange, fontSize = 16.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 2.sp
+                "🧭  MODEL ROUTING", color = forgePalette.orange, fontSize = 16.sp, letterSpacing = 2.sp
             )
         }
 
@@ -76,20 +74,17 @@ fun ModelRoutingScreen(
             "Primary provider/model is chosen automatically from your saved keys. " +
                 "When the primary fails, the agent walks this fallback chain top-to-bottom " +
                 "until one provider succeeds.",
-            color = forgePalette.textMuted, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace, lineHeight = 16.sp
+            color = forgePalette.textMuted, fontSize = 11.sp, lineHeight = 16.sp
         )
 
         Spacer(Modifier.height(12.dp))
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
-        ) {
+            contentPadding = PaddingValues(bottom = 32.dp)) {
             item {
                 Text(
-                    "FALLBACK CHAIN", color = forgePalette.textMuted, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                    "FALLBACK CHAIN", color = forgePalette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
                 )
             }
             items(state.chain.size) { index ->
@@ -111,8 +106,7 @@ fun ModelRoutingScreen(
             item { Spacer(Modifier.height(8.dp)) }
             item {
                 Text(
-                    "BACKGROUND CALLERS", color = forgePalette.textMuted, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                    "BACKGROUND CALLERS", color = forgePalette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
                 )
             }
             item {
@@ -128,8 +122,7 @@ fun ModelRoutingScreen(
             item { Spacer(Modifier.height(8.dp)) }
             item {
                 Text(
-                    "SYSTEM OVERRIDES", color = forgePalette.textMuted, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                    "SYSTEM OVERRIDES", color = forgePalette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
                 )
             }
             item {
@@ -156,8 +149,7 @@ fun ModelRoutingScreen(
             item { Spacer(Modifier.height(8.dp)) }
             item {
                 Text(
-                    "DYNAMIC TOKEN BUDGETING (ECO-MODE)", color = forgePalette.textMuted, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                    "DYNAMIC TOKEN BUDGETING (ECO-MODE)", color = forgePalette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
                 )
             }
             item {
@@ -174,8 +166,7 @@ fun ModelRoutingScreen(
             item { Spacer(Modifier.height(8.dp)) }
             item {
                 Text(
-                    "EMBEDDING MODEL (RAG)", color = forgePalette.textMuted, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                    "EMBEDDING MODEL (RAG)", color = forgePalette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
                 )
             }
             item {
@@ -194,8 +185,7 @@ fun ModelRoutingScreen(
                 Text(
                     "Tip — chain links highlighted in red have no saved key for that provider. " +
                         "Add the key in Settings → Built-in providers.",
-                    color = forgePalette.textMuted, fontSize = 10.sp, lineHeight = 14.sp,
-                    fontFamily = FontFamily.Monospace
+                    color = forgePalette.textMuted, fontSize = 10.sp, lineHeight = 14.sp
                 )
             }
         }
@@ -212,8 +202,7 @@ private fun ChainRow(
     canDelete: Boolean,
     onUp: () -> Unit,
     onDown: () -> Unit,
-    onRemove: () -> Unit,
-) {
+    onRemove: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = forgePalette.surface),
@@ -225,25 +214,23 @@ private fun ChainRow(
         ) {
             Text(
                 "${index + 1}.",
-                color = if (hasKey) forgePalette.orange else Color(0xFFb91c1c),
-                fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                color = if (hasKey) forgePalette.orange else forgePalette.danger,
+                fontSize = 12.sp
             )
             Spacer(Modifier.width(8.dp))
             Column(Modifier.weight(1f)) {
                 Text(
                     provider,
-                    color = if (hasKey) forgePalette.textPrimary else Color(0xFFb91c1c),
-                    fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                    color = if (hasKey) forgePalette.textPrimary else forgePalette.danger,
+                    fontSize = 12.sp
                 )
                 Text(
-                    model, color = forgePalette.textMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace
+                    model, color = forgePalette.textMuted, fontSize = 10.sp
                 )
                 if (!hasKey) {
                     Text(
                         "no key — link will be skipped",
-                        color = Color(0xFFb91c1c), fontSize = 9.sp,
-                        fontFamily = FontFamily.Monospace
+                        color = forgePalette.danger, fontSize = 9.sp
                     )
                 }
             }
@@ -262,8 +249,7 @@ private fun ChainRow(
 
 @Composable
 private fun AddRow(
-    onAdd: (String, String) -> Unit,
-) {
+    onAdd: (String, String) -> Unit) {
     var provider by remember { mutableStateOf("") }
     var model by remember { mutableStateOf("") }
     Card(
@@ -273,8 +259,7 @@ private fun AddRow(
     ) {
         Column(Modifier.padding(8.dp)) {
             Text(
-                "ADD LINK", color = forgePalette.textMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                "ADD LINK", color = forgePalette.textMuted, fontSize = 10.sp, letterSpacing = 1.sp
             )
             Spacer(Modifier.height(6.dp))
             OutlinedTextField(
@@ -297,7 +282,7 @@ private fun AddRow(
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = forgePalette.orange),
                 modifier = Modifier.fillMaxWidth()
-            ) { Text("ADD", color = Color.Black, fontFamily = FontFamily.Monospace, fontSize = 12.sp) }
+            ) { Text("ADD", color = Color.Black, fontSize = 12.sp) }
         }
     }
 }
@@ -308,8 +293,7 @@ private fun BackgroundUsageCard(
     alarms: Boolean,
     subAgents: Boolean,
     proactive: Boolean,
-    onChange: (BackgroundCaller, Boolean) -> Unit,
-) {
+    onChange: (BackgroundCaller, Boolean) -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = forgePalette.surface),
@@ -318,18 +302,16 @@ private fun BackgroundUsageCard(
         Column(Modifier.padding(12.dp)) {
             Text(
                 "Which background callers share the chain?",
-                color = forgePalette.textPrimary, fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace
+                color = forgePalette.textPrimary, fontSize = 12.sp
             )
             Spacer(Modifier.height(4.dp))
             Text(
                 "ON = if the primary provider fails, the call walks the fallback chain. " +
                     "OFF = the call dies on the first provider error.",
-                color = forgePalette.textMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace, lineHeight = 14.sp
+                color = forgePalette.textMuted, fontSize = 10.sp, lineHeight = 14.sp
             )
             Spacer(Modifier.height(8.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
+            HorizontalDivider(color = forgePalette.borderSoft)
             Spacer(Modifier.height(8.dp))
             BgRow("Cron jobs",       cron)      { onChange(BackgroundCaller.CRON, it) }
             BgRow("Alarms",          alarms)    { onChange(BackgroundCaller.ALARMS, it) }
@@ -350,7 +332,7 @@ private fun BgRow(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
             colors = CheckboxDefaults.colors(checkedColor = forgePalette.orange)
         )
         Spacer(Modifier.width(4.dp))
-        Text(label, color = forgePalette.textPrimary, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+        Text(label, color = forgePalette.textPrimary, fontSize = 12.sp)
     }
 }
 
@@ -362,8 +344,7 @@ private fun EmbeddingModelCard(
     suggestions: List<EmbeddingSpecUi>,
     isRefreshing: Boolean,
     onProbe: () -> Unit,
-    onSave: (String, String) -> Unit,
-) {
+    onSave: (String, String) -> Unit) {
     var p by remember(provider) { mutableStateOf(provider) }
     var m by remember(model) { mutableStateOf(model) }
     val changed = p.trim().uppercase() != provider || m.trim() != model
@@ -378,8 +359,7 @@ private fun EmbeddingModelCard(
                 Text(
                     "Used for semantic search (RAG) across all channels.",
                     modifier = Modifier.weight(1f),
-                    color = forgePalette.textMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace, lineHeight = 14.sp
+                    color = forgePalette.textMuted, fontSize = 10.sp, lineHeight = 14.sp
                 )
                 Button(
                     onClick = onProbe,
@@ -388,13 +368,13 @@ private fun EmbeddingModelCard(
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
                     modifier = Modifier.height(24.dp)
                 ) {
-                    Text(if (isRefreshing) "PROBING…" else "PROBE PROVIDERS", fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+                    Text(if (isRefreshing) "PROBING…" else "PROBE PROVIDERS", fontSize = 9.sp)
                 }
             }
 
             if (suggestions.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
-                Text("DETECTED MODELS:", color = forgePalette.textMuted, fontSize = 9.sp, fontFamily = FontFamily.Monospace)
+                Text("DETECTED MODELS:", color = forgePalette.textMuted, fontSize = 9.sp)
                 Spacer(Modifier.height(4.dp))
                 androidx.compose.foundation.layout.FlowRow(
                     modifier = Modifier.fillMaxWidth(),
@@ -404,14 +384,14 @@ private fun EmbeddingModelCard(
                         Button(
                             onClick = { p = spec.provider; m = spec.model },
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (p == spec.provider && m == spec.model) forgePalette.orange else Color(0xFF1f1f1f),
+                                containerColor = if (p == spec.provider && m == spec.model) forgePalette.orange else forgePalette.borderSoft,
                                 contentColor = if (p == spec.provider && m == spec.model) Color.Black else forgePalette.textPrimary
                             ),
                             shape = RoundedCornerShape(4.dp),
                             contentPadding = PaddingValues(horizontal = 6.dp, vertical = 0.dp),
                             modifier = Modifier.height(20.dp)
                         ) {
-                            Text(spec.display, fontSize = 8.sp, fontFamily = FontFamily.Monospace)
+                            Text(spec.display, fontSize = 8.sp)
                         }
                     }
                 }
@@ -422,7 +402,7 @@ private fun EmbeddingModelCard(
                 value = p, onValueChange = { p = it },
                 label = { Text("Provider (e.g. OPENAI, OLLAMA)", fontSize = 10.sp) },
                 singleLine = true, modifier = Modifier.fillMaxWidth(),
-                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp),
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = forgePalette.textPrimary,
                     unfocusedTextColor = forgePalette.textPrimary,
@@ -437,7 +417,7 @@ private fun EmbeddingModelCard(
                 value = m, onValueChange = { m = it },
                 label = { Text("Model ID (e.g. text-embedding-3-small)", fontSize = 10.sp) },
                 singleLine = true, modifier = Modifier.fillMaxWidth(),
-                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp),
                 colors = TextFieldDefaults.colors(
                     focusedTextColor = forgePalette.textPrimary,
                     unfocusedTextColor = forgePalette.textPrimary,
@@ -453,7 +433,7 @@ private fun EmbeddingModelCard(
                     onClick = { onSave(p, m) },
                     colors = ButtonDefaults.buttonColors(containerColor = forgePalette.orange),
                     modifier = Modifier.fillMaxWidth()
-                ) { Text("SAVE EMBEDDING CONFIG", color = Color.Black, fontSize = 11.sp, fontFamily = FontFamily.Monospace) }
+                ) { Text("SAVE EMBEDDING CONFIG", color = Color.Black, fontSize = 11.sp) }
             }
         }
     }
@@ -476,8 +456,7 @@ private fun SystemOverridesCard(
     reflectionProvider: String?,
     reflectionModel: String?,
     onSave: (com.forge.os.domain.companion.Mode, String?, String?) -> Unit,
-    availableModels: suspend () -> List<com.forge.os.data.api.AiApiManager.Quad>,
-) {
+    availableModels: suspend () -> List<com.forge.os.data.api.AiApiManager.Quad>) {
     var showSummPicker by remember { mutableStateOf(false) }
     var showSysPicker by remember { mutableStateOf(false) }
     var showCompPicker by remember { mutableStateOf(false) }
@@ -494,8 +473,7 @@ private fun SystemOverridesCard(
         Column(Modifier.padding(12.dp)) {
             Text(
                 "Configure specific models for conversational and background tasks. If left empty, the system uses the global default.",
-                color = forgePalette.textMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace, lineHeight = 14.sp
+                color = forgePalette.textMuted, fontSize = 10.sp, lineHeight = 14.sp
             )
             Spacer(Modifier.height(12.dp))
 
@@ -503,8 +481,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "Companion",
                 override = if (companionProvider != null && companionModel != null) companionProvider to companionModel else null,
                 onClick = { showCompPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.COMPANION, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.COMPANION, null, null) })
 
             Spacer(Modifier.height(8.dp))
 
@@ -512,8 +489,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "Summarization",
                 override = if (summarizationProvider != null && summarizationModel != null) summarizationProvider to summarizationModel else null,
                 onClick = { showSummPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.SUMMARIZATION, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.SUMMARIZATION, null, null) })
             
             Spacer(Modifier.height(8.dp))
 
@@ -521,8 +497,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "Skill Synthesis",
                 override = if (systemProvider != null && systemModel != null) systemProvider to systemModel else null,
                 onClick = { showSysPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.SYSTEM, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.SYSTEM, null, null) })
             
             Spacer(Modifier.height(8.dp))
 
@@ -530,8 +505,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "DAG Planner",
                 override = if (plannerProvider != null && plannerModel != null) plannerProvider to plannerModel else null,
                 onClick = { showPlannerPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.PLANNER, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.PLANNER, null, null) })
 
             Spacer(Modifier.height(8.dp))
 
@@ -539,8 +513,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "Vision",
                 override = if (visionProvider != null && visionModel != null) visionProvider to visionModel else null,
                 onClick = { showVisionPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.VISION, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.VISION, null, null) })
 
             Spacer(Modifier.height(8.dp))
 
@@ -548,8 +521,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "Reasoning",
                 override = if (reasoningProvider != null && reasoningModel != null) reasoningProvider to reasoningModel else null,
                 onClick = { showReasoningPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.REASONING, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.REASONING, null, null) })
 
             Spacer(Modifier.height(8.dp))
 
@@ -557,8 +529,7 @@ private fun SystemOverridesCard(
                 labelPrefix = "Reflection",
                 override = if (reflectionProvider != null && reflectionModel != null) reflectionProvider to reflectionModel else null,
                 onClick = { showReflectionPicker = true },
-                onClear = { onSave(com.forge.os.domain.companion.Mode.REFLECTION, null, null) },
-            )
+                onClear = { onSave(com.forge.os.domain.companion.Mode.REFLECTION, null, null) })
         }
     }
 
@@ -654,8 +625,7 @@ private fun EcoModeCard(
     ecoProvider: String,
     ecoModel: String,
     onSave: (Boolean?, Double?, String?, String?) -> Unit,
-    availableModels: suspend () -> List<com.forge.os.data.api.AiApiManager.Quad>,
-) {
+    availableModels: suspend () -> List<com.forge.os.data.api.AiApiManager.Quad>) {
     var showPicker by remember { mutableStateOf(false) }
     var limitStr by remember(limitUsd) { mutableStateOf("%.2f".format(limitUsd)) }
 
@@ -669,13 +639,11 @@ private fun EcoModeCard(
                 Column(Modifier.weight(1f)) {
                     Text(
                         "Auto-Downshift",
-                        color = forgePalette.textPrimary, fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace
+                        color = forgePalette.textPrimary, fontSize = 13.sp
                     )
                     Text(
                         "Switch to eco-model when daily spend exceeds limit",
-                        color = forgePalette.textMuted, fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace, lineHeight = 14.sp
+                        color = forgePalette.textMuted, fontSize = 10.sp, lineHeight = 14.sp
                     )
                 }
                 androidx.compose.material3.Switch(
@@ -683,21 +651,19 @@ private fun EcoModeCard(
                     onCheckedChange = { onSave(it, null, null, null) },
                     colors = androidx.compose.material3.SwitchDefaults.colors(
                         checkedThumbColor = Color.White,
-                        checkedTrackColor = forgePalette.orange,
-                    )
+                        checkedTrackColor = forgePalette.orange)
                 )
             }
 
             if (enabled) {
                 Spacer(Modifier.height(12.dp))
-                HorizontalDivider(color = Color(0xFF1f1f1f))
+                HorizontalDivider(color = forgePalette.borderSoft)
                 Spacer(Modifier.height(12.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "Daily Limit ($): ",
-                        color = forgePalette.textPrimary, fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace
+                        color = forgePalette.textPrimary, fontSize = 12.sp
                     )
                     Spacer(Modifier.width(8.dp))
                     OutlinedTextField(
@@ -708,7 +674,7 @@ private fun EcoModeCard(
                         },
                         modifier = Modifier.width(100.dp).height(48.dp),
                         singleLine = true,
-                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
+                        textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp),
                         colors = TextFieldDefaults.colors(
                             focusedTextColor = forgePalette.textPrimary,
                             unfocusedTextColor = forgePalette.textPrimary,

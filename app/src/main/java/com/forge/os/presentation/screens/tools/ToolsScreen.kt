@@ -52,8 +52,7 @@ import com.forge.os.presentation.screens.common.StatusPill
 @Composable
 fun ToolsScreen(
     onBack: () -> Unit,
-    viewModel: ToolsViewModel = hiltViewModel(),
-) {
+    viewModel: ToolsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var testing: ToolRow? by remember { mutableStateOf(null) }
     var inspecting: ToolRow? by remember { mutableStateOf(null) }
@@ -69,30 +68,25 @@ fun ToolsScreen(
                 Icon(
                     Icons.Default.History, "Audit log",
                     tint = if (state.showAudit) forgePalette.orange else forgePalette.textMuted,
-                    modifier = Modifier.size(18.dp),
-                )
+                    modifier = Modifier.size(18.dp))
             }
-        },
-    ) {
+        }) {
         Column(Modifier.fillMaxSize()) {
             if (state.showAudit) AuditPanel(
                 entries = state.audit,
-                onClear = viewModel::clearAudit,
-            )
+                onClear = viewModel::clearAudit)
 
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // ── System tools section ──────────────────────────────────────
                 item(key = "_header_system") {
                     SectionHeader(
                         label = "SYSTEM TOOLS",
                         count = systemTools.size,
                         tint = forgePalette.textMuted,
-                        icon = false,
-                    )
+                        icon = false)
                 }
                 items(systemTools, key = { it.name }) { row ->
                     ToolRowCard(
@@ -100,8 +94,7 @@ fun ToolsScreen(
                         onToggle = { v -> viewModel.toggle(row.name, v) },
                         onConfirmToggle = { v -> viewModel.setRequiresConfirmation(row.name, v) },
                         onTest = { testing = row },
-                        onInspect = { inspecting = row },
-                    )
+                        onInspect = { inspecting = row })
                 }
 
                 // ── Plugin tools section ──────────────────────────────────────
@@ -112,8 +105,7 @@ fun ToolsScreen(
                             label = "PLUGIN TOOLS",
                             count = pluginTools.size,
                             tint = forgePalette.info,
-                            icon = true,
-                        )
+                            icon = true)
                     }
                     items(pluginTools, key = { "plugin_${it.name}" }) { row ->
                         ToolRowCard(
@@ -121,8 +113,7 @@ fun ToolsScreen(
                             onToggle = { v -> viewModel.toggle(row.name, v) },
                             onConfirmToggle = { v -> viewModel.setRequiresConfirmation(row.name, v) },
                             onTest = { testing = row },
-                            onInspect = { inspecting = row },
-                        )
+                            onInspect = { inspecting = row })
                     }
                 }
             }
@@ -135,8 +126,7 @@ fun ToolsScreen(
             toolName = tool.name,
             description = tool.description,
             parametersJson = tool.parametersJson,
-            onDismiss = { inspecting = null },
-        )
+            onDismiss = { inspecting = null })
     }
 
     val active = testing
@@ -146,8 +136,7 @@ fun ToolsScreen(
             running = state.testRunning == active.name,
             onDismiss = { testing = null; viewModel.dismissTestResult() },
             onRun = { args -> viewModel.runTest(active.name, args) },
-            result = state.testResult,
-        )
+            result = state.testResult)
     }
 }
 
@@ -156,30 +145,25 @@ private fun SectionHeader(
     label: String,
     count: Int,
     tint: androidx.compose.ui.graphics.Color,
-    icon: Boolean,
-) {
+    icon: Boolean) {
     Row(
         Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp, horizontal = 2.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+        verticalAlignment = Alignment.CenterVertically) {
         if (icon) {
             Icon(
                 Icons.Default.Extension,
                 contentDescription = null,
                 tint = tint,
-                modifier = Modifier.size(12.dp),
-            )
+                modifier = Modifier.size(12.dp))
             Spacer(Modifier.width(4.dp))
         }
         Text(
             "$label  ($count)",
             color = tint,
-            fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
-            letterSpacing = 1.5.sp,
-        )
+            letterSpacing = 1.5.sp)
         Spacer(Modifier.width(8.dp))
         Box(
             Modifier
@@ -196,20 +180,17 @@ private fun ToolRowCard(
     onToggle: (Boolean) -> Unit,
     onConfirmToggle: (Boolean) -> Unit,
     onTest: () -> Unit,
-    onInspect: () -> Unit,
-) {
+    onInspect: () -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
             .background(forgePalette.surface, RoundedCornerShape(6.dp))
             .border(1.dp, forgePalette.border, RoundedCornerShape(6.dp))
-            .padding(12.dp),
-    ) {
+            .padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 row.name,
                 color = forgePalette.textPrimary,
-                fontFamily = FontFamily.Monospace,
                 fontSize = 13.sp,
                 modifier = Modifier
                     .clickable { onInspect() }
@@ -225,8 +206,7 @@ private fun ToolRowCard(
             IconButton(onClick = onTest, modifier = Modifier.size(28.dp)) {
                 Icon(
                     Icons.Default.PlayArrow, "Test",
-                    tint = forgePalette.success, modifier = Modifier.size(16.dp),
-                )
+                    tint = forgePalette.success, modifier = Modifier.size(16.dp))
             }
             Switch(
                 checked = row.enabled,
@@ -235,28 +215,21 @@ private fun ToolRowCard(
                     checkedThumbColor = forgePalette.orange,
                     checkedTrackColor = forgePalette.orange.copy(alpha = 0.3f),
                     uncheckedThumbColor = forgePalette.textDim,
-                    uncheckedTrackColor = forgePalette.surface2,
-                ),
-            )
+                    uncheckedTrackColor = forgePalette.surface2))
         }
         Text(
             row.description,
             color = forgePalette.textMuted,
-            fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
-            modifier = Modifier.padding(top = 4.dp),
-        )
+            modifier = Modifier.padding(top = 4.dp))
         if (!row.isPlugin) {
             Row(
                 Modifier.padding(top = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+                verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     "require confirm",
                     color = forgePalette.textDim,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                )
+                    fontSize = 10.sp)
                 Spacer(Modifier.weight(1f))
                 Switch(
                     checked = row.requiresConfirmation,
@@ -265,9 +238,7 @@ private fun ToolRowCard(
                         checkedThumbColor = forgePalette.orange,
                         checkedTrackColor = forgePalette.orange.copy(alpha = 0.3f),
                         uncheckedThumbColor = forgePalette.textDim,
-                        uncheckedTrackColor = forgePalette.surface2,
-                    ),
-                )
+                        uncheckedTrackColor = forgePalette.surface2))
             }
         }
     }
@@ -276,28 +247,23 @@ private fun ToolRowCard(
 @Composable
 private fun AuditPanel(
     entries: List<com.forge.os.domain.security.ToolAuditEntry>,
-    onClear: () -> Unit,
-) {
+    onClear: () -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
             .heightIn(max = 240.dp)
             .background(forgePalette.surface)
             .padding(12.dp)
-            .verticalScroll(rememberScrollState()),
-    ) {
+            .verticalScroll(rememberScrollState())) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 "AUDIT LOG (${entries.size})",
                 color = forgePalette.orange,
-                fontFamily = FontFamily.Monospace,
                 fontSize = 11.sp,
-                letterSpacing = 1.sp,
-            )
+                letterSpacing = 1.sp)
             Spacer(Modifier.weight(1f))
             TextButton(onClick = onClear) {
-                Text("CLEAR", color = forgePalette.danger,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("CLEAR", color = forgePalette.danger, fontSize = 10.sp)
             }
         }
         Spacer(Modifier.height(6.dp))
@@ -305,9 +271,7 @@ private fun AuditPanel(
             Text(
                 "(no tool dispatches recorded yet)",
                 color = forgePalette.textDim,
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
-            )
+                fontSize = 11.sp)
         } else {
             entries.take(40).forEach { e ->
                 val mark = if (e.success) "✓" else "✗"
@@ -316,9 +280,7 @@ private fun AuditPanel(
                     "$mark ${e.toolName} [${e.source}] ${e.durationMs}ms — ${e.outputPreview.take(80)}",
                     color = color,
                     fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace,
-                    modifier = Modifier.padding(vertical = 1.dp),
-                )
+                    modifier = Modifier.padding(vertical = 1.dp))
             }
         }
     }
@@ -330,8 +292,7 @@ private fun TestToolDialog(
     running: Boolean,
     result: String?,
     onDismiss: () -> Unit,
-    onRun: (String) -> Unit,
-) {
+    onRun: (String) -> Unit) {
     var args by remember { mutableStateOf("{}") }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -340,22 +301,17 @@ private fun TestToolDialog(
             Text(
                 "Test ${row.name}",
                 color = forgePalette.orange,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 14.sp,
-            )
+                fontSize = 14.sp)
         },
         text = {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-            ) {
+                    .verticalScroll(rememberScrollState())) {
                 Text(
                     "args (JSON)",
                     color = forgePalette.textMuted,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                )
+                    fontSize = 10.sp)
                 OutlinedTextField(
                     value = args,
                     onValueChange = { args = it },
@@ -364,10 +320,7 @@ private fun TestToolDialog(
                         .heightIn(min = 80.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
                         color = forgePalette.textPrimary,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                    ),
-                )
+                        fontSize = 12.sp))
                 if (result != null) {
                     Spacer(Modifier.height(8.dp))
                     Box(
@@ -375,15 +328,12 @@ private fun TestToolDialog(
                             .fillMaxWidth()
                             .heightIn(max = 220.dp)
                             .background(forgePalette.bg, RoundedCornerShape(4.dp))
-                            .padding(8.dp),
-                    ) {
+                            .padding(8.dp)) {
                         Text(
                             result,
                             color = forgePalette.textPrimary,
-                            fontFamily = FontFamily.Monospace,
                             fontSize = 11.sp,
-                            modifier = Modifier.verticalScroll(rememberScrollState()),
-                        )
+                            modifier = Modifier.verticalScroll(rememberScrollState()))
                     }
                 }
             }
@@ -392,15 +342,12 @@ private fun TestToolDialog(
             TextButton(onClick = { onRun(args) }, enabled = !running) {
                 Text(
                     if (running) "RUNNING…" else "RUN",
-                    color = forgePalette.success,
-                    fontFamily = FontFamily.Monospace,
-                )
+                    color = forgePalette.success)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CLOSE", color = forgePalette.textMuted, fontFamily = FontFamily.Monospace)
+                Text("CLOSE", color = forgePalette.textMuted)
             }
-        },
-    )
+        })
 }

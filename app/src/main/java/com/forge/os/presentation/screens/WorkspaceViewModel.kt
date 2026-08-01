@@ -31,8 +31,7 @@ data class WorkspaceUiState(
     val recursiveSearch: Boolean = false,
     val selection: Set<String> = emptySet(),    // selected paths
     val message: String? = null,                // transient toast/snackbar text
-    val error: String? = null,
-)
+    val error: String? = null)
 
 @HiltViewModel
 class WorkspaceViewModel @Inject constructor(
@@ -202,8 +201,7 @@ class WorkspaceViewModel @Inject constructor(
                     path = it.path,
                     isDirectory = it.isDirectory,
                     size = it.size,
-                    lastModified = it.lastModified,
-                )
+                    lastModified = it.lastModified)
             }
             val sorted = sortEntries(mapped, cur.sort, cur.sortAscending)
             _state.value = cur.copy(
@@ -214,9 +212,7 @@ class WorkspaceViewModel @Inject constructor(
                     totalDirs = info.totalDirs,
                     totalSize = info.totalSize,
                     maxSize = info.maxSize,
-                    usagePercent = info.usagePercent,
-                ),
-            )
+                    usagePercent = info.usagePercent))
         }
     }
 
@@ -238,13 +234,11 @@ data class WorkspaceFileItem(
     val path: String,
     val isDirectory: Boolean,
     val size: Long = 0,
-    val lastModified: Long = 0L,
-)
+    val lastModified: Long = 0L)
 
 data class WorkspaceInfo(
     val totalFiles: Int = 0,
     val totalDirs: Int = 0,
     val totalSize: Long = 0,
     val maxSize: Long = 500 * 1024 * 1024,
-    val usagePercent: Float = 0f,
-)
+    val usagePercent: Float = 0f)

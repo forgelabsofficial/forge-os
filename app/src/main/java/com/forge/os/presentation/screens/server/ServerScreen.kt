@@ -28,8 +28,7 @@ fun ServerScreen(onBack: () -> Unit, viewModel: ServerViewModel = hiltViewModel(
     ModuleScaffold(title = "SERVER", onBack = onBack) {
         Column(
             Modifier.fillMaxSize().padding(12.dp).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+            verticalArrangement = Arrangement.spacedBy(12.dp)) {
             StatusCard(state)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -37,13 +36,11 @@ fun ServerScreen(onBack: () -> Unit, viewModel: ServerViewModel = hiltViewModel(
                     onClick = { viewModel.start() },
                     enabled = !state.running,
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = forgePalette.success),
-                ) { Text("START", fontFamily = FontFamily.Monospace) }
+                    colors = ButtonDefaults.buttonColors(containerColor = forgePalette.success)) { Text("START") }
                 OutlinedButton(
                     onClick = { viewModel.stop() },
                     enabled = state.running,
-                    modifier = Modifier.weight(1f),
-                ) { Text("STOP", fontFamily = FontFamily.Monospace) }
+                    modifier = Modifier.weight(1f)) { Text("STOP") }
             }
 
             KeyCard(state.apiKey, onCopy = {
@@ -59,12 +56,10 @@ fun ServerScreen(onBack: () -> Unit, viewModel: ServerViewModel = hiltViewModel(
                         .border(1.dp, forgePalette.border, RoundedCornerShape(6.dp))
                         .padding(10.dp)
                 ) {
-                    Text("LAN addresses", color = forgePalette.orange,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("LAN addresses", color = forgePalette.orange, fontSize = 11.sp)
                     Spacer(Modifier.height(4.dp))
                     state.lanIps.forEach { ip ->
-                        Text("http://$ip:${state.port}", color = forgePalette.textPrimary,
-                            fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                        Text("http://$ip:${state.port}", color = forgePalette.textPrimary, fontSize = 12.sp)
                     }
                 }
             }
@@ -83,20 +78,16 @@ private fun StatusCard(state: ServerUiState) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 if (state.running) "● RUNNING" else "○ STOPPED",
-                color = if (state.running) forgePalette.success else forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 13.sp,
-            )
+                color = if (state.running) forgePalette.success else forgePalette.textMuted, fontSize = 13.sp)
             Spacer(Modifier.weight(1f))
-            Text("port ${state.port}", color = forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text("port ${state.port}", color = forgePalette.textMuted, fontSize = 11.sp)
         }
         Spacer(Modifier.height(6.dp))
         Text(
             "Local HTTP API for your own tools. Bind to 127.0.0.1 by default — " +
             "reachable from this device and over LAN if your OS routes it.",
-            color = forgePalette.textMuted, fontFamily = FontFamily.Monospace,
-            fontSize = 10.sp,
-        )
+            color = forgePalette.textMuted,
+            fontSize = 10.sp)
     }
 }
 
@@ -108,19 +99,17 @@ private fun KeyCard(apiKey: String, onCopy: () -> Unit, onRotate: () -> Unit) {
             .border(1.dp, forgePalette.border, RoundedCornerShape(6.dp))
             .padding(12.dp)
     ) {
-        Text("API KEY", color = forgePalette.orange,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+        Text("API KEY", color = forgePalette.orange, fontSize = 11.sp)
         Spacer(Modifier.height(4.dp))
-        Text(apiKey, color = forgePalette.textPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+        Text(apiKey, color = forgePalette.textPrimary, fontSize = 11.sp,
             modifier = Modifier.clickable { onCopy() })
         Spacer(Modifier.height(8.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             OutlinedButton(onClick = onCopy, modifier = Modifier.weight(1f)) {
-                Text("COPY", fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("COPY", fontSize = 11.sp)
             }
             OutlinedButton(onClick = onRotate, modifier = Modifier.weight(1f)) {
-                Text("ROTATE", fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("ROTATE", fontSize = 11.sp)
             }
         }
     }
@@ -134,22 +123,18 @@ private fun EndpointsCard() {
             .border(1.dp, forgePalette.border, RoundedCornerShape(6.dp))
             .padding(12.dp)
     ) {
-        Text("ENDPOINTS", color = forgePalette.orange,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+        Text("ENDPOINTS", color = forgePalette.orange, fontSize = 11.sp)
         Spacer(Modifier.height(4.dp))
         listOf(
             "GET  /api/status" to "Health check",
             "GET  /api/tools" to "List all tools",
-            "POST /api/tool" to "{ \"name\": \"...\", \"args\": {...} }",
-        ).forEach { (ep, desc) ->
-            Text(ep, color = forgePalette.textPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
-            Text("   $desc", color = forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            "POST /api/tool" to "{ \"name\": \"...\", \"args\": {...} }").forEach { (ep, desc) ->
+            Text(ep, color = forgePalette.textPrimary, fontSize = 11.sp)
+            Text("   $desc", color = forgePalette.textMuted, fontSize = 10.sp)
         }
         Spacer(Modifier.height(6.dp))
         Text("All requests require: Authorization: Bearer <api-key>",
-            color = forgePalette.textMuted, fontFamily = FontFamily.Monospace,
+            color = forgePalette.textMuted,
             fontSize = 10.sp)
     }
 }

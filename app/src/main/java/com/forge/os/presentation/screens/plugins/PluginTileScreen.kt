@@ -32,8 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PluginTileViewModel @Inject constructor(
     private val pluginManager: PluginManager,
-    private val toolRegistry: ToolRegistry,
-) : ViewModel() {
+    private val toolRegistry: ToolRegistry) : ViewModel() {
 
     private val _output = MutableStateFlow<String>("Tap RUN to execute the plugin tool.")
     val output: StateFlow<String> = _output
@@ -62,25 +61,21 @@ fun PluginTileScreen(
     pluginId: String,
     toolName: String,
     onBack: () -> Unit,
-    viewModel: PluginTileViewModel = hiltViewModel(),
-) {
+    viewModel: PluginTileViewModel = hiltViewModel()) {
     val output by viewModel.output.collectAsState()
     val busy by viewModel.busy.collectAsState()
     val tile = remember(pluginId, toolName) { viewModel.findTile(pluginId, toolName) }
 
     ModuleScaffold(title = (tile?.title ?: toolName).uppercase(), onBack = onBack) {
         Column(Modifier.fillMaxSize().padding(12.dp).verticalScroll(rememberScrollState())) {
-            Text("plugin: $pluginId", color = forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
-            Text("tool: $toolName", color = forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("plugin: $pluginId", color = forgePalette.textMuted, fontSize = 10.sp)
+            Text("tool: $toolName", color = forgePalette.textMuted, fontSize = 10.sp)
             Spacer(Modifier.height(12.dp))
             Button(
                 onClick = { viewModel.run(pluginId, toolName) },
                 enabled = !busy,
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = forgePalette.orange),
-            ) { Text(if (busy) "RUNNING..." else "RUN", fontFamily = FontFamily.Monospace) }
+                colors = ButtonDefaults.buttonColors(containerColor = forgePalette.orange)) { Text(if (busy) "RUNNING..." else "RUN") }
             Spacer(Modifier.height(12.dp))
             Column(
                 Modifier.fillMaxWidth()
@@ -88,11 +83,9 @@ fun PluginTileScreen(
                     .border(1.dp, forgePalette.border, RoundedCornerShape(6.dp))
                     .padding(10.dp)
             ) {
-                Text("OUTPUT", color = forgePalette.orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("OUTPUT", color = forgePalette.orange, fontSize = 11.sp)
                 Spacer(Modifier.height(4.dp))
-                Text(output, color = forgePalette.textPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text(output, color = forgePalette.textPrimary, fontSize = 11.sp)
             }
         }
     }

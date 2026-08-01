@@ -14,14 +14,12 @@ import javax.inject.Inject
 data class AgentsUiState(
     val agents: List<SubAgent> = emptyList(),
     val message: String? = null,
-    val spawning: Boolean = false,
-)
+    val spawning: Boolean = false)
 
 @HiltViewModel
 class AgentsViewModel @Inject constructor(
     private val delegationManager: DelegationManager,
-    private val aiApiManager: com.forge.os.data.api.AiApiManager,
-) : ViewModel() {
+    private val aiApiManager: com.forge.os.data.api.AiApiManager) : ViewModel() {
 
     private val _state = MutableStateFlow(AgentsUiState())
     val state: StateFlow<AgentsUiState> = _state.asStateFlow()
@@ -36,8 +34,7 @@ class AgentsViewModel @Inject constructor(
             val outcome = delegationManager.spawnAndAwait(goal, contextText, overrideProvider = provider, overrideModel = model)
             _state.value = _state.value.copy(
                 spawning = false,
-                message = if (outcome.success) "✓ ${outcome.agent.id}" else "✗ ${outcome.agent.error ?: "failed"}",
-            )
+                message = if (outcome.success) "✓ ${outcome.agent.id}" else "✗ ${outcome.agent.error ?: "failed"}")
             refresh()
         }
     }

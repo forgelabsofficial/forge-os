@@ -23,16 +23,14 @@ import javax.inject.Inject
 data class ExternalApiState(
     val masterEnabled: Boolean = false,
     val callers: List<ExternalCaller> = emptyList(),
-    val recentAudit: List<ExternalAuditEntry> = emptyList(),
-)
+    val recentAudit: List<ExternalAuditEntry> = emptyList())
 
 @HiltViewModel
 class ExternalApiViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val registry: ExternalCallerRegistry,
     private val audit: ExternalAuditLog,
-    private val bridge: ExternalApiBridge,
-) : ViewModel() {
+    private val bridge: ExternalApiBridge) : ViewModel() {
 
     private val _state = MutableStateFlow(ExternalApiState())
     val state: StateFlow<ExternalApiState> = _state.asStateFlow()
@@ -52,8 +50,7 @@ class ExternalApiViewModel @Inject constructor(
             _state.value = _state.value.copy(
                 masterEnabled = cfg.externalApi.enabled,
                 callers = registry.list(),
-                recentAudit = tail,
-            )
+                recentAudit = tail)
         }
     }
 

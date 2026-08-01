@@ -48,8 +48,7 @@ class VoiceModeViewModel @Inject constructor(
     private val voiceInputManager: VoiceInputManager,
     private val reActAgent: ReActAgent,
     private val conversationRepo: ConversationRepository,
-    private val configRepository: ConfigRepository,
-) : ViewModel() {
+    private val configRepository: ConfigRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(VoiceModeState())
     val state: StateFlow<VoiceModeState> = _state.asStateFlow()
@@ -110,8 +109,7 @@ class VoiceModeViewModel @Inject constructor(
             id = id,
             title = "🎤 Voice — $timestamp",
             createdAt = now,
-            updatedAt = now,
-        )
+            updatedAt = now)
         conversationRepo.save(conv)
         conversationRepo.setCurrent(id)
         currentConversation = conv
@@ -120,15 +118,13 @@ class VoiceModeViewModel @Inject constructor(
         val greeting = StoredChatMessage(
             id = UUID.randomUUID().toString(),
             role = "system",
-            content = "🎤 Voice session started — ${configRepository.get().agentIdentity.name} is listening.",
-        )
+            content = "🎤 Voice session started — ${configRepository.get().agentIdentity.name} is listening.")
         voiceMessages.add(greeting)
         persistConversation()
 
         _state.value = VoiceModeState(
             phase = VoicePhase.IDLE,
-            conversationId = id,
-        )
+            conversationId = id)
         startListening()
     }
 
@@ -165,8 +161,7 @@ class VoiceModeViewModel @Inject constructor(
             phase = VoicePhase.LISTENING,
             transcript = "",
             error = null,
-            rmsLevel = 0f,
-        )
+            rmsLevel = 0f)
         voiceInputManager.startListening()
     }
 
@@ -175,15 +170,13 @@ class VoiceModeViewModel @Inject constructor(
         _state.value = _state.value.copy(
             phase = VoicePhase.THINKING,
             transcript = text,
-            agentResponse = "",
-        )
+            agentResponse = "")
 
         // Persist the user turn immediately
         voiceMessages.add(StoredChatMessage(
             id = UUID.randomUUID().toString(),
             role = "user",
-            content = text,
-        ))
+            content = text))
         persistConversation()
 
         agentJob?.cancel()
@@ -194,8 +187,7 @@ class VoiceModeViewModel @Inject constructor(
                     userMessage = text,
                     history = voiceHistory.toList(),
                     spec = null,
-                    currentChannel = "voice",
-                ).collect { event ->
+                    currentChannel = "voice").collect { event ->
                     when (event) {
                         is AgentEvent.Thinking -> {
                             fullResponse = event.text
@@ -214,8 +206,7 @@ class VoiceModeViewModel @Inject constructor(
                             voiceMessages.add(StoredChatMessage(
                                 id = UUID.randomUUID().toString(),
                                 role = "assistant",
-                                content = fullResponse,
-                            ))
+                                content = fullResponse))
                             persistConversation()
                         }
                         is AgentEvent.ToolCall -> {
@@ -224,8 +215,7 @@ class VoiceModeViewModel @Inject constructor(
                                 id = UUID.randomUUID().toString(),
                                 role = "tool_call",
                                 content = event.args,
-                                toolName = event.name,
-                            ))
+                                toolName = event.name))
                         }
                         is AgentEvent.ToolResult -> {
                             voiceMessages.add(StoredChatMessage(
@@ -233,14 +223,12 @@ class VoiceModeViewModel @Inject constructor(
                                 role = "tool_result",
                                 content = event.result,
                                 toolName = event.name,
-                                isError = event.isError,
-                            ))
+                                isError = event.isError))
                         }
                         is AgentEvent.Error -> {
                             _state.value = _state.value.copy(
                                 phase = VoicePhase.IDLE,
-                                error = event.message,
-                            )
+                                error = event.message)
                             return@collect
                         }
                         else -> {}
@@ -256,8 +244,7 @@ class VoiceModeViewModel @Inject constructor(
                 Timber.e(e, "VoiceMode: agent error")
                 _state.value = _state.value.copy(
                     phase = VoicePhase.IDLE,
-                    error = "Agent error: ${e.message}",
-                )
+                    error = "Agent error: ${e.message}")
             }
         }
     }
@@ -292,8 +279,7 @@ class VoiceModeViewModel @Inject constructor(
             title = title,
             updatedAt = System.currentTimeMillis(),
             messages = voiceMessages.toList(),
-            apiHistory = apiStored,
-        )
+            apiHistory = apiStored)
         currentConversation = updated
         viewModelScope.launch(Dispatchers.IO) {
             conversationRepo.save(updated)

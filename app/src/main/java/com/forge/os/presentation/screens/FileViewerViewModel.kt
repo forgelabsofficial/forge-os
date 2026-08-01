@@ -28,13 +28,11 @@ data class FileViewerState(
     val outsideSandbox: Boolean = false,
     val loading: Boolean = true,
     val message: String? = null,
-    val error: String? = null,
-)
+    val error: String? = null)
 
 @HiltViewModel
 class FileViewerViewModel @Inject constructor(
-    private val sandboxManager: SandboxManager,
-) : ViewModel() {
+    private val sandboxManager: SandboxManager) : ViewModel() {
 
     private val _state = MutableStateFlow(FileViewerState())
     val state: StateFlow<FileViewerState> = _state.asStateFlow()
@@ -60,8 +58,7 @@ class FileViewerViewModel @Inject constructor(
                     size = file.length(),
                     mimeType = mime,
                     outsideSandbox = outside,
-                    loading = false,
-                )
+                    loading = false)
                 _state.value = when (kind) {
                     FileKind.TEXT -> {
                         val txt = sandboxManager.readFile(path).getOrElse { return@launch fail(path, it) }
@@ -172,7 +169,6 @@ class FileViewerViewModel @Inject constructor(
         private val TEXT_EXTS = setOf(
             "txt", "md", "json", "yaml", "yml", "py", "kt", "kts", "java", "xml",
             "html", "htm", "css", "js", "ts", "tsx", "jsx", "csv", "tsv", "log",
-            "ini", "toml", "properties", "conf", "sh", "gradle", "sql",
-        )
+            "ini", "toml", "properties", "conf", "sh", "gradle", "sql")
     }
 }

@@ -19,8 +19,7 @@ class AlarmsViewModel @Inject constructor(
     private val repository: AlarmRepository,
     private val scheduler: ForgeAlarmScheduler,
     private val sessionLog: AlarmSessionLog,
-    private val aiApiManager: com.forge.os.data.api.AiApiManager,
-) : ViewModel() {
+    private val aiApiManager: com.forge.os.data.api.AiApiManager) : ViewModel() {
 
     private val _alarms = MutableStateFlow<List<AlarmItem>>(emptyList())
     val alarms: StateFlow<List<AlarmItem>> = _alarms

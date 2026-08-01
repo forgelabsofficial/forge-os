@@ -29,8 +29,7 @@ import coil.compose.AsyncImage
 fun FileViewerScreen(
     path: String,
     onNavigateBack: () -> Unit,
-    viewModel: FileViewerViewModel = hiltViewModel(),
-) {
+    viewModel: FileViewerViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     val ctx = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
@@ -68,10 +67,8 @@ fun FileViewerScreen(
                             Icon(Icons.Default.OpenInNew, "Open with…")
                         }
                     }
-                },
-            )
-        },
-    ) { padding ->
+                })
+        }) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
                 state.loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -79,8 +76,7 @@ fun FileViewerScreen(
                 }
                 state.error != null && state.name.isEmpty() -> Box(
                     Modifier.fillMaxSize().padding(16.dp),
-                    contentAlignment = Alignment.Center,
-                ) { Text(state.error!!) }
+                    contentAlignment = Alignment.Center) { Text(state.error!!) }
                 state.kind == FileKind.TEXT -> TextEditor(state, viewModel::edit)
                 state.kind == FileKind.IMAGE -> ImageViewer(state)
                 state.kind == FileKind.BINARY -> BinaryViewer(state)
@@ -96,8 +92,7 @@ fun FileViewerScreen(
             confirmButton = {
                 TextButton(onClick = { confirmOutside = false; viewModel.save(force = true) }) { Text("Save anyway") }
             },
-            dismissButton = { TextButton(onClick = { confirmOutside = false }) { Text("Cancel") } },
-        )
+            dismissButton = { TextButton(onClick = { confirmOutside = false }) { Text("Cancel") } })
     }
 }
 
@@ -105,7 +100,7 @@ fun FileViewerScreen(
 private fun TextEditor(state: FileViewerState, onChange: (String) -> Unit) {
     val lang = remember(state.name) { languageFor(state.name) }
     val highlighted = rememberHighlighted(state.text, lang)
-    val mono = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+    val mono = TextStyle(, fontSize = 13.sp)
     Column(modifier = Modifier.fillMaxSize()) {
         // Read-only colored layer underneath; editable BasicTextField on top with transparent text
         // would be ideal, but for simplicity we fall back to the editable field with a visible
@@ -117,8 +112,7 @@ private fun TextEditor(state: FileViewerState, onChange: (String) -> Unit) {
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surfaceVariant)
                     .verticalScroll(rememberScrollState())
-                    .padding(12.dp),
-            ) {
+                    .padding(12.dp)) {
                 androidx.compose.material3.Text(text = highlighted, style = mono)
             }
         } else {
@@ -129,8 +123,7 @@ private fun TextEditor(state: FileViewerState, onChange: (String) -> Unit) {
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(12.dp),
-            )
+                    .padding(12.dp))
         }
     }
 }
@@ -151,8 +144,7 @@ private fun ImageViewer(state: FileViewerState) {
                     offsetY += pan.y
                 }
             },
-        contentAlignment = Alignment.Center,
-    ) {
+        contentAlignment = Alignment.Center) {
         AsyncImage(
             model = state.absolutePath,
             contentDescription = state.name,
@@ -162,9 +154,7 @@ private fun ImageViewer(state: FileViewerState) {
                     scaleX = scale,
                     scaleY = scale,
                     translationX = offsetX,
-                    translationY = offsetY,
-                ),
-        )
+                    translationY = offsetY))
     }
 }
 
@@ -180,19 +170,16 @@ private fun BinaryViewer(state: FileViewerState) {
         Text(
             "Hex preview (first 4 KB)",
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp),
-        )
+            modifier = Modifier.padding(start = 16.dp, top = 4.dp, bottom = 4.dp))
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surfaceVariant)
                 .verticalScroll(rememberScrollState())
-                .padding(12.dp),
-        ) {
+                .padding(12.dp)) {
             Text(
                 state.hexPreview,
-                style = TextStyle(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-            )
+                style = TextStyle(, fontSize = 12.sp))
         }
     }
 }

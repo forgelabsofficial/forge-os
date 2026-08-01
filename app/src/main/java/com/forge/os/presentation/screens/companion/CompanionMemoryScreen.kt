@@ -48,7 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 private val Bg        = Color(0xFF0d0d0d)
 private val Surface   = Color(0xFF141414)
 private val Border    = Color(0xFF2a2a2a)
-private val AccentRed = Color(0xFFef4444)
+private val AccentRed = forgePalette.danger
 private val TextPri   = Color(0xFFf5f5f5)
 private val TextSec   = Color(0xFF888888)
 private val Amber     = Color(0xFFf59e0b)
@@ -56,8 +56,7 @@ private val Amber     = Color(0xFFf59e0b)
 @Composable
 fun CompanionMemoryScreen(
     onBack: () -> Unit,
-    vm: CompanionMemoryViewModel = hiltViewModel(),
-) {
+    vm: CompanionMemoryViewModel = hiltViewModel()) {
     val episodes by vm.episodes.collectAsState()
     val facts by vm.facts.collectAsState()
     val summary by vm.summary.collectAsState()
@@ -74,8 +73,7 @@ fun CompanionMemoryScreen(
                 Text(
                     "This will permanently delete ${summary.episodeCount} episode(s) and " +
                             "${summary.factCount} fact(s). This cannot be undone.",
-                    color = TextSec,
-                )
+                    color = TextSec)
             },
             confirmButton = {
                 TextButton(onClick = { vm.confirmWipe() }) {
@@ -85,31 +83,26 @@ fun CompanionMemoryScreen(
             dismissButton = {
                 TextButton(onClick = { vm.cancelWipe() }) { Text("Cancel", color = TextSec) }
             },
-            containerColor = Color(0xFF1a1a1a),
-        )
+            containerColor = Color(0xFF1a1a1a))
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Bg)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-    ) {
+            .padding(horizontal = 16.dp, vertical = 12.dp)) {
         // Header
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "← Back",
                 color = TextSec,
                 fontSize = 13.sp,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.clickable { onBack() }.padding(end = 12.dp),
-            )
+                modifier = Modifier.clickable { onBack() }.padding(end = 12.dp))
             Text(
                 text = "Companion Memory",
                 color = TextPri,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold,
-            )
+                fontWeight = FontWeight.SemiBold)
         }
 
         Spacer(Modifier.height(8.dp))
@@ -120,14 +113,11 @@ fun CompanionMemoryScreen(
                 .fillMaxWidth()
                 .border(1.dp, Amber.copy(alpha = 0.4f), RoundedCornerShape(6.dp))
                 .background(Amber.copy(alpha = 0.06f), RoundedCornerShape(6.dp))
-                .padding(10.dp),
-        ) {
+                .padding(10.dp)) {
             Text(
                 text = "🔒  Local only · Never synced · Stored on this device only",
                 color = Amber,
-                fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace,
-            )
+                fontSize = 12.sp)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -142,8 +132,7 @@ fun CompanionMemoryScreen(
 
         LazyColumn(
             modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+            verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // ── Episodes ─────────────────────────────────────────────────────
             if (episodes.isNotEmpty()) {
                 item {
@@ -154,8 +143,7 @@ fun CompanionMemoryScreen(
                         summary = ep.summary,
                         timestamp = ep.timestamp,
                         topics = ep.keyTopics,
-                        onDelete = { vm.deleteEpisode(ep.id) },
-                    )
+                        onDelete = { vm.deleteEpisode(ep.id) })
                 }
                 item { Spacer(Modifier.height(8.dp)) }
             }
@@ -169,8 +157,7 @@ fun CompanionMemoryScreen(
                     FactRow(
                         factKey = key,
                         value = value,
-                        onDelete = { vm.deleteFact(key) },
-                    )
+                        onDelete = { vm.deleteFact(key) })
                 }
                 item { Spacer(Modifier.height(8.dp)) }
             }
@@ -179,14 +166,11 @@ fun CompanionMemoryScreen(
                 item {
                     Box(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 48.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
+                        contentAlignment = Alignment.Center) {
                         Text(
                             "No companion memory stored yet.",
                             color = TextSec,
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily.Monospace,
-                        )
+                            fontSize = 13.sp)
                     }
                 }
             }
@@ -202,15 +186,12 @@ fun CompanionMemoryScreen(
                 .background(AccentRed.copy(alpha = 0.08f), RoundedCornerShape(8.dp))
                 .clickable { vm.requestWipe() }
                 .padding(vertical = 14.dp),
-            contentAlignment = Alignment.Center,
-        ) {
+            contentAlignment = Alignment.Center) {
             Text(
                 text = "Forget Everything",
                 color = AccentRed,
                 fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                fontFamily = FontFamily.Monospace,
-            )
+                fontSize = 14.sp)
         }
     }
 }
@@ -221,10 +202,8 @@ private fun SectionHeader(title: String) {
         text = title.uppercase(),
         color = TextSec,
         fontSize = 11.sp,
-        fontFamily = FontFamily.Monospace,
         letterSpacing = 1.sp,
-        modifier = Modifier.padding(vertical = 4.dp),
-    )
+        modifier = Modifier.padding(vertical = 4.dp))
 }
 
 @Composable
@@ -233,9 +212,8 @@ private fun StatChip(label: String) {
         modifier = Modifier
             .border(1.dp, Border, RoundedCornerShape(4.dp))
             .background(Surface, RoundedCornerShape(4.dp))
-            .padding(horizontal = 10.dp, vertical = 4.dp),
-    ) {
-        Text(label, color = TextSec, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+            .padding(horizontal = 10.dp, vertical = 4.dp)) {
+        Text(label, color = TextSec, fontSize = 12.sp)
     }
 }
 
@@ -244,40 +222,32 @@ private fun EpisodeCard(
     summary: String,
     timestamp: Long,
     topics: List<String>,
-    onDelete: () -> Unit,
-) {
+    onDelete: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .border(1.dp, Border, RoundedCornerShape(8.dp))
             .background(Surface, RoundedCornerShape(8.dp))
             .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
+        verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(
             text = java.text.SimpleDateFormat("MMM d, yyyy · HH:mm", java.util.Locale.getDefault())
                 .format(java.util.Date(timestamp)),
             color = TextSec,
-            fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace,
-        )
+            fontSize = 11.sp)
         Text(summary, color = TextPri, fontSize = 13.sp)
         if (topics.isNotEmpty()) {
             Text(
                 text = topics.joinToString(" · "),
                 color = TextSec,
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
-            )
+                fontSize = 11.sp)
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
             Text(
                 text = "Delete",
                 color = AccentRed,
                 fontSize = 12.sp,
-                fontFamily = FontFamily.Monospace,
-                modifier = Modifier.clickable { onDelete() },
-            )
+                modifier = Modifier.clickable { onDelete() })
         }
     }
 }
@@ -291,10 +261,9 @@ private fun FactRow(factKey: String, value: String, onDelete: () -> Unit) {
             .background(Surface, RoundedCornerShape(6.dp))
             .padding(10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top,
-    ) {
+        verticalAlignment = Alignment.Top) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(factKey, color = TextSec, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+            Text(factKey, color = TextSec, fontSize = 11.sp)
             Text(value, color = TextPri, fontSize = 13.sp)
         }
         Spacer(Modifier.width(8.dp))
@@ -302,7 +271,6 @@ private fun FactRow(factKey: String, value: String, onDelete: () -> Unit) {
             text = "×",
             color = AccentRed,
             fontSize = 16.sp,
-            modifier = Modifier.clickable { onDelete() },
-        )
+            modifier = Modifier.clickable { onDelete() })
     }
 }

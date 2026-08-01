@@ -56,8 +56,7 @@ import com.forge.os.presentation.screens.common.StatusPill
 @Composable
 fun AgentsScreen(
     onBack: () -> Unit,
-    viewModel: AgentsViewModel = hiltViewModel(),
-) {
+    viewModel: AgentsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var spawning by remember { mutableStateOf(false) }
     var inspecting: SubAgent? by remember { mutableStateOf(null) }
@@ -75,18 +74,15 @@ fun AgentsScreen(
                 Icon(Icons.Default.Add, "Spawn",
                     tint = ForgeOsPalette.Orange, modifier = Modifier.size(20.dp))
             }
-        },
-    ) {
+        }) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (state.agents.isEmpty()) item {
                     Text("No sub-agents spawned yet.\nTap + to delegate a goal.",
-                        color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                        color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                 }
                 items(state.agents, key = { it.id }) { a ->
                     AgentCard(a, onClick = { inspecting = a })
@@ -102,16 +98,14 @@ fun AgentsScreen(
     if (spawning) SpawnDialog(
         loading = state.spawning,
         onSpawn = { goal, ctx, p, m -> viewModel.spawn(goal, ctx, p, m); spawning = false },
-        onDismiss = { spawning = false },
-    )
+        onDismiss = { spawning = false })
     val ins = inspecting
     if (ins != null) AgentDetailDialog(
         agent = ins,
         transcript = viewModel.transcript(ins.id),
         canCancel = !ins.isTerminal,
         onCancel = { viewModel.cancel(ins.id); inspecting = null },
-        onDismiss = { inspecting = null },
-    )
+        onDismiss = { inspecting = null })
 }
 
 @Composable
@@ -126,29 +120,23 @@ private fun AgentCard(a: SubAgent, onClick: () -> Unit) {
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .clickable { onClick() }.padding(12.dp),
-    ) {
+            .clickable { onClick() }.padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             StatusPill(a.status.name, color, bg)
             Spacer(Modifier.width(6.dp))
-            Text(a.id, color = ForgeOsPalette.TextDim,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text(a.id, color = ForgeOsPalette.TextDim, fontSize = 10.sp)
             Spacer(Modifier.weight(1f))
             a.durationMs?.let {
-                Text("${it}ms", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("${it}ms", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
             }
         }
         Spacer(Modifier.height(4.dp))
-        Text(a.goal.take(180), color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+        Text(a.goal.take(180), color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
         Text("d=${a.depth} tools=${a.toolCallCount}",
-            color = ForgeOsPalette.TextDim, fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace)
+            color = ForgeOsPalette.TextDim, fontSize = 10.sp)
         if (!a.overrideProvider.isNullOrBlank()) {
             Text("model: ${a.overrideProvider}/${a.overrideModel}",
-                color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                color = ForgeOsPalette.Orange, fontSize = 10.sp)
         }
     }
 }
@@ -159,73 +147,59 @@ private fun AgentDetailDialog(
     transcript: String,
     canCancel: Boolean,
     onCancel: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
-        title = { Text(agent.id, color = ForgeOsPalette.Orange,
-            fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+        title = { Text(agent.id, color = ForgeOsPalette.Orange, fontSize = 14.sp) },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
                 Text("[${agent.status}] depth=${agent.depth}",
-                    color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                    color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 if (!agent.overrideProvider.isNullOrBlank()) {
                     Text("Model Override: ${agent.overrideProvider}/${agent.overrideModel}",
-                        color = ForgeOsPalette.Orange, fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace)
+                        color = ForgeOsPalette.Orange, fontSize = 10.sp)
                 }
                 Spacer(Modifier.height(6.dp))
-                Text("GOAL", color = ForgeOsPalette.Orange, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                Text(agent.goal, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("GOAL", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
+                Text(agent.goal, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
                 Spacer(Modifier.height(8.dp))
                 if (transcript.isNotBlank()) {
-                    Text("TRANSCRIPT", color = ForgeOsPalette.Orange, fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+                    Text("TRANSCRIPT", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
                     Box(Modifier.fillMaxWidth().background(ForgeOsPalette.Bg, RoundedCornerShape(4.dp)).padding(8.dp)) {
-                        Text(transcript.take(2000), color = ForgeOsPalette.TextPrimary,
-                            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                        Text(transcript.take(2000), color = ForgeOsPalette.TextPrimary, fontSize = 10.sp)
                     }
                 }
                 agent.result?.let {
                     Spacer(Modifier.height(8.dp))
-                    Text("RESULT", color = ForgeOsPalette.Orange, fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                    Text(it.take(2000), color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("RESULT", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
+                    Text(it.take(2000), color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
                 }
                 agent.error?.let {
                     Spacer(Modifier.height(8.dp))
-                    Text("ERROR", color = ForgeOsPalette.Danger, fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                    Text(it, color = ForgeOsPalette.Danger, fontFamily = FontFamily.Monospace,
+                    Text("ERROR", color = ForgeOsPalette.Danger, fontSize = 10.sp, letterSpacing = 1.sp)
+                    Text(it, color = ForgeOsPalette.Danger,
                         fontSize = 11.sp)
                 }
             }
         },
         confirmButton = {
             if (canCancel) TextButton(onClick = onCancel) {
-                Text("CANCEL", color = ForgeOsPalette.Danger, fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.Danger)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CLOSE", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CLOSE", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
 private fun SpawnDialog(
     loading: Boolean,
     onSpawn: (String, String, String?, String?) -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     var goal by remember { mutableStateOf("") }
     var context by remember { mutableStateOf("") }
     var overrideProvider by remember { mutableStateOf<String?>(null) }
@@ -234,31 +208,22 @@ private fun SpawnDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
-        title = { Text("Spawn sub-agent", color = ForgeOsPalette.Orange,
-            fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+        title = { Text("Spawn sub-agent", color = ForgeOsPalette.Orange, fontSize = 14.sp) },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
-                Text("goal", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("goal", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(
                     value = goal, onValueChange = { goal = it },
                     modifier = Modifier.fillMaxWidth().height(120.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                    ),
-                )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
                 Spacer(Modifier.height(6.dp))
-                Text("context (optional)", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("context (optional)", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(
                     value = context, onValueChange = { context = it },
                     modifier = Modifier.fillMaxWidth().height(100.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                    ),
-                )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
                 Spacer(Modifier.height(8.dp))
                 ModelPickerRow(
                     override = if (overrideProvider != null && overrideModel != null) overrideProvider!! to overrideModel!! else null,
@@ -273,16 +238,14 @@ private fun SpawnDialog(
             TextButton(onClick = { onSpawn(goal, context, overrideProvider, overrideModel) },
                 enabled = goal.isNotBlank() && !loading) {
                 Text(if (loading) "RUNNING…" else "SPAWN",
-                    color = ForgeOsPalette.Success, fontFamily = FontFamily.Monospace)
+                    color = ForgeOsPalette.Success)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 
     if (showPicker) {
         val viewModel: AgentsViewModel = hiltViewModel()

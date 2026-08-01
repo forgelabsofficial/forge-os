@@ -20,14 +20,12 @@ data class CronUiState(
     val history: List<CronExecution> = emptyList(),
     val running: String? = null,
     val message: String? = null,
-    val availableModels: List<AiApiManager.Quad> = emptyList(),
-)
+    val availableModels: List<AiApiManager.Quad> = emptyList())
 
 @HiltViewModel
 class CronViewModel @Inject constructor(
     private val cronManager: CronManager,
-    private val cronRepository: CronRepository,
-) : ViewModel() {
+    private val cronRepository: CronRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(CronUiState())
     val state: StateFlow<CronUiState> = _state.asStateFlow()
@@ -43,8 +41,7 @@ class CronViewModel @Inject constructor(
     fun refresh() {
         _state.value = _state.value.copy(
             jobs = cronManager.listJobs(),
-            history = cronManager.recentHistory(limit = 30),
-        )
+            history = cronManager.recentHistory(limit = 30))
     }
 
     fun create(
@@ -81,8 +78,7 @@ class CronViewModel @Inject constructor(
             _state.value = _state.value.copy(
                 running = null,
                 message = if (exec.success) "✓ '${job.name}' (${exec.durationMs}ms)"
-                          else "✗ '${job.name}': ${exec.error ?: "failed"}",
-            )
+                          else "✗ '${job.name}': ${exec.error ?: "failed"}")
             refresh()
         }
     }

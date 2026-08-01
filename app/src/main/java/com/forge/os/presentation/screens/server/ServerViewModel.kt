@@ -18,14 +18,12 @@ data class ServerUiState(
     val running: Boolean = false,
     val port: Int = ForgeHttpServer.DEFAULT_PORT,
     val apiKey: String = "",
-    val lanIps: List<String> = emptyList(),
-)
+    val lanIps: List<String> = emptyList())
 
 @HiltViewModel
 class ServerViewModel @Inject constructor(
     app: Application,
-    private val server: ForgeHttpServer,
-) : AndroidViewModel(app) {
+    private val server: ForgeHttpServer) : AndroidViewModel(app) {
 
     private val _state = MutableStateFlow(ServerUiState())
     val state: StateFlow<ServerUiState> = _state
@@ -38,8 +36,7 @@ class ServerViewModel @Inject constructor(
                 running = server.isRunning(),
                 port = server.port(),
                 apiKey = server.apiKey(),
-                lanIps = detectLanIps(),
-            )
+                lanIps = detectLanIps())
         }
     }
 

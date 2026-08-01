@@ -31,10 +31,8 @@ fun DoctorScreen(onBack: () -> Unit, viewModel: DoctorViewModel = hiltViewModel(
                 Button(
                     onClick = { viewModel.runChecks() }, enabled = !busy,
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange),
-                ) {
-                    Text(if (busy) "SCANNING..." else "RUN CHECKS",
-                        fontFamily = FontFamily.Monospace)
+                    colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange)) {
+                    Text(if (busy) "SCANNING..." else "RUN CHECKS")
                 }
             }
             Spacer(Modifier.height(10.dp))
@@ -42,14 +40,13 @@ fun DoctorScreen(onBack: () -> Unit, viewModel: DoctorViewModel = hiltViewModel(
             val r = report
             when {
                 r == null -> Text("Initialising...",
-                    color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace)
+                    color = ForgeOsPalette.TextMuted)
                 else -> {
                     Text("${r.checks.size} checks  •  " +
                         "${r.checks.count { it.status == CheckStatus.OK }} ok  •  " +
                         "${r.checks.count { it.status == CheckStatus.WARN }} warn  •  " +
                         "${r.checks.count { it.status == CheckStatus.FAIL }} fail",
-                        color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                        color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                     Spacer(Modifier.height(8.dp))
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(r.checks, key = { it.id }) { c -> CheckRow(c) { viewModel.fix(c.id) } }
@@ -76,20 +73,17 @@ private fun CheckRow(c: DoctorCheck, onFix: () -> Unit) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.background(bg, RoundedCornerShape(4.dp))
                 .padding(horizontal = 6.dp, vertical = 2.dp)) {
-                Text(symbol, color = color, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                Text(symbol, color = color, fontSize = 12.sp)
             }
             Spacer(Modifier.width(8.dp))
-            Text(c.title, color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 13.sp,
+            Text(c.title, color = ForgeOsPalette.TextPrimary, fontSize = 13.sp,
                 modifier = Modifier.weight(1f))
             if (c.fixable && c.status != CheckStatus.OK) {
                 TextButton(onClick = onFix) {
-                    Text("FIX", color = ForgeOsPalette.Orange,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("FIX", color = ForgeOsPalette.Orange, fontSize = 11.sp)
                 }
             }
         }
-        Text(c.detail, color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+        Text(c.detail, color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
     }
 }

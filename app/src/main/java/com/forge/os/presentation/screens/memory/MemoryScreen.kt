@@ -63,8 +63,7 @@ import com.forge.os.presentation.screens.common.ModuleScaffold
 @Composable
 fun MemoryScreen(
     onBack: () -> Unit,
-    viewModel: MemoryViewModel = hiltViewModel(),
-) {
+    viewModel: MemoryViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var showWipe by remember { mutableStateOf(false) }
     var menuOpen by remember { mutableStateOf(false) }
@@ -79,11 +78,9 @@ fun MemoryScreen(
     }
 
     val exportLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.CreateDocument("application/json"),
-    ) { uri -> if (uri != null) viewModel.exportTo(uri) }
+        ActivityResultContracts.CreateDocument("application/json")) { uri -> if (uri != null) viewModel.exportTo(uri) }
     val importLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent(),
-    ) { uri -> if (uri != null) viewModel.importFrom(uri) }
+        ActivityResultContracts.GetContent()) { uri -> if (uri != null) viewModel.importFrom(uri) }
 
     ModuleScaffold(
         title = "MEMORY",
@@ -106,35 +103,27 @@ fun MemoryScreen(
             DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false },
                 modifier = Modifier.background(ForgeOsPalette.Surface)) {
                 DropdownMenuItem(
-                    text = { Text("Export…", color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp) },
+                    text = { Text("Export…", color = ForgeOsPalette.TextPrimary, fontSize = 12.sp) },
                     leadingIcon = { Icon(Icons.Default.Download, null,
                         tint = ForgeOsPalette.TextMuted, modifier = Modifier.size(16.dp)) },
-                    onClick = { menuOpen = false; exportLauncher.launch("memory_${System.currentTimeMillis()}.json") },
-                )
+                    onClick = { menuOpen = false; exportLauncher.launch("memory_${System.currentTimeMillis()}.json") })
                 DropdownMenuItem(
-                    text = { Text("Import…", color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp) },
+                    text = { Text("Import…", color = ForgeOsPalette.TextPrimary, fontSize = 12.sp) },
                     leadingIcon = { Icon(Icons.Default.Upload, null,
                         tint = ForgeOsPalette.TextMuted, modifier = Modifier.size(16.dp)) },
-                    onClick = { menuOpen = false; importLauncher.launch("application/json") },
-                )
+                    onClick = { menuOpen = false; importLauncher.launch("application/json") })
                 DropdownMenuItem(
-                    text = { Text("Wipe all", color = ForgeOsPalette.Danger,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp) },
+                    text = { Text("Wipe all", color = ForgeOsPalette.Danger, fontSize = 12.sp) },
                     leadingIcon = { Icon(Icons.Default.DeleteForever, null,
                         tint = ForgeOsPalette.Danger, modifier = Modifier.size(16.dp)) },
-                    onClick = { menuOpen = false; showWipe = true },
-                )
+                    onClick = { menuOpen = false; showWipe = true })
             }
-        },
-    ) {
+        }) {
         Column(Modifier.fillMaxSize()) {
             TabsRow(state.tab) { viewModel.selectTab(it) }
             Row(
                 Modifier.fillMaxWidth().padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+                verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = state.query, onValueChange = viewModel::setQuery,
                     modifier = Modifier.weight(1f),
@@ -142,27 +131,20 @@ fun MemoryScreen(
                     placeholder = {
                         val hint = if (state.searchMode == SearchMode.SEMANTIC)
                             "ask in natural language…" else "search…"
-                        Text(hint, color = ForgeOsPalette.TextDim,
-                            fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                        Text(hint, color = ForgeOsPalette.TextDim, fontSize = 12.sp)
                     },
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                    ),
-                )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
                 if (state.tab == MemoryTab.FACTS) {
                     Spacer(Modifier.size(6.dp))
                     val active = state.searchMode == SearchMode.SEMANTIC
                     TextButton(
                         onClick = { viewModel.toggleSearchMode() },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
-                    ) {
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)) {
                         Text(
                             if (state.semanticBusy) "…"
                             else if (active) "SEM" else "LEX",
-                            color = if (active) ForgeOsPalette.Orange else ForgeOsPalette.TextMuted,
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                        )
+                            color = if (active) ForgeOsPalette.Orange else ForgeOsPalette.TextMuted, fontSize = 11.sp)
                     }
                 }
             }
@@ -170,8 +152,7 @@ fun MemoryScreen(
                 LazyColumn(
                     Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                ) {
+                    verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     when (state.tab) {
                         MemoryTab.DAILY -> items(state.daily.reversed()) { e ->
                             EventLine(e.role, e.content, e.timestamp)
@@ -196,8 +177,7 @@ fun MemoryScreen(
                             (state.tab == MemoryTab.SKILLS && state.skills.isEmpty()) ||
                             (state.tab == MemoryTab.EPISODES && state.episodes.isEmpty()) ||
                             (state.tab == MemoryTab.REFLECTIONS && state.reflections.isEmpty())) {
-                            Text("(empty)", color = ForgeOsPalette.TextDim,
-                                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            Text("(empty)", color = ForgeOsPalette.TextDim, fontSize = 11.sp)
                         }
                     }
                 }
@@ -213,19 +193,14 @@ fun MemoryScreen(
         AlertDialog(
             onDismissRequest = { showWipe = false },
             containerColor = ForgeOsPalette.Surface,
-            title = { Text("Wipe all memory?", color = ForgeOsPalette.Danger,
-                fontFamily = FontFamily.Monospace) },
+            title = { Text("Wipe all memory?", color = ForgeOsPalette.Danger) },
             text = { Text("This permanently deletes facts, skills, and daily events. " +
                 "Export first if you want a backup.",
-                color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp) },
+                color = ForgeOsPalette.TextPrimary, fontSize = 12.sp) },
             confirmButton = { TextButton(onClick = { showWipe = false; viewModel.wipeAll() }) {
-                Text("WIPE", color = ForgeOsPalette.Danger,
-                    fontFamily = FontFamily.Monospace) } },
+                Text("WIPE", color = ForgeOsPalette.Danger) } },
             dismissButton = { TextButton(onClick = { showWipe = false }) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace) } },
-        )
+                Text("CANCEL", color = ForgeOsPalette.TextMuted) } })
     }
 
     val ef = editingFact
@@ -233,27 +208,23 @@ fun MemoryScreen(
         initial = ef,
         onSave = { k, c, t -> viewModel.upsertFact(k, c, t); editingFact = null },
         onDelete = { viewModel.deleteFact(ef.key); editingFact = null },
-        onDismiss = { editingFact = null },
-    )
+        onDismiss = { editingFact = null })
     if (creatingFact) FactDialog(
         initial = null,
         onSave = { k, c, t -> viewModel.upsertFact(k, c, t); creatingFact = false },
         onDelete = null,
-        onDismiss = { creatingFact = false },
-    )
+        onDismiss = { creatingFact = false })
     val es = editingSkill
     if (es != null) SkillDialog(
         initial = es,
         onSave = { n, d, c, t -> viewModel.upsertSkill(n, d, c, t); editingSkill = null },
         onDelete = { viewModel.deleteSkill(es.name); editingSkill = null },
-        onDismiss = { editingSkill = null },
-    )
+        onDismiss = { editingSkill = null })
     if (creatingSkill) SkillDialog(
         initial = null,
         onSave = { n, d, c, t -> viewModel.upsertSkill(n, d, c, t); creatingSkill = false },
         onDelete = null,
-        onDismiss = { creatingSkill = false },
-    )
+        onDismiss = { creatingSkill = false })
 }
 
 @Composable
@@ -263,10 +234,8 @@ private fun TabsRow(selected: MemoryTab, onSelect: (MemoryTab) -> Unit) {
             val active = t == selected
             Text(
                 t.name,
-                color = if (active) ForgeOsPalette.Orange else ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp, letterSpacing = 1.sp,
-                modifier = Modifier.weight(1f).clickable { onSelect(t) }.padding(8.dp),
-            )
+                color = if (active) ForgeOsPalette.Orange else ForgeOsPalette.TextMuted, fontSize = 12.sp, letterSpacing = 1.sp,
+                modifier = Modifier.weight(1f).clickable { onSelect(t) }.padding(8.dp))
         }
     }
 }
@@ -280,10 +249,8 @@ private fun EventLine(role: String, content: String, ts: Long) {
         else -> ForgeOsPalette.TextMuted
     }
     Column(Modifier.fillMaxWidth().padding(vertical = 2.dp)) {
-        Text("[$role]", color = color, fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace)
-        Text(content.take(400), color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace)
+        Text("[$role]", color = color, fontSize = 10.sp)
+        Text(content.take(400), color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
     }
 }
 
@@ -292,26 +259,20 @@ private fun FactCard(f: FactEntry, score: Float? = null, onClick: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .clickable { onClick() }.padding(10.dp),
-    ) {
+            .clickable { onClick() }.padding(10.dp)) {
         Row {
-            Text(f.key, color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+            Text(f.key, color = ForgeOsPalette.Orange, fontSize = 12.sp)
             Spacer(Modifier.weight(1f))
             if (score != null) {
-                Text("sim ${"%.2f".format(score)}", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("sim ${"%.2f".format(score)}", color = ForgeOsPalette.Orange, fontSize = 10.sp)
                 Spacer(Modifier.size(8.dp))
             }
-            Text("×${f.accessCount}", color = ForgeOsPalette.TextDim,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("×${f.accessCount}", color = ForgeOsPalette.TextDim, fontSize = 10.sp)
         }
-        Text(f.content.take(220), color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace)
+        Text(f.content.take(220), color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
         if (f.tags.isNotEmpty()) {
             Text(f.tags.joinToString(" ") { "#$it" },
-                color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace)
+                color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
     }
 }
@@ -321,19 +282,14 @@ private fun SkillCard(s: SkillEntry, onClick: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .clickable { onClick() }.padding(10.dp),
-    ) {
+            .clickable { onClick() }.padding(10.dp)) {
         Row {
-            Text(s.name, color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+            Text(s.name, color = ForgeOsPalette.Orange, fontSize = 12.sp)
             Spacer(Modifier.weight(1f))
-            Text("×${s.useCount}", color = ForgeOsPalette.TextDim,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("×${s.useCount}", color = ForgeOsPalette.TextDim, fontSize = 10.sp)
         }
-        Text(s.description, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace)
-        Text("${s.code.lines().size} lines", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace)
+        Text(s.description, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
+        Text("${s.code.lines().size} lines", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
     }
 }
 
@@ -342,40 +298,31 @@ private fun EpisodeCard(e: EpisodicMemory, onDelete: () -> Unit) {
     Column(
         Modifier.fillMaxWidth().background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(10.dp),
-    ) {
+            .padding(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("EPISODE", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("EPISODE", color = ForgeOsPalette.Orange, fontSize = 10.sp)
             Spacer(Modifier.weight(1f))
             Text(java.text.SimpleDateFormat("MMM dd HH:mm",
                 java.util.Locale.US).format(java.util.Date(e.timestamp)),
-                color = ForgeOsPalette.TextDim,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                color = ForgeOsPalette.TextDim, fontSize = 10.sp)
             Spacer(Modifier.size(8.dp))
             TextButton(onClick = onDelete, contentPadding = PaddingValues(0.dp)) {
-                Text("DEL", color = ForgeOsPalette.Danger,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("DEL", color = ForgeOsPalette.Danger, fontSize = 10.sp)
             }
         }
-        Text(e.summary, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace)
+        Text(e.summary, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
         if (e.moodTrajectory.isNotBlank()) {
-            Text("mood: ${e.moodTrajectory}", color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("mood: ${e.moodTrajectory}", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
         if (e.keyTopics.isNotEmpty()) {
             Text("topics: ${e.keyTopics.joinToString(", ")}",
-                color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
         if (e.followUps.isNotEmpty()) {
             Spacer(Modifier.size(4.dp))
-            Text("follow-ups:", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("follow-ups:", color = ForgeOsPalette.Orange, fontSize = 10.sp)
             e.followUps.forEach { f ->
-                Text("  • ${f.question}", color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("  • ${f.question}", color = ForgeOsPalette.TextPrimary, fontSize = 10.sp)
             }
         }
     }
@@ -387,36 +334,27 @@ private fun ReflectionCard(p: StoredPattern) {
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(10.dp),
-    ) {
+            .padding(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 p.name,
                 color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace,
                 fontSize = 12.sp,
-                modifier = Modifier.weight(1f),
-            )
+                modifier = Modifier.weight(1f))
             Text(
                 "×${p.useCount}",
                 color = ForgeOsPalette.TextDim,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp,
-            )
+                fontSize = 10.sp)
         }
         Text(
             p.description.take(200),
             color = ForgeOsPalette.TextPrimary,
-            fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace,
-        )
+            fontSize = 11.sp)
         if (p.tags.isNotEmpty()) {
             Text(
                 p.tags.joinToString(" ") { "#$it" },
                 color = ForgeOsPalette.TextMuted,
-                fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace,
-            )
+                fontSize = 10.sp)
         }
     }
 }
@@ -426,8 +364,7 @@ private fun FactDialog(
     initial: FactEntry?,
     onSave: (String, String, List<String>) -> Unit,
     onDelete: (() -> Unit)?,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     var key by remember { mutableStateOf(initial?.key ?: "") }
     var content by remember { mutableStateOf(initial?.content ?: "") }
     var tags by remember { mutableStateOf(initial?.tags?.joinToString(",") ?: "") }
@@ -435,7 +372,7 @@ private fun FactDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
         title = { Text(if (initial == null) "New fact" else "Edit fact",
-            color = ForgeOsPalette.Orange, fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+            color = ForgeOsPalette.Orange, fontSize = 14.sp) },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
                 LabeledField("key", key, initial == null) { key = it }
@@ -446,21 +383,19 @@ private fun FactDialog(
         confirmButton = {
             Row {
                 if (onDelete != null) TextButton(onClick = onDelete) {
-                    Text("DELETE", color = ForgeOsPalette.Danger, fontFamily = FontFamily.Monospace)
+                    Text("DELETE", color = ForgeOsPalette.Danger)
                 }
                 TextButton(
                     onClick = { onSave(key.trim(), content,
                         tags.split(",").map { it.trim() }.filter { it.isNotBlank() }) },
-                    enabled = key.isNotBlank() && content.isNotBlank(),
-                ) { Text("SAVE", color = ForgeOsPalette.Success, fontFamily = FontFamily.Monospace) }
+                    enabled = key.isNotBlank() && content.isNotBlank()) { Text("SAVE", color = ForgeOsPalette.Success) }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -468,8 +403,7 @@ private fun SkillDialog(
     initial: SkillEntry?,
     onSave: (String, String, String, List<String>) -> Unit,
     onDelete: (() -> Unit)?,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     var name by remember { mutableStateOf(initial?.name ?: "") }
     var desc by remember { mutableStateOf(initial?.description ?: "") }
     var code by remember { mutableStateOf(initial?.code ?: "") }
@@ -478,70 +412,56 @@ private fun SkillDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
         title = { Text(if (initial == null) "New skill" else "Edit skill",
-            color = ForgeOsPalette.Orange, fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+            color = ForgeOsPalette.Orange, fontSize = 14.sp) },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
                 LabeledField("name", name, initial == null) { name = it }
                 LabeledField("description", desc, true) { desc = it }
-                Text("code (Python)", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("code (Python)", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(
                     value = code, onValueChange = { code = it },
                     modifier = Modifier.fillMaxWidth().height(180.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                    ),
-                )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 11.sp))
                 LabeledField("tags", tags, true) { tags = it }
             }
         },
         confirmButton = {
             Row {
                 if (onDelete != null) TextButton(onClick = onDelete) {
-                    Text("DELETE", color = ForgeOsPalette.Danger, fontFamily = FontFamily.Monospace)
+                    Text("DELETE", color = ForgeOsPalette.Danger)
                 }
                 TextButton(
                     onClick = { onSave(name.trim(), desc, code,
                         tags.split(",").map { it.trim() }.filter { it.isNotBlank() }) },
-                    enabled = name.isNotBlank() && desc.isNotBlank() && code.isNotBlank(),
-                ) { Text("SAVE", color = ForgeOsPalette.Success, fontFamily = FontFamily.Monospace) }
+                    enabled = name.isNotBlank() && desc.isNotBlank() && code.isNotBlank()) { Text("SAVE", color = ForgeOsPalette.Success) }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
 private fun LabeledField(label: String, value: String, enabled: Boolean = true, onChange: (String) -> Unit) {
-    Text(label, color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-        fontFamily = FontFamily.Monospace)
+    Text(label, color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
     OutlinedTextField(
         value = value, onValueChange = onChange,
         modifier = Modifier.fillMaxWidth(), singleLine = true, enabled = enabled,
         textStyle = androidx.compose.ui.text.TextStyle(
-            color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-        ),
-    )
+            color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
     Spacer(Modifier.height(6.dp))
 }
 
 @Composable
 private fun LabeledArea(label: String, value: String, onChange: (String) -> Unit) {
-    Text(label, color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-        fontFamily = FontFamily.Monospace)
+    Text(label, color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
     OutlinedTextField(
         value = value, onValueChange = onChange,
         modifier = Modifier.fillMaxWidth().height(140.dp),
         textStyle = androidx.compose.ui.text.TextStyle(
-            color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-        ),
-    )
+            color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
     Spacer(Modifier.height(6.dp))
 }

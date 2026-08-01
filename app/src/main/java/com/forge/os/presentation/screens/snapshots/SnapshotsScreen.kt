@@ -36,8 +36,7 @@ import java.util.Locale
 @Composable
 fun SnapshotsScreen(
     onBack: () -> Unit,
-    viewModel: SnapshotsViewModel = hiltViewModel(),
-) {
+    viewModel: SnapshotsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var showCreate by remember { mutableStateOf(false) }
     var confirmRestore: SnapshotInfo? by remember { mutableStateOf(null) }
@@ -53,28 +52,24 @@ fun SnapshotsScreen(
         onBack = onBack,
         actions = {
             TextButton(onClick = { showCreate = true }) {
-                Text("+ NEW", color = forgePalette.orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                Text("+ NEW", color = forgePalette.orange, fontSize = 12.sp)
             }
         }
     ) {
         Column(Modifier.fillMaxSize()) {
             Text(
                 "Differential snapshots use Git-backed deduplication. Restoring reverts the entire workspace to that state.",
-                color = forgePalette.textMuted, fontFamily = FontFamily.Monospace,
-                fontSize = 11.sp, modifier = Modifier.padding(12.dp),
-            )
+                color = forgePalette.textMuted,
+                fontSize = 11.sp, modifier = Modifier.padding(12.dp))
             if (state.items.isEmpty()) {
-                Text("No snapshots yet.", color = forgePalette.textMuted,
-                    fontFamily = FontFamily.Monospace, modifier = Modifier.padding(16.dp))
+                Text("No snapshots yet.", color = forgePalette.textMuted, modifier = Modifier.padding(16.dp))
             } else {
                 LazyColumn(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
                     items(state.items, key = { it.id }) { snap ->
                         SnapshotRow(
                             snap = snap,
                             onRestore = { confirmRestore = snap },
-                            onDelete = { confirmDelete = snap },
-                        )
+                            onDelete = { confirmDelete = snap })
                         Spacer(Modifier.height(8.dp))
                     }
                 }
@@ -92,8 +87,7 @@ fun SnapshotsScreen(
                 OutlinedTextField(
                     value = label, onValueChange = { label = it },
                     label = { Text("Label (optional)") },
-                    singleLine = true,
-                )
+                    singleLine = true)
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -146,30 +140,25 @@ private fun SnapshotRow(snap: SnapshotInfo, onRestore: () -> Unit, onDelete: () 
             .background(forgePalette.surface, RoundedCornerShape(6.dp))
             .border(1.dp, forgePalette.border, RoundedCornerShape(6.dp))
             .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Text(snap.label, color = forgePalette.textPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(snap.label, color = forgePalette.textPrimary, fontSize = 13.sp)
         Text("${snap.id.take(12)}${if (snap.id.length > 12) "..." else ""} • ${tsFmt.format(Date(snap.createdAt))}",
-            color = forgePalette.textMuted, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            color = forgePalette.textMuted, fontSize = 10.sp)
         Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
             Text(
                 if (snap.isDifferential) "DIFFERENTIAL" else "${snap.fileCount} files • ${formatBytes(snap.sizeBytes)}",
-                color = if (snap.isDifferential) forgePalette.orange else forgePalette.textMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp
+                color = if (snap.isDifferential) forgePalette.orange else forgePalette.textMuted, fontSize = 10.sp
             )
             if (snap.isDifferential) {
                 Spacer(Modifier.width(8.dp))
-                Text("(Git VCS)", color = forgePalette.textMuted, fontFamily = FontFamily.Monospace, fontSize = 9.sp)
+                Text("(Git VCS)", color = forgePalette.textMuted, fontSize = 9.sp)
             }
         }
         Spacer(Modifier.height(4.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("RESTORE", color = forgePalette.orange,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+            Text("RESTORE", color = forgePalette.orange, fontSize = 11.sp,
                 modifier = Modifier.clickable { onRestore() })
-            Text("DELETE", color = forgePalette.danger,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+            Text("DELETE", color = forgePalette.danger, fontSize = 11.sp,
                 modifier = Modifier.clickable { onDelete() })
         }
     }

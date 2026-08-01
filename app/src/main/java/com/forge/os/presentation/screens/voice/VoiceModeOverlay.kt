@@ -53,8 +53,7 @@ private val VoiceTextMuted = Color(0xFF888888)
 @Composable
 fun VoiceModeOverlay(
     onDismiss: () -> Unit,
-    viewModel: VoiceModeViewModel = hiltViewModel(),
-) {
+    viewModel: VoiceModeViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
@@ -84,8 +83,7 @@ fun VoiceModeOverlay(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnBackPress = true,
-            dismissOnClickOutside = false,
-        )
+            dismissOnClickOutside = false)
     ) {
         Box(
             modifier = Modifier
@@ -98,23 +96,19 @@ fun VoiceModeOverlay(
                     .fillMaxSize()
                     .padding(horizontal = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween,
-            ) {
+                verticalArrangement = Arrangement.SpaceBetween) {
                 // ── Top bar ──────────────────────────────────────────────────
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 24.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
+                    verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "Voice Mode",
                         color = VoiceTextMuted,
                         fontSize = 14.sp,
-                        fontFamily = FontFamily.Monospace,
-                        letterSpacing = 2.sp,
-                    )
+                        letterSpacing = 2.sp)
                     IconButton(
                         onClick = { viewModel.exitVoiceMode(); onDismiss() },
                         modifier = Modifier
@@ -131,8 +125,7 @@ fun VoiceModeOverlay(
                 AnimatedVisibility(
                     visible = state.transcript.isNotBlank(),
                     enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
+                    exit = fadeOut()) {
                     Text(
                         state.transcript,
                         color = VoiceTextMuted,
@@ -140,8 +133,7 @@ fun VoiceModeOverlay(
                         textAlign = TextAlign.Center,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+                        modifier = Modifier.fillMaxWidth())
                 }
 
                 Spacer(Modifier.weight(1f))
@@ -150,8 +142,7 @@ fun VoiceModeOverlay(
                 VoiceOrb(
                     phase = state.phase,
                     rmsLevel = state.rmsLevel,
-                    onTap = { viewModel.tapOrb() },
-                )
+                    onTap = { viewModel.tapOrb() })
 
                 Spacer(Modifier.weight(1f))
 
@@ -170,9 +161,7 @@ fun VoiceModeOverlay(
                         VoicePhase.IDLE      -> VoiceTextMuted
                     },
                     fontSize = 14.sp,
-                    fontFamily = FontFamily.Monospace,
-                    letterSpacing = 1.sp,
-                )
+                    letterSpacing = 1.sp)
 
                 Spacer(Modifier.height(16.dp))
 
@@ -180,15 +169,13 @@ fun VoiceModeOverlay(
                 AnimatedVisibility(
                     visible = state.agentResponse.isNotBlank(),
                     enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
+                    exit = fadeOut()) {
                     Surface(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
                         color = VoiceSurface,
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                    ) {
+                        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)) {
                         Text(
                             state.agentResponse.take(300).let {
                                 if (state.agentResponse.length > 300) "$it…" else it
@@ -197,8 +184,7 @@ fun VoiceModeOverlay(
                             fontSize = 14.sp,
                             lineHeight = 20.sp,
                             textAlign = TextAlign.Start,
-                            modifier = Modifier.padding(16.dp),
-                        )
+                            modifier = Modifier.padding(16.dp))
                     }
                 }
 
@@ -206,12 +192,10 @@ fun VoiceModeOverlay(
                 AnimatedVisibility(visible = state.error != null) {
                     Text(
                         state.error ?: "",
-                        color = Color(0xFFEF4444),
+                        color = forgePalette.danger,
                         fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                    )
+                        modifier = Modifier.padding(bottom = 8.dp))
                 }
 
                 Spacer(Modifier.height(32.dp))
@@ -228,8 +212,7 @@ fun VoiceModeOverlay(
 private fun VoiceOrb(
     phase: VoicePhase,
     rmsLevel: Float,
-    onTap: () -> Unit,
-) {
+    onTap: () -> Unit) {
     val infiniteTransition = rememberInfiniteTransition(label = "orb")
 
     // Idle / thinking pulse
@@ -238,10 +221,8 @@ private fun VoiceOrb(
         targetValue = 1.08f,
         animationSpec = infiniteRepeatable(
             tween(1800, easing = FastOutSlowInEasing),
-            RepeatMode.Reverse,
-        ),
-        label = "idle_pulse",
-    )
+            RepeatMode.Reverse),
+        label = "idle_pulse")
 
     // Speaking bounce
     val speakBounce by infiniteTransition.animateFloat(
@@ -249,18 +230,15 @@ private fun VoiceOrb(
         targetValue = 1.15f,
         animationSpec = infiniteRepeatable(
             tween(400, easing = FastOutSlowInEasing),
-            RepeatMode.Reverse,
-        ),
-        label = "speak_bounce",
-    )
+            RepeatMode.Reverse),
+        label = "speak_bounce")
 
     // Thinking rotation (ring)
     val thinkRotation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
         animationSpec = infiniteRepeatable(tween(1200, easing = LinearEasing)),
-        label = "think_rotation",
-    )
+        label = "think_rotation")
 
     val orbScale = when (phase) {
         VoicePhase.LISTENING -> 1f + rmsLevel * 0.35f   // grows with voice
@@ -283,12 +261,9 @@ private fun VoiceOrb(
             .scale(orbScale)
             .background(
                 brush = Brush.radialGradient(
-                    colors = listOf(orbColor.copy(alpha = 0.25f), Color.Transparent),
-                ),
-                shape = CircleShape,
-            )
-            .clickable { onTap() },
-    ) {
+                    colors = listOf(orbColor.copy(alpha = 0.25f), Color.Transparent)),
+                shape = CircleShape)
+            .clickable { onTap() }) {
         // Outer glow ring
         Box(
             modifier = Modifier
@@ -301,8 +276,7 @@ private fun VoiceOrb(
             modifier = Modifier
                 .size(100.dp)
                 .background(orbColor, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
+            contentAlignment = Alignment.Center) {
             Icon(
                 imageVector = when (phase) {
                     VoicePhase.LISTENING -> Icons.Default.Mic
@@ -312,8 +286,7 @@ private fun VoiceOrb(
                 },
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.size(40.dp),
-            )
+                modifier = Modifier.size(40.dp))
         }
     }
 }

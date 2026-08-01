@@ -49,8 +49,7 @@ data class ChatMessage(
     /** Absolute path to a file the agent produced (image, audio, download, etc.) */
     val attachmentPath: String? = null,
     /** MIME type of the attachment, e.g. "image/png", "audio/mpeg", "application/pdf" */
-    val attachmentMime: String? = null,
-)
+    val attachmentMime: String? = null)
 
 /** A mid-run clarification request from the agent to the user. */
 data class InputRequest(val question: String, val requestId: String)
@@ -192,8 +191,7 @@ class ChatViewModel @Inject constructor(
             pendingSends.addLast(input)
             addMsg(ChatMessage(
                 role = "user",
-                content = "$input\n\n⏳ queued — will run after the current turn finishes",
-            ))
+                content = "$input\n\n⏳ queued — will run after the current turn finishes"))
             return
         }
 
@@ -258,8 +256,7 @@ class ChatViewModel @Inject constructor(
                             toolName = event.name,
                             isError = event.isError,
                             attachmentPath = attachPath,
-                            attachmentMime = attachMime,
-                        ))
+                            attachmentMime = attachMime))
                         val lastCall = _messages.value.lastOrNull {
                             it.role == "tool_call" && it.toolName == event.name
                         }
@@ -535,8 +532,7 @@ SETTINGS: tap ⚙ to add API keys & custom endpoints.
         // Tools that produce files: file_write, file_download, python_run (output path), autophone_screenshot
         val fileProducingTools = setOf(
             "file_write", "file_download", "python_run",
-            "autophone_screenshot", "browser_screenshot_region",
-        )
+            "autophone_screenshot", "browser_screenshot_region")
         if (toolName !in fileProducingTools) return null to null
         if (result.contains("\"ok\":false") || result.contains("error")) return null to null
 

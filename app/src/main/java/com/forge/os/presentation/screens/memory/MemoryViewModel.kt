@@ -40,16 +40,14 @@ data class MemoryUiState(
     /** Phase J2: filled when [searchMode] = SEMANTIC; key → cosine score. */
     val factScores: Map<String, Float> = emptyMap(),
     val semanticBusy: Boolean = false,
-    val message: String? = null,
-)
+    val message: String? = null)
 
 @HiltViewModel
 class MemoryViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val memoryManager: MemoryManager,
     private val episodicStore: EpisodicMemoryStore,
-    private val reflectionStore: ReflectionStore,
-) : ViewModel() {
+    private val reflectionStore: ReflectionStore) : ViewModel() {
 
     private val _state = MutableStateFlow(MemoryUiState())
     val state: StateFlow<MemoryUiState> = _state.asStateFlow()
@@ -79,8 +77,7 @@ class MemoryViewModel @Inject constructor(
             } }
         _state.value = s.copy(
             daily = daily, facts = factsLexical, skills = skills, episodes = episodes,
-            factScores = if (s.searchMode == SearchMode.LEXICAL) emptyMap() else s.factScores,
-        )
+            factScores = if (s.searchMode == SearchMode.LEXICAL) emptyMap() else s.factScores)
         // Load reflections async (suspend function)
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -105,8 +102,7 @@ class MemoryViewModel @Inject constructor(
         val cur = _state.value.searchMode
         _state.value = _state.value.copy(
             searchMode = if (cur == SearchMode.LEXICAL) SearchMode.SEMANTIC else SearchMode.LEXICAL,
-            factScores = emptyMap(),
-        )
+            factScores = emptyMap())
         refresh()
     }
 
@@ -119,14 +115,12 @@ class MemoryViewModel @Inject constructor(
                 val ordered = hits.mapNotNull { all[it.key] }
                 val scores = hits.associate { it.key to it.score }
                 _state.value = _state.value.copy(
-                    facts = ordered, factScores = scores, semanticBusy = false,
-                )
+                    facts = ordered, factScores = scores, semanticBusy = false)
             } catch (e: Exception) {
                 Timber.w(e, "Semantic fact search failed")
                 _state.value = _state.value.copy(
                     semanticBusy = false,
-                    message = "❌ Semantic search failed: ${e.message}",
-                )
+                    message = "❌ Semantic search failed: ${e.message}")
             }
         }
     }
@@ -188,8 +182,7 @@ class MemoryViewModel @Inject constructor(
                 val archive = MemoryArchive(
                     facts = memoryManager.longterm.getAll(),
                     skills = memoryManager.skill.getAll(),
-                    daily = memoryManager.daily.readRecent(days = 30),
-                )
+                    daily = memoryManager.daily.readRecent(days = 30))
                 context.contentResolver.openOutputStream(uri)?.use {
                     it.write(MemoryArchive.toJson(archive).toByteArray())
                 }

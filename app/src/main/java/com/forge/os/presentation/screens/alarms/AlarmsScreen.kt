@@ -41,9 +41,9 @@ fun AlarmsScreen(onBack: () -> Unit, viewModel: AlarmsViewModel = hiltViewModel(
             // Phase R — Sessions tab so users can verify alarms actually fired.
             TabRow(selectedTabIndex = tab, containerColor = ForgeOsPalette.Surface) {
                 Tab(selected = tab == 0, onClick = { tab = 0 },
-                    text = { Text("ALARMS (${alarms.size})", fontFamily = FontFamily.Monospace, fontSize = 12.sp) })
+                    text = { Text("ALARMS (${alarms.size})", fontSize = 12.sp) })
                 Tab(selected = tab == 1, onClick = { tab = 1; viewModel.refresh() },
-                    text = { Text("SESSIONS (${sessions.size})", fontFamily = FontFamily.Monospace, fontSize = 12.sp) })
+                    text = { Text("SESSIONS (${sessions.size})", fontSize = 12.sp) })
             }
             Spacer(Modifier.height(8.dp))
 
@@ -51,17 +51,14 @@ fun AlarmsScreen(onBack: () -> Unit, viewModel: AlarmsViewModel = hiltViewModel(
                 Button(
                     onClick = { showAdd = true },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange),
-                ) { Text("+ NEW ALARM", fontFamily = FontFamily.Monospace) }
+                    colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange)) { Text("+ NEW ALARM") }
 
                 Spacer(Modifier.height(12.dp))
 
                 if (alarms.isEmpty()) {
                     Text(
                         "No alarms yet. Tap NEW ALARM to schedule one.",
-                        color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                    )
+                        color = ForgeOsPalette.TextMuted, fontSize = 12.sp)
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(alarms, key = { it.id }) { a -> AlarmRow(a, viewModel) }
@@ -71,12 +68,10 @@ fun AlarmsScreen(onBack: () -> Unit, viewModel: AlarmsViewModel = hiltViewModel(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "Recent firings (most recent first):",
-                        color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                        modifier = Modifier.weight(1f),
-                    )
+                        color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
+                        modifier = Modifier.weight(1f))
                     TextButton(onClick = { viewModel.clearSessions() }) {
-                        Text("CLEAR", fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                        Text("CLEAR", fontSize = 11.sp,
                             color = ForgeOsPalette.Orange)
                     }
                 }
@@ -84,9 +79,7 @@ fun AlarmsScreen(onBack: () -> Unit, viewModel: AlarmsViewModel = hiltViewModel(
                 if (sessions.isEmpty()) {
                     Text(
                         "No sessions logged yet. Sessions appear here after an alarm actually fires.",
-                        color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                    )
+                        color = ForgeOsPalette.TextMuted, fontSize = 12.sp)
                 } else {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(sessions, key = { it.id }) { s -> SessionRow(s) }
@@ -102,8 +95,7 @@ fun AlarmsScreen(onBack: () -> Unit, viewModel: AlarmsViewModel = hiltViewModel(
             onConfirm = { label, ms, action, payload, repeat, provider, model ->
                 viewModel.addAlarm(label, ms, action, payload, repeat, provider, model)
                 showAdd = false
-            },
-        )
+            })
     }
 }
 
@@ -119,25 +111,19 @@ private fun SessionRow(s: AlarmSession) {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(if (s.success) "✓" else "✗",
-                color = if (s.success) ForgeOsPalette.Orange else androidx.compose.ui.graphics.Color(0xFFef4444),
-                fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+                color = if (s.success) ForgeOsPalette.Orange else androidx.compose.ui.graphics.forgePalette.danger, fontSize = 14.sp)
             Spacer(Modifier.width(6.dp))
-            Text(s.label, color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp,
+            Text(s.label, color = ForgeOsPalette.TextPrimary, fontSize = 12.sp,
                 modifier = Modifier.weight(1f))
-            Text("${s.durationMs}ms", color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("${s.durationMs}ms", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
         Text("${fmt.format(Date(s.firedAtMs))}  ·  ${s.action}",
-            color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         if (s.output.isNotBlank()) {
-            Text(s.output.take(400), color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text(s.output.take(400), color = ForgeOsPalette.TextPrimary, fontSize = 10.sp)
         }
         s.error?.let {
-            Text("error: $it", color = androidx.compose.ui.graphics.Color(0xFFef4444),
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("error: $it", color = androidx.compose.ui.graphics.forgePalette.danger, fontSize = 10.sp)
         }
     }
 }
@@ -155,31 +141,25 @@ private fun AlarmRow(a: AlarmItem, vm: AlarmsViewModel) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(if (a.enabled) "⏰" else "○", fontSize = 18.sp)
             Spacer(Modifier.width(8.dp))
-            Text(a.label, color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 13.sp,
+            Text(a.label, color = ForgeOsPalette.TextPrimary, fontSize = 13.sp,
                 modifier = Modifier.weight(1f))
             Switch(checked = a.enabled, onCheckedChange = { vm.toggle(a) })
         }
         Text("${fmt.format(Date(a.triggerAt))}  —  ${a.action}",
-            color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
         if (a.payload.isNotBlank()) {
-            Text(a.payload.take(120), color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text(a.payload.take(120), color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
         if (a.repeatIntervalMs > 0) {
             Text("repeats every ${a.repeatIntervalMs / 60_000}min",
-                color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                color = ForgeOsPalette.Orange, fontSize = 10.sp)
         }
         if (!a.overrideProvider.isNullOrBlank()) {
             Text("model: ${a.overrideProvider}/${a.overrideModel}",
-                color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                color = ForgeOsPalette.Orange, fontSize = 10.sp)
         }
         TextButton(onClick = { vm.remove(a.id) }) {
-            Text("Delete", color = androidx.compose.ui.graphics.Color(0xFFef4444),
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text("Delete", color = androidx.compose.ui.graphics.forgePalette.danger, fontSize = 11.sp)
         }
     }
 }
@@ -188,8 +168,7 @@ private fun AlarmRow(a: AlarmItem, vm: AlarmsViewModel) {
 @Composable
 private fun AddAlarmDialog(
     onDismiss: () -> Unit,
-    onConfirm: (label: String, triggerAt: Long, action: AlarmAction, payload: String, repeatMs: Long, provider: String?, model: String?) -> Unit,
-) {
+    onConfirm: (label: String, triggerAt: Long, action: AlarmAction, payload: String, repeatMs: Long, provider: String?, model: String?) -> Unit) {
     var label by remember { mutableStateOf("") }
     var minutesFromNow by remember { mutableStateOf("5") }
     var repeatMin by remember { mutableStateOf("0") }
@@ -203,7 +182,7 @@ private fun AddAlarmDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New Alarm", fontFamily = FontFamily.Monospace) },
+        title = { Text("New Alarm") },
         text = {
             Column {
                 OutlinedTextField(label, { label = it },
@@ -227,7 +206,7 @@ private fun AddAlarmDialog(
                     ExposedDropdownMenu(expanded, { expanded = false }) {
                         AlarmAction.entries.forEach { a ->
                             DropdownMenuItem(
-                                text = { Text(a.name, fontFamily = FontFamily.Monospace) },
+                                text = { Text(a.name) },
                                 onClick = { action = a; expanded = false }
                             )
                         }
@@ -241,8 +220,7 @@ private fun AddAlarmDialog(
                 Spacer(Modifier.height(6.dp))
                 Text(
                     "Trigger at: ${System.currentTimeMillis() + (minutesFromNow.toLongOrNull() ?: 5) * 60_000}",
-                    color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp
+                    color = ForgeOsPalette.TextMuted, fontSize = 10.sp
                 )
 
                 if (action == AlarmAction.PROMPT_AGENT || action == AlarmAction.RUN_TOOL) {
@@ -275,8 +253,7 @@ private fun AddAlarmDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel", color = ForgeOsPalette.TextMuted) }
         },
-        containerColor = ForgeOsPalette.Surface,
-    )
+        containerColor = ForgeOsPalette.Surface)
 
     if (showPicker) {
         val viewModel: AlarmsViewModel = hiltViewModel()

@@ -40,8 +40,7 @@ import com.forge.os.presentation.screens.common.ModuleScaffold
 @Composable
 fun CostStatsScreen(
     onBack: () -> Unit,
-    viewModel: CostStatsViewModel = hiltViewModel(),
-) {
+    viewModel: CostStatsViewModel = hiltViewModel()) {
     val snap by viewModel.snapshot.collectAsState()
     val prices by viewModel.prices.collectAsState()
     val message by viewModel.message.collectAsState()
@@ -58,8 +57,7 @@ fun CostStatsScreen(
         onBack = onBack,
         actions = {
             TextButton(onClick = { addingNew = true }) {
-                Text("+ PRICE", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                Text("+ PRICE", color = ForgeOsPalette.Orange, fontSize = 12.sp)
             }
         }
     ) {
@@ -74,11 +72,9 @@ fun CostStatsScreen(
                 statRow("Last call", "$${"%.4f".format(snap.lastCallUsd)} (in ${snap.lastInputTokens}, out ${snap.lastOutputTokens} tok)")
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text("RESET SESSION", color = ForgeOsPalette.Orange,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                    Text("RESET SESSION", color = ForgeOsPalette.Orange, fontSize = 11.sp,
                         modifier = Modifier.clickable { viewModel.resetSession() })
-                    Text("RESET LIFETIME", color = ForgeOsPalette.Danger,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                    Text("RESET LIFETIME", color = ForgeOsPalette.Danger, fontSize = 11.sp,
                         modifier = Modifier.clickable { viewModel.resetLifetime() })
                 }
             }
@@ -86,8 +82,7 @@ fun CostStatsScreen(
             Spacer(Modifier.height(16.dp))
             Section("BY MODEL") {
                 if (snap.perModel.isEmpty()) {
-                    Text("No usage yet.", color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("No usage yet.", color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                 } else {
                     snap.perModel.entries.sortedByDescending { it.value.usd }.forEach { (model, st) ->
                         statRow(model, "$${"%.4f".format(st.usd)}  •  ${st.calls} calls  •  in ${st.inputTokens}/out ${st.outputTokens}")
@@ -98,19 +93,16 @@ fun CostStatsScreen(
             Spacer(Modifier.height(16.dp))
             Section("PRICES (USD per 1M tokens)") {
                 Text("Tap a row to edit. Unknown models fall back to 1.00 / 3.00.",
-                    color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                    color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 Spacer(Modifier.height(8.dp))
                 prices.entries.sortedBy { it.key }.forEach { (model, pp) ->
                     Row(Modifier.fillMaxWidth()
                         .clickable { editing = model to pp }
                         .padding(vertical = 4.dp)) {
-                        Text(model, color = ForgeOsPalette.TextPrimary,
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                        Text(model, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
                             modifier = Modifier.weight(1f))
                         Text("in ${"%.2f".format(pp.inputPerM)}  /  out ${"%.2f".format(pp.outputPerM)}",
-                            color = ForgeOsPalette.TextMuted,
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                     }
                 }
             }
@@ -125,8 +117,7 @@ fun CostStatsScreen(
             allowNameEdit = false,
             onSave = { name, i, o -> viewModel.setPrice(name, i, o); editing = null },
             onRemove = { viewModel.removePrice(model); editing = null },
-            onCancel = { editing = null },
-        )
+            onCancel = { editing = null })
     }
     if (addingNew) {
         PriceEditor(
@@ -135,8 +126,7 @@ fun CostStatsScreen(
             allowNameEdit = true,
             onSave = { name, i, o -> viewModel.setPrice(name, i, o); addingNew = false },
             onRemove = null,
-            onCancel = { addingNew = false },
-        )
+            onCancel = { addingNew = false })
     }
 }
 
@@ -146,9 +136,8 @@ private fun Section(title: String, content: @Composable () -> Unit) {
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(12.dp),
-    ) {
-        Text(title, color = ForgeOsPalette.Orange, fontFamily = FontFamily.Monospace,
+            .padding(12.dp)) {
+        Text(title, color = ForgeOsPalette.Orange,
             fontSize = 11.sp, letterSpacing = 1.sp)
         Spacer(Modifier.height(8.dp))
         content()
@@ -158,11 +147,9 @@ private fun Section(title: String, content: @Composable () -> Unit) {
 @Composable
 private fun statRow(label: String, value: String) {
     Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+        Text(label, color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
             modifier = Modifier.weight(1f))
-        Text(value, color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+        Text(value, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
     }
 }
 
@@ -173,8 +160,7 @@ private fun PriceEditor(
     allowNameEdit: Boolean,
     onSave: (String, Double, Double) -> Unit,
     onRemove: (() -> Unit)?,
-    onCancel: () -> Unit,
-) {
+    onCancel: () -> Unit) {
     var name by remember { mutableStateOf(initialModel) }
     var inp by remember { mutableStateOf(initial.inputPerM.toString()) }
     var out by remember { mutableStateOf(initial.outputPerM.toString()) }

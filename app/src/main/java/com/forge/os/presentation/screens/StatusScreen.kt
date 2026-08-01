@@ -68,8 +68,7 @@ fun StatusScreen(
             Text("💓", fontSize = 20.sp)
             Spacer(Modifier.width(8.dp))
             Text(
-                "SYSTEM STATUS", color = orange, fontSize = 16.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 2.sp
+                "SYSTEM STATUS", color = orange, fontSize = 16.sp, letterSpacing = 2.sp
             )
             Spacer(Modifier.weight(1f))
             HealthBadge(status.overallHealth)
@@ -77,7 +76,7 @@ fun StatusScreen(
         Spacer(Modifier.height(8.dp))
         Text(
             "Last check: ${formatTime(status.timestamp)}",
-            color = Color.Gray, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            color = Color.Gray, fontSize = 11.sp
         )
         Spacer(Modifier.height(16.dp))
 
@@ -85,14 +84,13 @@ fun StatusScreen(
             status.alerts.forEach { alert ->
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(bottom = 6.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF2a1a0a))
+                    colors = CardDefaults.cardColors(containerColor = forgePalette.warningBg)
                 ) {
                     Row(Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text("⚠️", fontSize = 14.sp)
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            alert.message, color = Color(0xFFf59e0b), fontSize = 12.sp,
-                            fontFamily = FontFamily.Monospace
+                            alert.message, color = forgePalette.warning, fontSize = 12.sp
                         )
                     }
                 }
@@ -111,8 +109,7 @@ fun StatusScreen(
                             Text(componentIcon(name), fontSize = 16.sp)
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                name.uppercase(), color = Color.White, fontSize = 13.sp,
-                                fontFamily = FontFamily.Monospace
+                                name.uppercase(), color = Color.White, fontSize = 13.sp
                             )
                             Spacer(Modifier.weight(1f))
                             HealthBadge(HealthLevel.valueOf(comp.health))
@@ -122,12 +119,10 @@ fun StatusScreen(
                             comp.metrics.forEach { (k, v) ->
                                 Row {
                                     Text(
-                                        "  $k: ", color = Color.Gray, fontSize = 11.sp,
-                                        fontFamily = FontFamily.Monospace
+                                        "  $k: ", color = Color.Gray, fontSize = 11.sp
                                     )
                                     Text(
-                                        v, color = Color(0xFFa3a3a3), fontSize = 11.sp,
-                                        fontFamily = FontFamily.Monospace
+                                        v, color = forgePalette.textMuted, fontSize = 11.sp
                                     )
                                 }
                             }
@@ -135,8 +130,7 @@ fun StatusScreen(
                         comp.message?.let {
                             Spacer(Modifier.height(4.dp))
                             Text(
-                                it, color = Color(0xFFf59e0b), fontSize = 11.sp,
-                                fontFamily = FontFamily.Monospace
+                                it, color = forgePalette.warning, fontSize = 11.sp
                             )
                         }
                     }
@@ -147,14 +141,12 @@ fun StatusScreen(
                 item {
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "RECOMMENDATIONS", color = orange, fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                        "RECOMMENDATIONS", color = orange, fontSize = 12.sp, letterSpacing = 1.sp
                     )
                     Spacer(Modifier.height(4.dp))
                     status.recommendations.forEach { rec ->
                         Text(
                             "→ $rec", color = Color.Gray, fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
@@ -168,7 +160,7 @@ fun StatusScreen(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = orange)
                 ) {
-                    Text("↺  REFRESH", fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                    Text("↺  REFRESH", fontSize = 13.sp)
                 }
             }
         }
@@ -178,14 +170,13 @@ fun StatusScreen(
 @Composable
 fun HealthBadge(level: HealthLevel) {
     val (emoji, color) = when (level) {
-        HealthLevel.HEALTHY -> "●" to Color(0xFF22c55e)
-        HealthLevel.WARNING -> "●" to Color(0xFFf59e0b)
-        HealthLevel.CRITICAL -> "●" to Color(0xFFef4444)
-        HealthLevel.DOWN -> "●" to Color(0xFF6b7280)
+        HealthLevel.HEALTHY -> "●" to forgePalette.success
+        HealthLevel.WARNING -> "●" to forgePalette.warning
+        HealthLevel.CRITICAL -> "●" to forgePalette.danger
+        HealthLevel.DOWN -> "●" to forgePalette.textDim
     }
     Text(
-        "$emoji ${level.name}", color = color, fontSize = 12.sp,
-        fontFamily = FontFamily.Monospace
+        "$emoji ${level.name}", color = color, fontSize = 12.sp
     )
 }
 

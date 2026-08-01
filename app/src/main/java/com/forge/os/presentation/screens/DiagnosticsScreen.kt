@@ -60,8 +60,7 @@ fun DiagnosticsScreen(
                      tint = TextMuted, modifier = Modifier.size(18.dp))
             }
             Spacer(Modifier.width(4.dp))
-            Text("⚙  DIAGNOSTICS", color = Orange, fontSize = 16.sp,
-                 fontFamily = FontFamily.Monospace, letterSpacing = 2.sp)
+            Text("⚙  DIAGNOSTICS", color = Orange, fontSize = 16.sp, letterSpacing = 2.sp)
             Spacer(Modifier.weight(1f))
             IconButton(onClick = viewModel::clear, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Default.DeleteSweep, "Clear",
@@ -70,13 +69,13 @@ fun DiagnosticsScreen(
         }
         Spacer(Modifier.height(4.dp))
         Text("Last ${entries.size} API calls (in-memory)", color = TextMuted,
-             fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+             fontSize = 11.sp)
         Spacer(Modifier.height(12.dp))
 
         if (entries.isEmpty()) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("No calls yet. Send a chat message to populate the log.",
-                     color = TextMuted, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                     color = TextMuted, fontSize = 12.sp)
             }
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -89,9 +88,9 @@ fun DiagnosticsScreen(
 @Composable
 private fun CallRow(e: ApiCallLogEntry, fmt: SimpleDateFormat) {
     val accent = when {
-        e.errorMessage != null -> Color(0xFFef4444)
-        e.httpCode in 200..299 -> Color(0xFF22c55e)
-        else -> Color(0xFFf59e0b)
+        e.errorMessage != null -> forgePalette.danger
+        e.httpCode in 200..299 -> forgePalette.success
+        else -> forgePalette.warning
     }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -105,32 +104,28 @@ private fun CallRow(e: ApiCallLogEntry, fmt: SimpleDateFormat) {
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text("${e.httpCode} · ${e.durationMs}ms",
-                         color = accent, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                         color = accent, fontSize = 10.sp)
                 }
                 Spacer(Modifier.width(6.dp))
-                Text(e.provider, color = TextPrimary, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace)
+                Text(e.provider, color = TextPrimary, fontSize = 11.sp)
                 Spacer(Modifier.width(4.dp))
-                Text("· ${e.model}", color = TextMuted, fontSize = 10.sp,
-                     fontFamily = FontFamily.Monospace)
+                Text("· ${e.model}", color = TextMuted, fontSize = 10.sp)
                 Spacer(Modifier.weight(1f))
                 Text(fmt.format(Date(e.timestamp)), color = TextMuted,
-                     fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                     fontSize = 10.sp)
             }
             if (e.inputTokens + e.outputTokens > 0) {
                 Spacer(Modifier.height(2.dp))
                 Text("in=${e.inputTokens} out=${e.outputTokens} tokens" +
                         if (e.attempt > 1) " · attempt ${e.attempt}" else "",
-                     color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                     color = TextMuted, fontSize = 10.sp)
             }
             e.errorMessage?.let {
                 Spacer(Modifier.height(4.dp))
-                Text(it.take(200), color = Color(0xFFef4444), fontSize = 10.sp,
-                     fontFamily = FontFamily.Monospace, lineHeight = 14.sp)
+                Text(it.take(200), color = forgePalette.danger, fontSize = 10.sp, lineHeight = 14.sp)
             }
             Spacer(Modifier.height(2.dp))
-            Text(e.url, color = Color(0xFF404040), fontSize = 9.sp,
-                 fontFamily = FontFamily.Monospace)
+            Text(e.url, color = forgePalette.textDim, fontSize = 9.sp)
         }
     }
 }

@@ -54,8 +54,7 @@ import com.forge.os.presentation.screens.common.StatusPill
 @Composable
 fun ProjectsScreen(
     onBack: () -> Unit,
-    viewModel: ProjectsViewModel = hiltViewModel(),
-) {
+    viewModel: ProjectsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var creating by remember { mutableStateOf(false) }
     var inspecting: Project? by remember { mutableStateOf(null) }
@@ -73,36 +72,30 @@ fun ProjectsScreen(
                 Icon(Icons.Default.Add, "New",
                     tint = ForgeOsPalette.Orange, modifier = Modifier.size(20.dp))
             }
-        },
-    ) {
+        }) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 item {
                     val active = state.active
                     Row(
                         Modifier.fillMaxWidth()
                             .background(ForgeOsPalette.Surface2, RoundedCornerShape(6.dp))
                             .padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                        verticalAlignment = Alignment.CenterVertically) {
                         Text("ACTIVE: ${active?.name ?: "(none)"}",
-                            color = if (active == null) ForgeOsPalette.TextMuted else ForgeOsPalette.Orange,
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            color = if (active == null) ForgeOsPalette.TextMuted else ForgeOsPalette.Orange, fontSize = 11.sp)
                         Spacer(Modifier.weight(1f))
                         if (active != null) TextButton(onClick = { viewModel.activate(null) }) {
-                            Text("CLEAR", color = ForgeOsPalette.TextMuted,
-                                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                            Text("CLEAR", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                         }
                     }
                 }
                 if (state.projects.isEmpty()) item {
                     Text("No projects yet.\nTap + to create your first scoped workspace.",
-                        color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                        color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                 }
                 items(state.projects, key = { it.slug }) { p ->
                     ProjectCard(
@@ -110,8 +103,7 @@ fun ProjectsScreen(
                         active = state.active?.slug == p.slug,
                         fileCount = viewModel.fileCount(p.slug),
                         onActivate = { viewModel.activate(p) },
-                        onClick = { inspecting = p },
-                    )
+                        onClick = { inspecting = p })
                 }
             }
             SnackbarHost(snackbar, modifier = Modifier.align(Alignment.BottomCenter)) {
@@ -123,15 +115,13 @@ fun ProjectsScreen(
 
     if (creating) CreateDialog(
         onCreate = { name, desc -> viewModel.create(name, desc); creating = false },
-        onDismiss = { creating = false },
-    )
+        onDismiss = { creating = false })
     val ins = inspecting
     if (ins != null) DetailDialog(
         project = ins,
         onSave = { p -> viewModel.update(p); inspecting = null },
         onDelete = { viewModel.delete(ins.slug); inspecting = null },
-        onDismiss = { inspecting = null },
-    )
+        onDismiss = { inspecting = null })
 }
 
 @Composable
@@ -140,22 +130,18 @@ private fun ProjectCard(
     active: Boolean,
     fileCount: Int,
     onActivate: () -> Unit,
-    onClick: () -> Unit,
-) {
+    onClick: () -> Unit) {
     Column(
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, if (active) ForgeOsPalette.Orange else ForgeOsPalette.Border,
                 RoundedCornerShape(6.dp))
-            .clickable { onClick() }.padding(12.dp),
-    ) {
+            .clickable { onClick() }.padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(project.name, color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                Text(project.name, color = ForgeOsPalette.TextPrimary, fontSize = 13.sp)
                 Text("workspace/projects/${project.slug}",
-                    color = ForgeOsPalette.TextDim,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                    color = ForgeOsPalette.TextDim, fontSize = 10.sp)
             }
             if (active) StatusPill("ACTIVE", ForgeOsPalette.Orange, ForgeOsPalette.Surface2)
             else IconButton(onClick = onActivate, modifier = Modifier.size(28.dp)) {
@@ -165,13 +151,11 @@ private fun ProjectCard(
         }
         if (project.description.isNotBlank()) {
             Spacer(Modifier.height(4.dp))
-            Text(project.description, color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text(project.description, color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
         }
         Spacer(Modifier.height(4.dp))
         Text("$fileCount files • ${project.scopedTools.size} tools • ${project.scopedMemoryTags.size} mem tags",
-            color = ForgeOsPalette.TextDim,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            color = ForgeOsPalette.TextDim, fontSize = 10.sp)
     }
 }
 
@@ -182,40 +166,32 @@ private fun CreateDialog(onCreate: (String, String) -> Unit, onDismiss: () -> Un
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
-        title = { Text("New project", color = ForgeOsPalette.Orange,
-            fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+        title = { Text("New project", color = ForgeOsPalette.Orange, fontSize = 14.sp) },
         text = {
             Column(Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
-                Text("name", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("name", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(value = name, onValueChange = { name = it },
                     modifier = Modifier.fillMaxWidth(), singleLine = true,
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp))
+                        color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
                 Spacer(Modifier.height(6.dp))
-                Text("description", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("description", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(value = desc, onValueChange = { desc = it },
                     modifier = Modifier.fillMaxWidth().height(100.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp))
+                        color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
             }
         },
         confirmButton = {
             TextButton(onClick = { onCreate(name, desc) }, enabled = name.isNotBlank()) {
-                Text("CREATE", color = ForgeOsPalette.Success,
-                    fontFamily = FontFamily.Monospace)
+                Text("CREATE", color = ForgeOsPalette.Success)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -223,8 +199,7 @@ private fun DetailDialog(
     project: Project,
     onSave: (Project) -> Unit,
     onDelete: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     var description by remember { mutableStateOf(project.description) }
     var scopedTools by remember { mutableStateOf(project.scopedTools.joinToString(",")) }
     var scopedTags by remember { mutableStateOf(project.scopedMemoryTags.joinToString(",")) }
@@ -232,12 +207,10 @@ private fun DetailDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
-        title = { Text(project.name, color = ForgeOsPalette.Orange,
-            fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+        title = { Text(project.name, color = ForgeOsPalette.Orange, fontSize = 14.sp) },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
-                Text(project.slug, color = ForgeOsPalette.TextDim, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text(project.slug, color = ForgeOsPalette.TextDim, fontSize = 10.sp)
                 Spacer(Modifier.height(6.dp))
                 Lab("description", description) { description = it }
                 Lab("scoped tools (comma-sep)", scopedTools) { scopedTools = it }
@@ -248,40 +221,31 @@ private fun DetailDialog(
         confirmButton = {
             Row {
                 TextButton(onClick = onDelete) {
-                    Text("DELETE", color = ForgeOsPalette.Danger,
-                        fontFamily = FontFamily.Monospace)
+                    Text("DELETE", color = ForgeOsPalette.Danger)
                 }
                 TextButton(onClick = {
                     onSave(project.copy(
                         description = description,
                         scopedTools = scopedTools.split(",").map { it.trim() }.filter { it.isNotBlank() },
                         scopedMemoryTags = scopedTags.split(",").map { it.trim() }.filter { it.isNotBlank() },
-                        scopedAgentId = agentId.ifBlank { null },
-                    ))
-                }) { Text("SAVE", color = ForgeOsPalette.Success,
-                    fontFamily = FontFamily.Monospace) }
+                        scopedAgentId = agentId.ifBlank { null }))
+                }) { Text("SAVE", color = ForgeOsPalette.Success) }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CLOSE", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CLOSE", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
 private fun Lab(label: String, value: String, onChange: (String) -> Unit) {
-    Text(label, color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-        fontFamily = FontFamily.Monospace)
+    Text(label, color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
     OutlinedTextField(
         value = value, onValueChange = onChange,
         modifier = Modifier.fillMaxWidth(), singleLine = label != "description",
         textStyle = androidx.compose.ui.text.TextStyle(
-            color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-        ),
-    )
+            color = ForgeOsPalette.TextPrimary, fontSize = 12.sp))
     Spacer(Modifier.height(4.dp))
 }

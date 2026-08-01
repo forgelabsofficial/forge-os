@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +27,7 @@ fun ToolInspectorSheet(
     parametersJson: String,
     onDismiss: () -> Unit
 ) {
-    val palette = LocalForgePalette.current
+    val palette = forgePalette
     val scrollState = rememberScrollState()
 
     ModalBottomSheet(
@@ -62,7 +62,6 @@ fun ToolInspectorSheet(
                     toolName.uppercase(),
                     color = palette.textPrimary,
                     fontSize = 18.sp,
-                    fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 2.sp
                 )
@@ -78,7 +77,6 @@ fun ToolInspectorSheet(
                 "DESCRIPTION",
                 color = palette.orange,
                 fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
@@ -87,7 +85,6 @@ fun ToolInspectorSheet(
                 description,
                 color = palette.textPrimary,
                 fontSize = 14.sp,
-                fontFamily = FontFamily.Monospace,
                 lineHeight = 20.sp
             )
 
@@ -97,7 +94,6 @@ fun ToolInspectorSheet(
                 "PARAMETERS SCHEMA",
                 color = palette.orange,
                 fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
@@ -113,7 +109,6 @@ fun ToolInspectorSheet(
                     parametersJson,
                     color = palette.textMuted,
                     fontSize = 12.sp,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier
                         .padding(12.dp)
                         .fillMaxWidth(),
@@ -128,7 +123,6 @@ fun ToolInspectorSheet(
                 "USAGE EXAMPLE",
                 color = palette.orange,
                 fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 1.sp
             )
@@ -142,7 +136,6 @@ fun ToolInspectorSheet(
                     "{\n  \"tool\": \"$toolName\",\n  \"args\": {}\n}",
                     color = palette.textDim,
                     fontSize = 12.sp,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier
                         .padding(12.dp)
                         .fillMaxWidth()

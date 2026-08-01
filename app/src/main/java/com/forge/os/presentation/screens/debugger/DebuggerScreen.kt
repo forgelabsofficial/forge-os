@@ -212,7 +212,7 @@ fun TraceStepItem(step: TraceStep) {
                     Text("Memory Context:", style = MaterialTheme.typography.labelMedium)
                     Box(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surface).padding(8.dp)) {
                         Text(step.memoryContext.take(500) + if (step.memoryContext.length > 500) "..." else "", 
-                            style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+                            style = MaterialTheme.typography.bodySmall)
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -229,7 +229,7 @@ fun TraceStepItem(step: TraceStep) {
                             ) {
                                 Column(modifier = Modifier.padding(8.dp)) {
                                     Text("⚡ ${tc.name} (${tc.durationMs}ms)", style = MaterialTheme.typography.titleSmall)
-                                    Text("Args: ${tc.argsJson}", style = MaterialTheme.typography.bodySmall, fontFamily = FontFamily.Monospace)
+                                    Text("Args: ${tc.argsJson}", style = MaterialTheme.typography.bodySmall)
                                     Spacer(modifier = Modifier.height(4.dp))
                                     val resultColor = if (tc.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
                                     Text("Result: ${tc.result?.take(200)}", style = MaterialTheme.typography.bodySmall, color = resultColor)

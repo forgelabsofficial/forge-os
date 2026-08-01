@@ -24,15 +24,13 @@ data class SkillsUiState(
     val query: String = "",
     val testingName: String? = null,
     val testOutput: String? = null,
-    val message: String? = null,
-)
+    val message: String? = null)
 
 @HiltViewModel
 class SkillsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val memoryManager: MemoryManager,
-    private val sandboxManager: SandboxManager,
-) : ViewModel() {
+    private val sandboxManager: SandboxManager) : ViewModel() {
 
     private val json = Json { ignoreUnknownKeys = true; isLenient = true; prettyPrint = true }
 
@@ -64,8 +62,7 @@ class SkillsViewModel @Inject constructor(
             val r = withContext(Dispatchers.IO) { sandboxManager.executePython(skill.code) }
             _state.value = _state.value.copy(
                 testingName = null,
-                testOutput = r.fold({ "✅\n$it" }, { "❌ ${it.message}" }),
-            )
+                testOutput = r.fold({ "✅\n$it" }, { "❌ ${it.message}" }))
             refresh()
         }
     }

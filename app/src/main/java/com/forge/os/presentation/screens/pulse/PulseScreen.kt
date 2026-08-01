@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.forge.os.domain.heartbeat.HealthLevel
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 
 /**
  * Phase P — Pulse Dashboard.
@@ -33,7 +33,7 @@ fun PulseScreen(
     onBack: () -> Unit,
     viewModel: PulseViewModel = hiltViewModel()
 ) {
-    val palette = LocalForgePalette.current
+    val palette = forgePalette
     val state by viewModel.state.collectAsState()
 
     Column(
@@ -52,8 +52,7 @@ fun PulseScreen(
             }
             Spacer(Modifier.width(4.dp))
             Text(
-                "📈  SYSTEM PULSE", color = palette.orange, fontSize = 16.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 2.sp
+                "📈  SYSTEM PULSE", color = palette.orange, fontSize = 16.sp, letterSpacing = 2.sp
             )
             Spacer(Modifier.weight(1f))
             IconButton(onClick = { viewModel.refresh() }, modifier = Modifier.size(32.dp)) {
@@ -100,7 +99,6 @@ fun PulseScreen(
                     "COMPONENT STATUS",
                     color = palette.textMuted,
                     fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace,
                     letterSpacing = 1.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -116,9 +114,8 @@ fun PulseScreen(
                 item {
                     Text(
                         "ACTIVE ALERTS",
-                        color = Color(0xFFb91c1c),
+                        color = forgePalette.danger,
                         fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
                         letterSpacing = 1.sp,
                         modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                     )
@@ -135,7 +132,6 @@ fun PulseScreen(
                     "BACKGROUND ACTIVITY",
                     color = palette.textMuted,
                     fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace,
                     letterSpacing = 1.sp,
                     modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
                 )
@@ -147,7 +143,6 @@ fun PulseScreen(
                         "No recent activity logged.",
                         color = palette.textMuted,
                         fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
@@ -165,9 +160,9 @@ fun PulseScreen(
 @Composable
 private fun StatusCard(health: HealthLevel, palette: com.forge.os.presentation.theme.ForgePalette) {
     val color = when (health) {
-        HealthLevel.HEALTHY -> Color(0xFF15803d)
+        HealthLevel.HEALTHY -> forgePalette.success
         HealthLevel.WARNING -> palette.orange
-        HealthLevel.CRITICAL -> Color(0xFFb91c1c)
+        HealthLevel.CRITICAL -> forgePalette.danger
         HealthLevel.DOWN -> Color.Gray
     }
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
@@ -224,15 +219,13 @@ private fun StatusCard(health: HealthLevel, palette: com.forge.os.presentation.t
                     color = palette.textPrimary,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
                     letterSpacing = 0.5.sp
                 )
                 Text(
                     if (health == HealthLevel.HEALTHY) "All systems operational." 
                     else "Monitoring anomalies in core services.",
                     color = palette.textMuted,
-                    fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = 11.sp
                 )
             }
         }
@@ -247,7 +240,7 @@ private fun BudgetCard(
     palette: com.forge.os.presentation.theme.ForgePalette
 ) {
     val progress = if (limit > 0) (spend / limit).coerceIn(0.0, 1.0).toFloat() else 0f
-    val barColor = if (progress > 0.9f) Color(0xFFb91c1c) else if (progress > 0.7f) palette.orange else Color(0xFF15803d)
+    val barColor = if (progress > 0.9f) forgePalette.danger else if (progress > 0.7f) palette.orange else forgePalette.success
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -258,8 +251,7 @@ private fun BudgetCard(
             Text(
                 "TOKEN BUDGET",
                 color = palette.textMuted,
-                fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace
+                fontSize = 10.sp
             )
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.Bottom) {
@@ -267,15 +259,13 @@ private fun BudgetCard(
                     "$${"%.2f".format(spend)}",
                     color = palette.textPrimary,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
                     "/ $${"%.2f".format(limit)} USD",
                     color = palette.textMuted,
                     fontSize = 14.sp,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
             }
@@ -284,15 +274,14 @@ private fun BudgetCard(
                 progress = { progress },
                 modifier = Modifier.fillMaxWidth().height(4.dp),
                 color = barColor,
-                trackColor = Color(0xFF1f1f1f)
+                trackColor = forgePalette.borderSoft
             )
             if (enabled && spend >= limit) {
                 Spacer(Modifier.height(8.dp))
                 Text(
                     "⚠️ ECO-MODE ACTIVE: Budget exceeded.",
                     color = palette.orange,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = 10.sp
                 )
             }
         }
@@ -312,23 +301,21 @@ private fun TaskPulseCard(
     ) {
         Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             Column(Modifier.weight(1f)) {
-                Text("CRON JOBS", color = palette.textMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                Text("CRON JOBS", color = palette.textMuted, fontSize = 10.sp)
                 Text(
                     "$cronCount ACTIVE",
                     color = if (cronCount > 0) palette.orange else palette.textPrimary,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontWeight = FontWeight.Bold
                 )
             }
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.End) {
-                Text("SUB-AGENTS", color = palette.textMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                Text("SUB-AGENTS", color = palette.textMuted, fontSize = 10.sp)
                 Text(
                     "$agentCount RUNNING",
                     color = if (agentCount > 0) palette.orange else palette.textPrimary,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontWeight = FontWeight.Bold
                 )
             }
         }
@@ -342,9 +329,9 @@ private fun ComponentCard(
     palette: com.forge.os.presentation.theme.ForgePalette
 ) {
     val healthColor = when (status.health) {
-        HealthLevel.HEALTHY.name -> Color(0xFF15803d)
+        HealthLevel.HEALTHY.name -> forgePalette.success
         HealthLevel.WARNING.name -> palette.orange
-        HealthLevel.CRITICAL.name -> Color(0xFFb91c1c)
+        HealthLevel.CRITICAL.name -> forgePalette.danger
         else -> Color.Gray
     }
 
@@ -361,30 +348,28 @@ private fun ComponentCard(
                     name.uppercase(),
                     color = palette.textPrimary,
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
                     status.health,
                     color = healthColor,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = 10.sp
                 )
             }
             if (status.metrics.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
                 status.metrics.forEach { (k, v) ->
                     Row {
-                        Text("$k:", color = palette.textMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                        Text("$k:", color = palette.textMuted, fontSize = 10.sp)
                         Spacer(Modifier.width(4.dp))
-                        Text(v, color = palette.textPrimary, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                        Text(v, color = palette.textPrimary, fontSize = 10.sp)
                     }
                 }
             }
             if (status.message != null) {
                 Spacer(Modifier.height(4.dp))
-                Text(status.message!!, color = palette.textMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                Text(status.message!!, color = palette.textMuted, fontSize = 10.sp)
             }
         }
     }
@@ -399,22 +384,20 @@ private fun AlertCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Color(0x33b91c1c)),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFb91c1c)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, forgePalette.danger),
         shape = RoundedCornerShape(8.dp)
     ) {
         Column(Modifier.padding(12.dp)) {
             Text(
                 component.uppercase(),
-                color = Color(0xFFef4444),
+                color = forgePalette.danger,
                 fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.Monospace
+                fontWeight = FontWeight.Bold
             )
             Text(
                 message,
                 color = palette.textPrimary,
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace
+                fontSize = 11.sp
             )
         }
     }
@@ -425,7 +408,7 @@ private fun LogItemCard(
     log: com.forge.os.domain.debug.BackgroundTaskLog,
     palette: com.forge.os.presentation.theme.ForgePalette
 ) {
-    val statusColor = if (log.success) Color(0xFF15803d) else Color(0xFFb91c1c)
+    val statusColor = if (log.success) forgePalette.success else forgePalette.danger
     val timeStr = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date(log.timestamp))
 
     Card(
@@ -439,8 +422,7 @@ private fun LogItemCard(
                     log.source.name,
                     color = palette.orange,
                     fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace
+                    fontWeight = FontWeight.Bold
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
@@ -448,14 +430,12 @@ private fun LogItemCard(
                     color = palette.textPrimary,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     timeStr,
                     color = palette.textMuted,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = 10.sp
                 )
             }
             Spacer(Modifier.height(4.dp))
@@ -465,16 +445,14 @@ private fun LogItemCard(
                 Text(
                     if (log.success) "SUCCESS" else "FAILED",
                     color = statusColor,
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = 10.sp
                 )
                 if (log.durationMs > 0) {
                     Spacer(Modifier.width(12.dp))
                     Text(
                         "${log.durationMs}ms",
                         color = palette.textMuted,
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
+                        fontSize = 10.sp
                     )
                 }
             }
@@ -482,9 +460,8 @@ private fun LogItemCard(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     log.error,
-                    color = Color(0xFFef4444),
-                    fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace
+                    color = forgePalette.danger,
+                    fontSize = 10.sp
                 )
             } else if (log.output.isNotBlank()) {
                 Spacer(Modifier.height(4.dp))
@@ -492,7 +469,6 @@ private fun LogItemCard(
                     log.output.take(120).replace("\n", " "),
                     color = palette.textMuted,
                     fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace,
                     maxLines = 1
                 )
             }

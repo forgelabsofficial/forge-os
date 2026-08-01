@@ -28,8 +28,7 @@ import java.util.Locale
 fun ChannelsScreen(
     onBack: () -> Unit,
     onOpenSessions: () -> Unit = {},
-    viewModel: ChannelsViewModel = hiltViewModel(),
-) {
+    viewModel: ChannelsViewModel = hiltViewModel()) {
     val channels by viewModel.channels.collectAsState()
     val recent by viewModel.recent.collectAsState()
     val sessions by viewModel.sessions.collectAsState()
@@ -43,24 +42,20 @@ fun ChannelsScreen(
                 Button(
                     onClick = { showAdd = true },
                     modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange),
-                ) { Text("+ ADD TELEGRAM BOT", fontFamily = FontFamily.Monospace) }
+                    colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange)) { Text("+ ADD TELEGRAM BOT") }
                 OutlinedButton(
                     onClick = onOpenSessions,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text("📜 SESSIONS (${sessions.size})",
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    modifier = Modifier.weight(1f)) {
+                    Text("📜 SESSIONS (${sessions.size})", fontSize = 11.sp)
                 }
             }
 
             Spacer(Modifier.height(12.dp))
-            Text("CHANNELS", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text("CHANNELS", color = ForgeOsPalette.Orange, fontSize = 11.sp)
             Spacer(Modifier.height(6.dp))
             if (channels.isEmpty()) {
                 Text("No channels configured yet.",
-                    color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace,
+                    color = ForgeOsPalette.TextMuted,
                     fontSize = 11.sp)
             } else {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -78,12 +73,11 @@ fun ChannelsScreen(
             }
 
             Spacer(Modifier.height(16.dp))
-            Text("RECENT INCOMING (${recent.size})", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text("RECENT INCOMING (${recent.size})", color = ForgeOsPalette.Orange, fontSize = 11.sp)
             Spacer(Modifier.height(6.dp))
             if (recent.isEmpty()) {
                 Text("Nothing yet. Incoming Telegram messages will appear here.",
-                    color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace,
+                    color = ForgeOsPalette.TextMuted,
                     fontSize = 11.sp)
             } else {
                 recent.take(30).forEach { m -> MessageRow(m) }
@@ -131,8 +125,7 @@ private fun ChannelRow(
     onSendVoice: () -> Unit,
     onAutoReply: (Boolean) -> Unit,
     onParseMode: (String) -> Unit,
-    onAllowList: (String) -> Unit,
-) {
+    onAllowList: (String) -> Unit) {
     var expanded by remember(c.id) { mutableStateOf(false) }
     var allowEdit by remember(c.id) { mutableStateOf(c.allowedChatIds) }
 
@@ -146,45 +139,37 @@ private fun ChannelRow(
             Text("📡", fontSize = 16.sp)
             Spacer(Modifier.width(6.dp))
             Column(Modifier.weight(1f)) {
-                Text(c.displayName, color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                Text(c.displayName, color = ForgeOsPalette.TextPrimary, fontSize = 13.sp)
                 Text("${c.type}  ·  ${c.purpose}  ·  auto-reply: ${if (c.autoReply) "ON" else "OFF"}  ·  ${c.parseMode.ifBlank { "plain" }}",
-                    color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                    color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
             }
             Switch(checked = c.enabled, onCheckedChange = { onToggle() })
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = onCompose) {
-                Text("SEND", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("SEND", color = ForgeOsPalette.Orange, fontSize = 11.sp)
             }
             TextButton(onClick = onSendVoice) {
-                Text("🎙 VOICE", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("🎙 VOICE", color = ForgeOsPalette.Orange, fontSize = 11.sp)
             }
             TextButton(onClick = { expanded = !expanded }) {
                 Text(if (expanded) "▴ HIDE" else "▾ SETTINGS",
-                    color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             }
             Spacer(Modifier.weight(1f))
             TextButton(onClick = onDelete) {
-                Text("DELETE", color = ForgeOsPalette.Danger,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("DELETE", color = ForgeOsPalette.Danger, fontSize = 11.sp)
             }
         }
         if (expanded) {
             Divider(Modifier.padding(vertical = 6.dp), color = ForgeOsPalette.Border)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Auto-reply:", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                Text("Auto-reply:", color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
                     modifier = Modifier.weight(1f))
                 Switch(checked = c.autoReply, onCheckedChange = onAutoReply)
             }
             Spacer(Modifier.height(4.dp))
-            Text("Parse mode:", color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text("Parse mode:", color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 listOf("HTML", "MarkdownV2", "Markdown", "").forEach { mode ->
                     val label = if (mode.isBlank()) "plain" else mode
@@ -194,9 +179,8 @@ private fun ChannelRow(
                         colors = if (selected)
                             ButtonDefaults.outlinedButtonColors(
                                 containerColor = ForgeOsPalette.Orange.copy(alpha = 0.2f))
-                        else ButtonDefaults.outlinedButtonColors(),
-                    ) {
-                        Text(label, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                        else ButtonDefaults.outlinedButtonColors()) {
+                        Text(label, fontSize = 10.sp)
                     }
                 }
             }
@@ -204,12 +188,10 @@ private fun ChannelRow(
             OutlinedTextField(
                 value = allowEdit, onValueChange = { allowEdit = it },
                 label = { Text("Allowed chat ids (comma-separated, blank = all)") },
-                singleLine = true, modifier = Modifier.fillMaxWidth(),
-            )
+                singleLine = true, modifier = Modifier.fillMaxWidth())
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 TextButton(onClick = { onAllowList(allowEdit) }) {
-                    Text("SAVE ALLOW-LIST", color = ForgeOsPalette.Orange,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("SAVE ALLOW-LIST", color = ForgeOsPalette.Orange, fontSize = 11.sp)
                 }
             }
         }
@@ -225,14 +207,11 @@ private fun MessageRow(m: IncomingMessage) {
             .padding(8.dp)
     ) {
         Text("${fmt.format(Date(m.receivedAt))}  ${m.channelType}:${m.fromName}",
-            color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
-        Text(m.text, color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+            color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
+        Text(m.text, color = ForgeOsPalette.TextPrimary, fontSize = 12.sp)
         if (m.attachmentKind != null) {
             Text("📎 ${m.attachmentKind} → ${m.attachmentPath ?: "(download failed)"}",
-                color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
     }
     Spacer(Modifier.height(4.dp))
@@ -244,8 +223,7 @@ private fun AddTelegramDialog(
     onDismiss: () -> Unit,
     onConfirm: (name: String, token: String, chat: String,
                 autoReply: Boolean, parseMode: String, allow: String,
-                purpose: String) -> Unit,
-) {
+                purpose: String) -> Unit) {
     var name by remember { mutableStateOf("Telegram Bot") }
     var token by remember { mutableStateOf("") }
     var chat by remember { mutableStateOf("") }
@@ -259,12 +237,11 @@ private fun AddTelegramDialog(
         "teaching"  to "📚 Teaching",
         "work"      to "💼 Work",
         "support"   to "🎧 Support",
-        "custom"    to "⚙️ Custom",
-    )
+        "custom"    to "⚙️ Custom")
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add Telegram Bot", fontFamily = FontFamily.Monospace) },
+        title = { Text("Add Telegram Bot") },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 OutlinedTextField(name, { name = it }, label = { Text("Display name") },
@@ -282,7 +259,7 @@ private fun AddTelegramDialog(
                     label = { Text("Allowed chat ids (CSV, blank = all)") },
                     singleLine = true, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(10.dp))
-                Text("Channel purpose:", fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                Text("Channel purpose:", fontSize = 11.sp,
                     color = ForgeOsPalette.TextMuted)
                 Spacer(Modifier.height(4.dp))
                 androidx.compose.foundation.layout.FlowRow(
@@ -296,20 +273,18 @@ private fun AddTelegramDialog(
                             colors = if (selected)
                                 ButtonDefaults.outlinedButtonColors(
                                     containerColor = ForgeOsPalette.Orange.copy(alpha = 0.2f))
-                            else ButtonDefaults.outlinedButtonColors(),
-                        ) {
-                            Text(label, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                            else ButtonDefaults.outlinedButtonColors()) {
+                            Text(label, fontSize = 10.sp)
                         }
                     }
                 }
                 Spacer(Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Auto-reply", modifier = Modifier.weight(1f),
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    Text("Auto-reply", modifier = Modifier.weight(1f), fontSize = 12.sp)
                     Switch(checked = autoReply, onCheckedChange = { autoReply = it })
                 }
                 Spacer(Modifier.height(4.dp))
-                Text("Parse mode:", fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("Parse mode:", fontSize = 11.sp)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf("HTML", "MarkdownV2", "Markdown", "").forEach { mode ->
                         val label = if (mode.isBlank()) "plain" else mode
@@ -319,9 +294,8 @@ private fun AddTelegramDialog(
                             colors = if (selected)
                                 ButtonDefaults.outlinedButtonColors(
                                     containerColor = ForgeOsPalette.Orange.copy(alpha = 0.2f))
-                            else ButtonDefaults.outlinedButtonColors(),
-                        ) {
-                            Text(label, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                            else ButtonDefaults.outlinedButtonColors()) {
+                            Text(label, fontSize = 10.sp)
                         }
                     }
                 }
@@ -340,13 +314,12 @@ private fun AddTelegramDialog(
 private fun ComposeDialog(
     channel: ChannelConfig,
     onDismiss: () -> Unit,
-    onSend: (String, String) -> Unit,
-) {
+    onSend: (String, String) -> Unit) {
     var to by remember { mutableStateOf("") }
     var body by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Send via ${channel.displayName}", fontFamily = FontFamily.Monospace) },
+        title = { Text("Send via ${channel.displayName}") },
         text = {
             Column {
                 OutlinedTextField(to, { to = it },
@@ -369,14 +342,13 @@ private fun ComposeDialog(
 private fun VoiceDialog(
     channel: ChannelConfig,
     onDismiss: () -> Unit,
-    onSend: (to: String, path: String, caption: String?) -> Unit,
-) {
+    onSend: (to: String, path: String, caption: String?) -> Unit) {
     var to by remember { mutableStateOf("") }
     var path by remember { mutableStateOf("") }
     var caption by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Send voice via ${channel.displayName}", fontFamily = FontFamily.Monospace) },
+        title = { Text("Send voice via ${channel.displayName}") },
         text = {
             Column {
                 OutlinedTextField(to, { to = it },
@@ -391,8 +363,7 @@ private fun VoiceDialog(
                     label = { Text("Caption (optional)") },
                     singleLine = true, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(6.dp))
-                Text("Tip: OGG/Opus is best. Other formats may be re-encoded by Telegram.",
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp,
+                Text("Tip: OGG/Opus is best. Other formats may be re-encoded by Telegram.", fontSize = 10.sp,
                     color = ForgeOsPalette.TextMuted)
             }
         },

@@ -28,8 +28,7 @@ data class PluginsUiState(
 @HiltViewModel
 class PluginsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val pluginManager: PluginManager,
-) : ViewModel() {
+    private val pluginManager: PluginManager) : ViewModel() {
 
     private val _state = MutableStateFlow(PluginsUiState())
     val state: StateFlow<PluginsUiState> = _state.asStateFlow()
@@ -66,8 +65,7 @@ class PluginsViewModel @Inject constructor(
                 },
                 onFailure = {
                     _state.value = _state.value.copy(message = "❌ ${it.message}")
-                },
-            )
+                })
         }
     }
 

@@ -31,8 +31,7 @@ import javax.inject.Inject
 class CompanionMemoryViewModel @Inject constructor(
     private val episodicStore: EpisodicMemoryStore,
     private val memoryManager: MemoryManager,
-    private val semanticFactIndex: SemanticFactIndex,
-) : ViewModel() {
+    private val semanticFactIndex: SemanticFactIndex) : ViewModel() {
 
     // ── Episodes ─────────────────────────────────────────────────────────────
 
@@ -105,8 +104,7 @@ class CompanionMemoryViewModel @Inject constructor(
     data class MemorySummary(
         val episodeCount: Int,
         val factCount: Int,
-        val localOnly: Boolean = true,
-    )
+        val localOnly: Boolean = true)
 
     private val _summary = MutableStateFlow(MemorySummary(0, 0))
     val summary: StateFlow<MemorySummary> = _summary

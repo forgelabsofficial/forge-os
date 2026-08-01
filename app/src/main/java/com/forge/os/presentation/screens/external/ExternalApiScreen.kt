@@ -33,6 +33,7 @@ import com.forge.os.external.ExternalCaller
 import com.forge.os.external.GrantStatus
 import com.forge.os.presentation.screens.common.ForgeOsPalette
 import com.forge.os.presentation.screens.common.ModuleScaffold
+import com.forge.os.presentation.theme.forgePalette
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -61,8 +62,7 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+            verticalArrangement = Arrangement.spacedBy(12.dp)) {
 
             // ── Master switch ──────────────────────────────────────────────
             item {
@@ -76,27 +76,22 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
                             Text(
                                 "Allow external apps",
                                 color = ForgeOsPalette.TextPrimary,
-                                fontFamily = FontFamily.Monospace,
                                 fontSize = 13.sp,
-                                fontWeight = FontWeight.SemiBold,
-                            )
+                                fontWeight = FontWeight.SemiBold)
                             Text(
                                 if (s.masterEnabled)
                                     "On — granted apps can call the Forge OS API"
                                 else
                                     "Off — all external requests are denied",
                                 color = ForgeOsPalette.TextMuted,
-                                fontFamily = FontFamily.Monospace,
-                                fontSize = 11.sp,
-                            )
+                                fontSize = 11.sp)
                         }
                         Switch(
                             checked = s.masterEnabled,
                             onCheckedChange = vm::setMasterEnabled,
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = ForgeOsPalette.Orange,
-                                checkedTrackColor = ForgeOsPalette.Orange.copy(alpha = 0.3f),
-                            )
+                                checkedTrackColor = ForgeOsPalette.Orange.copy(alpha = 0.3f))
                         )
                     }
                 }
@@ -107,19 +102,15 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
                 Text(
                     "REGISTERED APPS (${s.callers.size})",
                     color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace,
                     fontSize = 10.sp,
-                    letterSpacing = 1.sp,
-                )
+                    letterSpacing = 1.sp)
             }
             if (s.callers.isEmpty()) {
                 item {
                     Text(
                         "No app has tried to bind yet.",
                         color = ForgeOsPalette.TextDim,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 11.sp,
-                    )
+                        fontSize = 11.sp)
                 }
             } else {
                 items(s.callers, key = { it.packageName }) { caller ->
@@ -128,8 +119,7 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
                         onGrant = { editing = caller },
                         onDeny = { vm.deny(caller) },
                         onRevoke = { vm.revoke(caller) },
-                        onRemove = { vm.remove(caller) },
-                    )
+                        onRemove = { vm.remove(caller) })
                 }
             }
 
@@ -139,19 +129,15 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
                 Text(
                     "CALL HISTORY (${s.recentAudit.size})",
                     color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace,
                     fontSize = 10.sp,
-                    letterSpacing = 1.sp,
-                )
+                    letterSpacing = 1.sp)
             }
             if (s.recentAudit.isEmpty()) {
                 item {
                     Text(
                         "No external calls yet.",
                         color = ForgeOsPalette.TextDim,
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 11.sp,
-                    )
+                        fontSize = 11.sp)
                 }
             } else {
                 items(s.recentAudit, key = { "${it.ts}_${it.packageName}_${it.operation}" }) { entry ->
@@ -165,8 +151,7 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
         GrantDialog(
             caller = caller,
             onDismiss = { editing = null },
-            onConfirm = { caps -> vm.grant(caller, caps); editing = null },
-        )
+            onConfirm = { caps -> vm.grant(caller, caps); editing = null })
     }
 
     if (showClearConfirm) {
@@ -174,27 +159,23 @@ fun ExternalApiScreen(onBack: () -> Unit, vm: ExternalApiViewModel = hiltViewMod
             onDismissRequest = { showClearConfirm = false },
             containerColor = ForgeOsPalette.Surface,
             title = {
-                Text("Clear history?", color = ForgeOsPalette.Danger,
-                    fontFamily = FontFamily.Monospace)
+                Text("Clear history?", color = ForgeOsPalette.Danger)
             },
             text = {
                 Text(
                     "This deletes all external API call history. Cannot be undone.",
-                    color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                )
+                    color = ForgeOsPalette.TextPrimary, fontSize = 12.sp)
             },
             confirmButton = {
                 TextButton(onClick = { vm.clearHistory(); showClearConfirm = false }) {
-                    Text("CLEAR", color = ForgeOsPalette.Danger, fontFamily = FontFamily.Monospace)
+                    Text("CLEAR", color = ForgeOsPalette.Danger)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showClearConfirm = false }) {
-                    Text("CANCEL", color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace)
+                    Text("CANCEL", color = ForgeOsPalette.TextMuted)
                 }
-            },
-        )
+            })
     }
 }
 
@@ -205,10 +186,10 @@ private fun AuditEntryCard(entry: ExternalAuditEntry) {
     var expanded by remember { mutableStateOf(false) }
 
     val outcomeColor = when (entry.outcome) {
-        "ok"           -> Color(0xFF22c55e)
-        "error"        -> Color(0xFFef4444)
-        "deny"         -> Color(0xFFf59e0b)
-        "rate_limited" -> Color(0xFFa78bfa)
+        "ok"           -> forgePalette.success
+        "error"        -> forgePalette.danger
+        "deny"         -> forgePalette.warning
+        "rate_limited" -> forgePalette.info
         else           -> ForgeOsPalette.TextMuted
     }
 
@@ -235,8 +216,7 @@ private fun AuditEntryCard(entry: ExternalAuditEntry) {
                 .fillMaxWidth()
                 .clickable { expanded = !expanded }
                 .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+            verticalAlignment = Alignment.CenterVertically) {
             // Outcome dot
             Box(
                 modifier = Modifier
@@ -249,10 +229,8 @@ private fun AuditEntryCard(entry: ExternalAuditEntry) {
                 Text(
                     opLabel,
                     color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace,
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                )
+                    fontWeight = FontWeight.SemiBold)
                 Text(
                     buildString {
                         append(entry.packageName.substringAfterLast('.'))
@@ -260,39 +238,32 @@ private fun AuditEntryCard(entry: ExternalAuditEntry) {
                         if (entry.outputBytes > 0) append("  ${entry.outputBytes}B")
                     },
                     color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                )
+                    fontSize = 10.sp)
             }
 
             Text(
                 formatTs(entry.ts),
                 color = ForgeOsPalette.TextDim,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp,
-            )
+                fontSize = 10.sp)
             Spacer(Modifier.width(4.dp))
             Icon(
                 if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                 contentDescription = null,
                 tint = ForgeOsPalette.TextDim,
-                modifier = Modifier.size(16.dp),
-            )
+                modifier = Modifier.size(16.dp))
         }
 
         // ── Expanded detail ────────────────────────────────────────────────
         AnimatedVisibility(
             visible = expanded,
             enter = expandVertically(),
-            exit = shrinkVertically(),
-        ) {
+            exit = shrinkVertically()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(ForgeOsPalette.Bg, RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp))
                     .padding(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Full package name
                 DetailRow("Package", entry.packageName)
 
@@ -300,8 +271,7 @@ private fun AuditEntryCard(entry: ExternalAuditEntry) {
                 DetailRow(
                     "Outcome",
                     entry.outcome + if (entry.message.isNotBlank()) " — ${entry.message}" else "",
-                    valueColor = outcomeColor,
-                )
+                    valueColor = outcomeColor)
 
                 // Timestamp
                 DetailRow("Time", formatTsFull(entry.ts))
@@ -316,8 +286,7 @@ private fun AuditEntryCard(entry: ExternalAuditEntry) {
                     DetailBlock(
                         label = if (entry.outcome == "error") "Error output" else "Response",
                         value = entry.outputPayload,
-                        valueColor = if (entry.outcome == "error") Color(0xFFef4444) else ForgeOsPalette.TextPrimary,
-                    )
+                        valueColor = if (entry.outcome == "error") forgePalette.danger else ForgeOsPalette.TextPrimary)
                 }
             }
         }
@@ -330,17 +299,13 @@ private fun DetailRow(label: String, value: String, valueColor: Color = ForgeOsP
         Text(
             "$label:",
             color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
-            modifier = Modifier.width(72.dp),
-        )
+            modifier = Modifier.width(72.dp))
         Text(
             value,
             color = valueColor,
-            fontFamily = FontFamily.Monospace,
             fontSize = 10.sp,
-            modifier = Modifier.weight(1f),
-        )
+            modifier = Modifier.weight(1f))
     }
 }
 
@@ -350,9 +315,7 @@ private fun DetailBlock(label: String, value: String, valueColor: Color = ForgeO
         Text(
             "$label:",
             color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 10.sp,
-        )
+            fontSize = 10.sp)
         Spacer(Modifier.height(2.dp))
         Box(
             modifier = Modifier
@@ -364,10 +327,8 @@ private fun DetailBlock(label: String, value: String, valueColor: Color = ForgeO
             Text(
                 value,
                 color = valueColor,
-                fontFamily = FontFamily.Monospace,
                 fontSize = 10.sp,
-                lineHeight = 14.sp,
-            )
+                lineHeight = 14.sp)
         }
     }
 }
@@ -380,48 +341,38 @@ private fun CallerCard(
     onGrant: () -> Unit,
     onDeny: () -> Unit,
     onRevoke: () -> Unit,
-    onRemove: () -> Unit,
-) {
+    onRemove: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(8.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(8.dp))
-            .padding(12.dp),
-    ) {
+            .padding(12.dp)) {
         Text(
             caller.displayName,
             color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace,
             fontSize = 13.sp,
-            fontWeight = FontWeight.SemiBold,
-        )
+            fontWeight = FontWeight.SemiBold)
         Text(
             caller.packageName,
             color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 10.sp,
-        )
+            fontSize = 10.sp)
         Text(
             "Cert: ${caller.signingCertSha256.take(24)}…",
             color = ForgeOsPalette.TextDim,
-            fontFamily = FontFamily.Monospace,
-            fontSize = 10.sp,
-        )
+            fontSize = 10.sp)
         Spacer(Modifier.height(6.dp))
 
         val statusColor = when (caller.status) {
-            GrantStatus.GRANTED -> Color(0xFF22c55e)
-            GrantStatus.DENIED, GrantStatus.REVOKED -> Color(0xFFef4444)
+            GrantStatus.GRANTED -> forgePalette.success
+            GrantStatus.DENIED, GrantStatus.REVOKED -> forgePalette.danger
             else -> ForgeOsPalette.TextMuted
         }
         Text(
             caller.status.name,
             color = statusColor,
-            fontFamily = FontFamily.Monospace,
             fontSize = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-        )
+            fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(8.dp))
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -429,21 +380,19 @@ private fun CallerCard(
                 GrantStatus.PENDING, GrantStatus.DENIED, GrantStatus.REVOKED ->
                     Button(
                         onClick = onGrant,
-                        colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange),
-                    ) { Text("Grant…", fontFamily = FontFamily.Monospace, fontSize = 11.sp) }
+                        colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange)) { Text("Grant…", fontSize = 11.sp) }
                 GrantStatus.GRANTED ->
                     OutlinedButton(onClick = onRevoke) {
-                        Text("Revoke", fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                        Text("Revoke", fontSize = 11.sp)
                     }
             }
             if (caller.status != GrantStatus.GRANTED) {
                 OutlinedButton(onClick = onDeny) {
-                    Text("Deny", fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("Deny", fontSize = 11.sp)
                 }
             }
             TextButton(onClick = onRemove) {
-                Text("Forget", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("Forget", color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             }
         }
     }
@@ -455,8 +404,7 @@ private fun CallerCard(
 private fun GrantDialog(
     caller: ExternalCaller,
     onDismiss: () -> Unit,
-    onConfirm: (Capabilities) -> Unit,
-) {
+    onConfirm: (Capabilities) -> Unit) {
     var listTools    by remember { mutableStateOf(true) }
     var invokeTools  by remember { mutableStateOf(true) }
     var allowAll     by remember { mutableStateOf(false) }
@@ -473,18 +421,14 @@ private fun GrantDialog(
             Text(
                 "Grant: ${caller.displayName}",
                 color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 14.sp,
-            )
+                fontSize = 14.sp)
         },
         text = {
             Column(Modifier.verticalScroll(rememberScrollState())) {
                 Text(
                     "Choose what this app may do.",
                     color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 11.sp,
-                )
+                    fontSize = 11.sp)
                 Spacer(Modifier.height(8.dp))
                 Toggle("List tools",        listTools)   { listTools = it }
                 Toggle("Invoke tools",      invokeTools) { invokeTools = it }
@@ -495,16 +439,12 @@ private fun GrantDialog(
                             value = toolList,
                             onValueChange = { toolList = it },
                             label = {
-                                Text("Allowed tools (comma-separated)",
-                                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                                Text("Allowed tools (comma-separated)", fontSize = 10.sp)
                             },
                             singleLine = false,
                             modifier = Modifier.fillMaxWidth(),
-                            textStyle = androidx.compose.ui.text.TextStyle(
-                                fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                                color = ForgeOsPalette.TextPrimary,
-                            ),
-                        )
+                            textStyle = androidx.compose.ui.text.TextStyle(, fontSize = 11.sp,
+                                color = ForgeOsPalette.TextPrimary))
                     }
                 }
                 Toggle("Ask the agent",     askAgent)    { askAgent = it }
@@ -516,9 +456,7 @@ private fun GrantDialog(
                     "Rate limit: ${caller.rateLimit.callsPerMinute} calls/min, " +
                         "${caller.rateLimit.tokensPerDay} tokens/day",
                     color = ForgeOsPalette.TextDim,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 10.sp,
-                )
+                    fontSize = 10.sp)
             }
         },
         confirmButton = {
@@ -533,18 +471,16 @@ private fun GrantDialog(
                     readMemory   = readMemory,
                     writeMemory  = writeMemory,
                     runSkills    = runSkills,
-                    skillAllowlist = if (runSkills) listOf("*") else emptyList(),
-                ))
+                    skillAllowlist = if (runSkills) listOf("*") else emptyList()))
             }) {
-                Text("GRANT", color = ForgeOsPalette.Success, fontFamily = FontFamily.Monospace)
+                Text("GRANT", color = ForgeOsPalette.Success)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -553,10 +489,8 @@ private fun Toggle(label: String, value: Boolean, onChange: (Boolean) -> Unit) {
         Checkbox(
             checked = value,
             onCheckedChange = onChange,
-            colors = CheckboxDefaults.colors(checkedColor = ForgeOsPalette.Orange),
-        )
-        Text(label, color = ForgeOsPalette.TextPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+            colors = CheckboxDefaults.colors(checkedColor = ForgeOsPalette.Orange))
+        Text(label, color = ForgeOsPalette.TextPrimary, fontSize = 12.sp)
     }
 }
 

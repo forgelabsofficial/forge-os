@@ -11,13 +11,11 @@ import javax.inject.Inject
 data class ConversationsState(
     val items: List<StoredConversation> = emptyList(),
     val currentId: String? = null,
-    val message: String? = null,
-)
+    val message: String? = null)
 
 @HiltViewModel
 class ConversationsViewModel @Inject constructor(
-    private val repo: ConversationRepository,
-) : ViewModel() {
+    private val repo: ConversationRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(load())
     val state: StateFlow<ConversationsState> = _state

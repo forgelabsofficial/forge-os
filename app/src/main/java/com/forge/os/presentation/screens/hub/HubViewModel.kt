@@ -13,8 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HubViewModel @Inject constructor(
-    private val pluginManager: PluginManager,
-) : ViewModel() {
+    private val pluginManager: PluginManager) : ViewModel() {
 
     private val _pluginTiles = MutableStateFlow<List<Pair<String, HubTile>>>(emptyList())
     val pluginTiles: StateFlow<List<Pair<String, HubTile>>> = _pluginTiles

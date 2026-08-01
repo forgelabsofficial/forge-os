@@ -77,8 +77,7 @@ private val tsFmt = SimpleDateFormat("MMM d HH:mm:ss", Locale.US)
 @Composable
 fun CronSessionScreen(
     onBack: () -> Unit,
-    viewModel: CronSessionViewModel = hiltViewModel(),
-) {
+    viewModel: CronSessionViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     val snackbar = remember { SnackbarHostState() }
     var inspecting: CronExecution? by remember { mutableStateOf(null) }
@@ -107,28 +106,24 @@ fun CronSessionScreen(
                 Icon(Icons.Default.Clear, "Clear history",
                     tint = ForgeOsPalette.Danger, modifier = Modifier.size(18.dp))
             }
-        },
-    ) {
+        }) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 item { StatsHeader(state) }
                 item { ControlsBar(state, viewModel) }
                 item {
                     Text("LIVE FEED (${state.filtered.size})",
-                        color = ForgeOsPalette.Orange,
-                        fontFamily = FontFamily.Monospace, fontSize = 10.sp,
+                        color = ForgeOsPalette.Orange, fontSize = 10.sp,
                         letterSpacing = 1.sp,
                         modifier = Modifier.padding(top = 6.dp))
                 }
                 if (state.filtered.isEmpty()) {
                     item {
                         Text("No matching executions.",
-                            color = ForgeOsPalette.TextMuted,
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+                            color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
                             modifier = Modifier.padding(8.dp))
                     }
                 }
@@ -149,8 +144,7 @@ fun CronSessionScreen(
         OutputDialog(
             exec = ins,
             onRunAgain = { viewModel.runJobAgain(ins.jobId) },
-            onDismiss = { inspecting = null },
-        )
+            onDismiss = { inspecting = null })
     }
 
     if (confirmClear) {
@@ -158,28 +152,23 @@ fun CronSessionScreen(
             onDismissRequest = { confirmClear = false },
             containerColor = ForgeOsPalette.Surface,
             title = {
-                Text("Clear all cron history?", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                Text("Clear all cron history?", color = ForgeOsPalette.Orange, fontSize = 13.sp)
             },
             text = {
                 Text("This permanently deletes every execution record on this device. " +
                      "Active scheduled jobs are NOT affected.",
-                    color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
             },
             confirmButton = {
                 TextButton(onClick = { viewModel.clearHistory(); confirmClear = false }) {
-                    Text("DELETE", color = ForgeOsPalette.Danger,
-                        fontFamily = FontFamily.Monospace)
+                    Text("DELETE", color = ForgeOsPalette.Danger)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { confirmClear = false }) {
-                    Text("CANCEL", color = ForgeOsPalette.TextMuted,
-                        fontFamily = FontFamily.Monospace)
+                    Text("CANCEL", color = ForgeOsPalette.TextMuted)
                 }
-            },
-        )
+            })
     }
 }
 
@@ -189,10 +178,8 @@ private fun StatsHeader(state: CronSessionUiState) {
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(12.dp),
-    ) {
-        Text("SESSION STATS", color = ForgeOsPalette.Orange,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp, letterSpacing = 1.sp)
+            .padding(12.dp)) {
+        Text("SESSION STATS", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
         Spacer(Modifier.height(6.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
             StatusPill("runs ${state.totalRuns}",
@@ -222,12 +209,10 @@ private fun ControlsBar(state: CronSessionUiState, vm: CronSessionViewModel) {
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(10.dp),
-    ) {
+            .padding(10.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("LIVE TAIL",
-                color = if (state.liveTail) ForgeOsPalette.Success else ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp, letterSpacing = 1.sp)
+                color = if (state.liveTail) ForgeOsPalette.Success else ForgeOsPalette.TextMuted, fontSize = 10.sp, letterSpacing = 1.sp)
             Spacer(Modifier.width(8.dp))
             Switch(
                 checked = state.liveTail,
@@ -236,13 +221,10 @@ private fun ControlsBar(state: CronSessionUiState, vm: CronSessionViewModel) {
                     checkedThumbColor = ForgeOsPalette.Success,
                     checkedTrackColor = ForgeOsPalette.Success.copy(alpha = 0.3f),
                     uncheckedThumbColor = ForgeOsPalette.TextDim,
-                    uncheckedTrackColor = ForgeOsPalette.Surface2,
-                ),
-            )
+                    uncheckedTrackColor = ForgeOsPalette.Surface2))
             Spacer(Modifier.weight(1f))
             TextButton(onClick = { vm.exportHistory() }) {
-                Text("EXPORT", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("EXPORT", color = ForgeOsPalette.Orange, fontSize = 10.sp)
             }
         }
         Spacer(Modifier.height(4.dp))
@@ -266,14 +248,10 @@ private fun ControlsBar(state: CronSessionUiState, vm: CronSessionViewModel) {
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             textStyle = androidx.compose.ui.text.TextStyle(
-                color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-            ),
-        )
+                color = ForgeOsPalette.TextPrimary, fontSize = 11.sp))
         if (state.jobNames.isNotEmpty()) {
             Spacer(Modifier.height(6.dp))
-            Text("JOB FILTER", color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 9.sp, letterSpacing = 1.sp)
+            Text("JOB FILTER", color = ForgeOsPalette.TextMuted, fontSize = 9.sp, letterSpacing = 1.sp)
             Spacer(Modifier.height(2.dp))
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())) {
                 FilterChip("all", state.selectedJobId == null) { vm.selectJob(null) }
@@ -297,11 +275,9 @@ private fun FilterChip(label: String, active: Boolean, onClick: () -> Unit) {
                 if (active) ForgeOsPalette.Orange else ForgeOsPalette.Border,
                 RoundedCornerShape(4.dp))
             .clickable { onClick() }
-            .padding(horizontal = 8.dp, vertical = 4.dp),
-    ) {
+            .padding(horizontal = 8.dp, vertical = 4.dp)) {
         Text(label,
-            color = if (active) ForgeOsPalette.Orange else ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            color = if (active) ForgeOsPalette.Orange else ForgeOsPalette.TextMuted, fontSize = 10.sp)
     }
 }
 
@@ -315,21 +291,16 @@ private fun ExecutionRow(exec: CronExecution, onClick: () -> Unit) {
                 RoundedCornerShape(4.dp))
             .clickable { onClick() }
             .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+        verticalAlignment = Alignment.CenterVertically) {
         Text(if (exec.success) "✓" else "✗",
-            color = if (exec.success) ForgeOsPalette.Success else ForgeOsPalette.Danger,
-            fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+            color = if (exec.success) ForgeOsPalette.Success else ForgeOsPalette.Danger, fontSize = 12.sp)
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
-            Text(exec.jobName, color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+            Text(exec.jobName, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
             Text(
                 "${tsFmt.format(Date(exec.startedAt))} • ${exec.durationMs}ms" +
                     (exec.error?.let { " • $it" } ?: ""),
-                color = if (exec.success) ForgeOsPalette.TextDim else ForgeOsPalette.Danger,
-                fontFamily = FontFamily.Monospace, fontSize = 9.sp,
-            )
+                color = if (exec.success) ForgeOsPalette.TextDim else ForgeOsPalette.Danger, fontSize = 9.sp)
         }
     }
 }
@@ -338,39 +309,32 @@ private fun ExecutionRow(exec: CronExecution, onClick: () -> Unit) {
 private fun OutputDialog(
     exec: CronExecution,
     onRunAgain: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     val clipboard = LocalClipboardManager.current
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
         title = {
             Text("${if (exec.success) "✓" else "✗"} ${exec.jobName}",
-                color = if (exec.success) ForgeOsPalette.Success else ForgeOsPalette.Danger,
-                fontFamily = FontFamily.Monospace, fontSize = 13.sp)
+                color = if (exec.success) ForgeOsPalette.Success else ForgeOsPalette.Danger, fontSize = 13.sp)
         },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 460.dp)
                 .verticalScroll(rememberScrollState())) {
                 Text("${tsFmt.format(Date(exec.startedAt))} • ${exec.durationMs}ms",
-                    color = ForgeOsPalette.TextDim,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                    color = ForgeOsPalette.TextDim, fontSize = 10.sp)
                 exec.error?.let {
                     Spacer(Modifier.height(4.dp))
-                    Text("ERROR: $it", color = ForgeOsPalette.Danger,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                    Text("ERROR: $it", color = ForgeOsPalette.Danger, fontSize = 11.sp)
                 }
                 Spacer(Modifier.height(8.dp))
-                Text("OUTPUT", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp, letterSpacing = 1.sp)
+                Text("OUTPUT", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
                 Box(Modifier.fillMaxWidth()
                     .background(ForgeOsPalette.Bg, RoundedCornerShape(4.dp))
                     .padding(8.dp)) {
                     Text(
                         if (exec.output.isBlank()) "(no output)" else exec.output,
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 10.sp,
-                    )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 10.sp)
                 }
             }
         },
@@ -379,20 +343,16 @@ private fun OutputDialog(
                 TextButton(onClick = {
                     clipboard.setText(AnnotatedString(exec.output))
                 }) {
-                    Text("COPY", color = ForgeOsPalette.Orange,
-                        fontFamily = FontFamily.Monospace)
+                    Text("COPY", color = ForgeOsPalette.Orange)
                 }
                 TextButton(onClick = { onRunAgain(); onDismiss() }) {
-                    Text("RUN AGAIN", color = ForgeOsPalette.Success,
-                        fontFamily = FontFamily.Monospace)
+                    Text("RUN AGAIN", color = ForgeOsPalette.Success)
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CLOSE", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CLOSE", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }

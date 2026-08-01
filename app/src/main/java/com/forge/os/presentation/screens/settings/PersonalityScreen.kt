@@ -67,15 +67,14 @@ fun PersonalityScreen(
             Spacer(Modifier.width(4.dp))
             Text(
                 "🎭  PERSONALITY",
-                color = palette.orange, fontSize = 16.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 2.sp
+                color = palette.orange, fontSize = 16.sp, letterSpacing = 2.sp
             )
         }
 
         Spacer(Modifier.height(4.dp))
         Text(
             "Customize how Forge thinks, speaks, and behaves",
-            color = palette.textMuted, fontSize = 11.sp, fontFamily = FontFamily.Monospace
+            color = palette.textMuted, fontSize = 11.sp
         )
 
         // Save message banner
@@ -85,10 +84,10 @@ fun PersonalityScreen(
                 Box(
                     Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFF052e16), RoundedCornerShape(6.dp))
+                        .background(forgePalette.successBg, RoundedCornerShape(6.dp))
                         .padding(10.dp, 8.dp)
                 ) {
-                    Text(it, color = Color(0xFF4ade80), fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                    Text(it, color = forgePalette.success, fontSize = 12.sp)
                 }
             }
         }
@@ -136,8 +135,7 @@ fun PersonalityScreen(
                                 Text(
                                     name,
                                     color = if (isActive) palette.orange else palette.textPrimary,
-                                    fontSize = 12.sp,
-                                    fontFamily = FontFamily.Monospace
+                                    fontSize = 12.sp
                                 )
                             }
                         }
@@ -229,7 +227,7 @@ fun PersonalityScreen(
                         shape = RoundedCornerShape(6.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Apply", fontSize = 13.sp, fontFamily = FontFamily.Monospace, color = Color.Black)
+                        Text("Apply", fontSize = 13.sp, color = Color.Black)
                     }
 
                     // Save as named profile
@@ -246,7 +244,7 @@ fun PersonalityScreen(
                     ) {
                         Icon(Icons.Default.Add, null, tint = palette.textMuted, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Save Profile", fontSize = 13.sp, fontFamily = FontFamily.Monospace, color = palette.textMuted)
+                        Text("Save Profile", fontSize = 13.sp, color = palette.textMuted)
                     }
                 }
             }
@@ -266,7 +264,6 @@ fun PersonalityScreen(
                     Text(
                         "Reset to Forge Defaults",
                         fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace,
                         color = palette.danger.copy(alpha = 0.8f)
                     )
                 }
@@ -278,8 +275,7 @@ fun PersonalityScreen(
                         title = {
                             Text(
                                 "Reset personality?",
-                                color = palette.textPrimary,
-                                fontFamily = FontFamily.Monospace
+                                color = palette.textPrimary
                             )
                         },
                         text = {
@@ -287,8 +283,7 @@ fun PersonalityScreen(
                                 "This restores the built-in Forge personality and discards any unsaved edits. " +
                                 "Saved profiles are not affected — you can switch back to them at any time.",
                                 color = palette.textMuted,
-                                fontSize = 13.sp,
-                                fontFamily = FontFamily.Monospace
+                                fontSize = 13.sp
                             )
                         },
                         confirmButton = {
@@ -296,12 +291,12 @@ fun PersonalityScreen(
                                 viewModel.resetToDefault()
                                 showResetConfirm = false
                             }) {
-                                Text("Reset", color = palette.danger, fontFamily = FontFamily.Monospace)
+                                Text("Reset", color = palette.danger)
                             }
                         },
                         dismissButton = {
                             TextButton(onClick = { showResetConfirm = false }) {
-                                Text("Cancel", color = palette.textMuted, fontFamily = FontFamily.Monospace)
+                                Text("Cancel", color = palette.textMuted)
                             }
                         }
                     )
@@ -318,13 +313,13 @@ fun PersonalityScreen(
             onDismissRequest = { showSaveDialog = false },
             containerColor = palette.surface,
             title = {
-                Text("Save Profile", color = palette.textPrimary, fontFamily = FontFamily.Monospace)
+                Text("Save Profile", color = palette.textPrimary)
             },
             text = {
                 Column {
                     Text(
                         "Profile name:",
-                        color = palette.textMuted, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                        color = palette.textMuted, fontSize = 12.sp
                     )
                     Spacer(Modifier.height(8.dp))
                     OutlinedTextField(
@@ -347,12 +342,12 @@ fun PersonalityScreen(
                     viewModel.saveProfile(saveProfileName)
                     showSaveDialog = false
                 }) {
-                    Text("Save", color = palette.orange, fontFamily = FontFamily.Monospace)
+                    Text("Save", color = palette.orange)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSaveDialog = false }) {
-                    Text("Cancel", color = palette.textMuted, fontFamily = FontFamily.Monospace)
+                    Text("Cancel", color = palette.textMuted)
                 }
             }
         )
@@ -364,8 +359,7 @@ private fun SectionLabel(text: String) {
     val palette = forgePalette
     Text(
         text,
-        color = palette.textMuted, fontSize = 11.sp,
-        fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+        color = palette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
     )
 }
 
@@ -382,11 +376,10 @@ private fun PersonalityField(
     Column {
         Text(
             label.uppercase(),
-            color = palette.textMuted, fontSize = 10.sp,
-            fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+            color = palette.textMuted, fontSize = 10.sp, letterSpacing = 1.sp
         )
         if (hint.isNotBlank()) {
-            Text(hint, color = palette.textMuted.copy(alpha = 0.6f), fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+            Text(hint, color = palette.textMuted.copy(alpha = 0.6f), fontSize = 10.sp)
         }
         Spacer(Modifier.height(4.dp))
         OutlinedTextField(
@@ -401,8 +394,7 @@ private fun PersonalityField(
                 unfocusedTextColor = palette.textPrimary,
                 cursorColor = palette.orange
             ),
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontFamily = FontFamily.Monospace,
+            textStyle = androidx.compose.ui.text.TextStyle(,
                 fontSize = 13.sp
             ),
             modifier = Modifier.fillMaxWidth()

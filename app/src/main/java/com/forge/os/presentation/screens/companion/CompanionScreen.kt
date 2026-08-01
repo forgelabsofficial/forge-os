@@ -55,8 +55,7 @@ fun CompanionScreen(
     onOpenPersona: () -> Unit,
     onSwitchToAgent: () -> Unit = onBack,
     onOpenHistory: () -> Unit = {},
-    vm: CompanionViewModel = hiltViewModel(),
-) {
+    vm: CompanionViewModel = hiltViewModel()) {
     val persona by vm.personaManager.persona.collectAsState()
     val messages by vm.messages.collectAsState()
     val phase by vm.phase.collectAsState()
@@ -83,8 +82,7 @@ fun CompanionScreen(
         Row(
             Modifier.fillMaxWidth().background(ForgeOsPalette.Surface)
                 .padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+            verticalAlignment = Alignment.CenterVertically) {
             Text("←", color = ForgeOsPalette.TextMuted, fontSize = 18.sp,
                 modifier = Modifier.clickable { onBack() }.padding(end = 8.dp))
             Text("💛", fontSize = 18.sp)
@@ -98,7 +96,7 @@ fun CompanionScreen(
                 else
                     "companion mode"
                 Text(sub, color = ForgeOsPalette.TextMuted,
-                    fontSize = 10.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+                    fontSize = 10.sp, letterSpacing = 1.sp)
             }
             // Phase P-5 — switch back to AGENT at the top of the screen.
             Text("⚡", fontSize = 16.sp,
@@ -108,14 +106,12 @@ fun CompanionScreen(
                     .padding(horizontal = 8.dp, vertical = 4.dp))
             Spacer(Modifier.width(6.dp))
             Text("chats", color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
                 modifier = Modifier
                     .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(4.dp))
                     .clickable { onOpenHistory() }
                     .padding(horizontal = 8.dp, vertical = 4.dp))
             Spacer(Modifier.width(6.dp))
             Text("persona", color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
                 modifier = Modifier
                     .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(4.dp))
                     .clickable { onOpenPersona() }
@@ -127,8 +123,7 @@ fun CompanionScreen(
             state = listState,
             modifier = Modifier.weight(1f).fillMaxWidth(),
             contentPadding = PaddingValues(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
+            verticalArrangement = Arrangement.spacedBy(10.dp)) {
             items(messages, key = { it.id }) { m -> Bubble(m) }
             if (isBusy) item {
                 val label = when (phase) {
@@ -146,8 +141,7 @@ fun CompanionScreen(
             Row(
                 Modifier.fillMaxWidth().background(ForgeOsPalette.Surface)
                     .padding(horizontal = 10.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
+                horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 listOf("rough day", "ok", "good", "great").forEach { mood ->
                     Box(
                         Modifier
@@ -155,8 +149,7 @@ fun CompanionScreen(
                             .clickable { input = "Today feels $mood. " }
                             .padding(horizontal = 10.dp, vertical = 5.dp)
                     ) {
-                        Text(mood, color = CompanionAccent, fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace)
+                        Text(mood, color = CompanionAccent, fontSize = 11.sp)
                     }
                 }
             }
@@ -165,21 +158,18 @@ fun CompanionScreen(
         // Input
         Row(
             Modifier.fillMaxWidth().background(ForgeOsPalette.Surface).padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+            verticalAlignment = Alignment.CenterVertically) {
             Box(
                 Modifier.weight(1f).height(44.dp)
                     .background(ForgeOsPalette.Surface2, RoundedCornerShape(22.dp))
                     .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(22.dp))
                     .padding(horizontal = 14.dp),
-                contentAlignment = Alignment.CenterStart,
-            ) {
+                contentAlignment = Alignment.CenterStart) {
                 BasicTextField(
                     value = input, onValueChange = { input = it },
                     textStyle = TextStyle(color = ForgeOsPalette.TextPrimary, fontSize = 14.sp),
                     cursorBrush = SolidColor(CompanionAccent),
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                    modifier = Modifier.fillMaxWidth())
                 if (input.isEmpty()) {
                     Text("Tell ${persona.name} what's on your mind…",
                         color = ForgeOsPalette.TextDim, fontSize = 14.sp)
@@ -192,10 +182,8 @@ fun CompanionScreen(
                     .clickable(enabled = input.isNotBlank() && !isBusy) {
                         vm.send(input); input = ""
                     }
-                    .padding(horizontal = 18.dp, vertical = 12.dp),
-            ) {
-                Text("send", color = Color.Black, fontSize = 13.sp,
-                    fontFamily = FontFamily.Monospace)
+                    .padding(horizontal = 18.dp, vertical = 12.dp)) {
+                Text("send", color = Color.Black, fontSize = 13.sp)
             }
         }
     }
@@ -217,27 +205,23 @@ private fun Bubble(m: CompanionMessage) {
     }
     Row(
         Modifier.fillMaxWidth(),
-        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
-    ) {
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start) {
         Column(
             Modifier
                 .background(bg, RoundedCornerShape(16.dp))
                 .border(1.dp, border, RoundedCornerShape(16.dp))
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-        ) {
+                .padding(horizontal = 14.dp, vertical = 10.dp)) {
             if (!isUser) {
                 Text(
                     if (crisis) "support" else "companion",
                     color = if (crisis) ForgeOsPalette.Danger else CompanionAccent,
-                    fontSize = 9.sp, fontFamily = FontFamily.Monospace, letterSpacing = 1.sp,
-                )
+                    fontSize = 9.sp, letterSpacing = 1.sp)
                 Spacer(Modifier.height(2.dp))
             }
             Text(
                 m.content,
                 color = if (m.isError) ForgeOsPalette.Danger else ForgeOsPalette.TextPrimary,
-                fontSize = 14.sp,
-            )
+                fontSize = 14.sp)
             // Phase K-4: tiny tag chip on user bubbles after classification.
             m.tags?.let { t ->
                 Spacer(Modifier.height(4.dp))
@@ -245,9 +229,7 @@ private fun Bubble(m: CompanionMessage) {
                     "${t.intent.name.lowercase()} · ${t.emotion}" +
                         (if (t.urgency > 0) " · u${t.urgency}" else ""),
                     color = ForgeOsPalette.TextDim,
-                    fontSize = 9.sp,
-                    fontFamily = FontFamily.Monospace,
-                )
+                    fontSize = 9.sp)
             }
         }
     }
@@ -257,7 +239,7 @@ private fun Bubble(m: CompanionMessage) {
 private fun TypingIndicator(label: String) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
         Text(label, color = ForgeOsPalette.TextMuted,
-            fontSize = 11.sp, fontFamily = FontFamily.Monospace,
+            fontSize = 11.sp,
             textAlign = TextAlign.Start)
     }
 }

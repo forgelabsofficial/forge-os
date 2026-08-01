@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 
 data class CommandOption(
     val label: String,
@@ -35,7 +35,7 @@ fun CommandPalette(
     options: List<CommandOption>,
     onDismiss: () -> Unit
 ) {
-    val palette = LocalForgePalette.current
+    val palette = forgePalette
     var query by remember { mutableStateOf("") }
     
     val filtered = remember(query) {
@@ -60,8 +60,7 @@ fun CommandPalette(
                 onValueChange = { query = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
-                    Text("Type a command or screen name...", color = palette.textDim,
-                        fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+                    Text("Type a command or screen name...", color = palette.textDim, fontSize = 14.sp)
                 },
                 leadingIcon = { Icon(Icons.Default.Search, null, tint = palette.orange) },
                 singleLine = true,
@@ -71,7 +70,7 @@ fun CommandPalette(
                     focusedTextColor = palette.textPrimary,
                     unfocusedTextColor = palette.textPrimary
                 ),
-                textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 14.sp),
+                textStyle = LocalTextStyle.current.copy(, fontSize = 14.sp),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 shape = RoundedCornerShape(8.dp)
             )
@@ -89,7 +88,7 @@ fun CommandPalette(
             
             if (filtered.isEmpty()) {
                 Box(Modifier.fillMaxWidth().padding(24.dp), contentAlignment = Alignment.Center) {
-                    Text("No commands found", color = palette.textDim, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    Text("No commands found", color = palette.textDim, fontSize = 12.sp)
                 }
             }
             
@@ -114,14 +113,12 @@ private fun CommandItem(opt: CommandOption, palette: com.forge.os.presentation.t
                 opt.label.uppercase(),
                 color = palette.textPrimary,
                 fontSize = 13.sp,
-                fontFamily = FontFamily.Monospace,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 opt.description,
                 color = palette.textMuted,
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace
+                fontSize = 11.sp
             )
         }
     }

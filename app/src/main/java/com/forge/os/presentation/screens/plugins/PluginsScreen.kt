@@ -57,8 +57,7 @@ import com.forge.os.presentation.screens.common.StatusPill
 @Composable
 fun PluginsScreen(
     onBack: () -> Unit,
-    viewModel: PluginsViewModel = hiltViewModel(),
-) {
+    viewModel: PluginsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var showInstaller by remember { mutableStateOf(false) }
     var inspecting: PluginManifest? by remember { mutableStateOf(null) }
@@ -72,8 +71,7 @@ fun PluginsScreen(
     }
 
     val zipPicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent(),
-    ) { uri -> if (uri != null) viewModel.installFromZip(uri) }
+        ActivityResultContracts.GetContent()) { uri -> if (uri != null) viewModel.installFromZip(uri) }
 
     ModuleScaffold(
         title = "PLUGINS",
@@ -83,19 +81,16 @@ fun PluginsScreen(
                 Icon(Icons.Default.Add, "Install",
                     tint = ForgeOsPalette.Orange, modifier = Modifier.size(20.dp))
             }
-        },
-    ) {
+        }) {
         Box(Modifier.fillMaxSize()) {
             LazyColumn(
                 Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+                verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 if (state.plugins.isEmpty()) {
                     item {
                         Text("No plugins installed.\nTap + to install a .zip or paste a manifest.",
-                            color = ForgeOsPalette.TextMuted,
-                            fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                            color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                     }
                 }
                 items(state.plugins, key = { it.id }) { p ->
@@ -119,8 +114,7 @@ fun PluginsScreen(
                 viewModel.installFromText(manifest, code)
                 showInstaller = false
             },
-            onDismiss = { showInstaller = false },
-        )
+            onDismiss = { showInstaller = false })
     }
 
     val ins = inspecting
@@ -131,8 +125,7 @@ fun PluginsScreen(
                 viewModel.uninstall(ins.id)
                 inspecting = null
             },
-            onDismiss = { inspecting = null },
-        )
+            onDismiss = { inspecting = null })
     }
 }
 
@@ -140,20 +133,16 @@ fun PluginsScreen(
 private fun PluginCard(
     p: PluginManifest,
     onToggle: (Boolean) -> Unit,
-    onClick: () -> Unit,
-) {
+    onClick: () -> Unit) {
     Column(
         Modifier.fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-            .padding(12.dp),
-    ) {
+            .padding(12.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("${p.name} v${p.version}", color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 13.sp)
-                Text(p.id, color = ForgeOsPalette.TextDim,
-                    fontFamily = FontFamily.Monospace, fontSize = 9.sp)
+                Text("${p.name} v${p.version}", color = ForgeOsPalette.TextPrimary, fontSize = 13.sp)
+                Text(p.id, color = ForgeOsPalette.TextDim, fontSize = 9.sp)
             }
             if (p.source == "builtin") {
                 StatusPill("BUILTIN", ForgeOsPalette.Info, ForgeOsPalette.Surface2)
@@ -165,22 +154,18 @@ private fun PluginCard(
                     checkedThumbColor = ForgeOsPalette.Orange,
                     checkedTrackColor = ForgeOsPalette.Orange.copy(alpha = 0.3f),
                     uncheckedThumbColor = ForgeOsPalette.TextDim,
-                    uncheckedTrackColor = ForgeOsPalette.Surface2,
-                ),
-            )
+                    uncheckedTrackColor = ForgeOsPalette.Surface2))
         }
-        Text(p.description, color = ForgeOsPalette.TextMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp,
+        Text(p.description, color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
             modifier = Modifier.padding(top = 4.dp))
         Spacer(Modifier.height(4.dp))
         Row {
             Text("${p.tools.size} tools • ${p.permissions.size} perms",
-                color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace)
+                color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
             Spacer(Modifier.weight(1f))
             TextButton(onClick = onClick) {
                 Text("DETAILS", color = ForgeOsPalette.Orange,
-                    fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                    fontSize = 10.sp)
             }
         }
     }
@@ -190,41 +175,32 @@ private fun PluginCard(
 private fun DetailDialog(
     plugin: PluginManifest,
     onUninstall: () -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
         title = {
-            Text("${plugin.name} v${plugin.version}", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+            Text("${plugin.name} v${plugin.version}", color = ForgeOsPalette.Orange, fontSize = 14.sp)
         },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 360.dp).verticalScroll(rememberScrollState())) {
-                Text("by ${plugin.author}", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("by ${plugin.author}", color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
                 Spacer(Modifier.height(6.dp))
-                Text(plugin.description, color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text(plugin.description, color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
                 Spacer(Modifier.height(10.dp))
-                Text("PERMISSIONS", color = ForgeOsPalette.Orange, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+                Text("PERMISSIONS", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
                 if (plugin.permissions.isEmpty()) {
-                    Text("(none)", color = ForgeOsPalette.TextDim, fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace)
+                    Text("(none)", color = ForgeOsPalette.TextDim, fontSize = 11.sp)
                 } else {
                     plugin.permissions.forEach {
-                        Text(" • $it", color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace)
+                        Text(" • $it", color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
                     }
                 }
                 Spacer(Modifier.height(10.dp))
-                Text("TOOLS", color = ForgeOsPalette.Orange, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+                Text("TOOLS", color = ForgeOsPalette.Orange, fontSize = 10.sp, letterSpacing = 1.sp)
                 plugin.tools.forEach { t ->
                     Text(" • ${t.name} — ${t.description}",
-                        color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace)
+                        color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
                 }
             }
         },
@@ -235,19 +211,16 @@ private fun DetailDialog(
                         Icon(Icons.Default.Delete, null,
                             tint = ForgeOsPalette.Danger, modifier = Modifier.size(14.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("UNINSTALL", color = ForgeOsPalette.Danger,
-                            fontFamily = FontFamily.Monospace)
+                        Text("UNINSTALL", color = ForgeOsPalette.Danger)
                     }
                 }
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CLOSE", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CLOSE", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }
 
 @Composable
@@ -255,62 +228,47 @@ private fun InstallerDialog(
     installing: Boolean,
     onPickZip: () -> Unit,
     onPasteInstall: (String, String) -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     var manifest by remember { mutableStateOf("") }
     var code by remember { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = ForgeOsPalette.Surface,
         title = {
-            Text("Install plugin", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 14.sp)
+            Text("Install plugin", color = ForgeOsPalette.Orange, fontSize = 14.sp)
         },
         text = {
             Column(Modifier.fillMaxWidth().heightIn(max = 380.dp).verticalScroll(rememberScrollState())) {
                 TextButton(onClick = onPickZip, enabled = !installing) {
-                    Text("📦 Pick .zip from device", color = ForgeOsPalette.Orange,
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    Text("📦 Pick .zip from device", color = ForgeOsPalette.Orange, fontSize = 12.sp)
                 }
-                Text("— or paste —", color = ForgeOsPalette.TextDim, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace, modifier = Modifier.padding(vertical = 4.dp))
-                Text("manifest.json", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("— or paste —", color = ForgeOsPalette.TextDim, fontSize = 10.sp, modifier = Modifier.padding(vertical = 4.dp))
+                Text("manifest.json", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(
                     value = manifest, onValueChange = { manifest = it },
                     modifier = Modifier.fillMaxWidth().height(120.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                    ),
-                )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 11.sp))
                 Spacer(Modifier.height(6.dp))
-                Text("entrypoint .py", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace)
+                Text("entrypoint .py", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
                 OutlinedTextField(
                     value = code, onValueChange = { code = it },
                     modifier = Modifier.fillMaxWidth().height(160.dp),
                     textStyle = androidx.compose.ui.text.TextStyle(
-                        color = ForgeOsPalette.TextPrimary,
-                        fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                    ),
-                )
+                        color = ForgeOsPalette.TextPrimary, fontSize = 11.sp))
             }
         },
         confirmButton = {
             TextButton(
                 onClick = { onPasteInstall(manifest, code) },
-                enabled = manifest.isNotBlank() && code.isNotBlank() && !installing,
-            ) {
+                enabled = manifest.isNotBlank() && code.isNotBlank() && !installing) {
                 Text(if (installing) "INSTALLING…" else "INSTALL",
-                    color = ForgeOsPalette.Success, fontFamily = FontFamily.Monospace)
+                    color = ForgeOsPalette.Success)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = ForgeOsPalette.TextMuted)
             }
-        },
-    )
+        })
 }

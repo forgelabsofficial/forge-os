@@ -13,14 +13,12 @@ import javax.inject.Inject
 data class ProjectsUiState(
     val projects: List<Project> = emptyList(),
     val active: Project? = null,
-    val message: String? = null,
-)
+    val message: String? = null)
 
 @HiltViewModel
 class ProjectsViewModel @Inject constructor(
     private val repository: ProjectsRepository,
-    private val scope: ProjectScopeManager,
-) : ViewModel() {
+    private val scope: ProjectScopeManager) : ViewModel() {
 
     private val _state = MutableStateFlow(ProjectsUiState())
     val state: StateFlow<ProjectsUiState> = _state.asStateFlow()
@@ -31,8 +29,7 @@ class ProjectsViewModel @Inject constructor(
         scope.refresh()
         _state.value = _state.value.copy(
             projects = repository.list(),
-            active = scope.active.value,
-        )
+            active = scope.active.value)
     }
 
     fun create(name: String, description: String) {

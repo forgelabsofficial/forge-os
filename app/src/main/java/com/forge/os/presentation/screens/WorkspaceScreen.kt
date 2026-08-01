@@ -35,8 +35,7 @@ fun WorkspaceScreen(
     onNavigateBack: () -> Unit,
     onOpenFile: (String) -> Unit = {},
     sandboxManager: SandboxManager? = null,
-    viewModel: WorkspaceViewModel = hiltViewModel(),
-) {
+    viewModel: WorkspaceViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     val ctx = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
@@ -80,8 +79,7 @@ fun WorkspaceScreen(
                         IconButton(onClick = { viewModel.deleteSelectionToTrash() }) {
                             Icon(Icons.Default.Delete, "Delete selected")
                         }
-                    },
-                )
+                    })
             } else {
                 TopAppBar(
                     title = { Text("Workspace") },
@@ -102,44 +100,37 @@ fun WorkspaceScreen(
                                 DropdownMenuItem(
                                     text = { Text("New file") },
                                     onClick = { showNewMenu = false; newDialog = NewKind.FILE },
-                                    leadingIcon = { Icon(Icons.Default.InsertDriveFile, null) },
-                                )
+                                    leadingIcon = { Icon(Icons.Default.InsertDriveFile, null) })
                                 DropdownMenuItem(
                                     text = { Text("New folder") },
                                     onClick = { showNewMenu = false; newDialog = NewKind.FOLDER },
-                                    leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) },
-                                )
+                                    leadingIcon = { Icon(Icons.Default.CreateNewFolder, null) })
                                 DropdownMenuItem(
                                     text = { Text("Upload from device") },
                                     onClick = {
                                         showNewMenu = false
                                         importLauncher.launch(arrayOf("*/*"))
                                     },
-                                    leadingIcon = { Icon(Icons.Default.Upload, null) },
-                                )
+                                    leadingIcon = { Icon(Icons.Default.Upload, null) })
                             }
                         }
                         IconButton(onClick = { viewModel.refresh() }) {
                             Icon(Icons.Default.Refresh, "Refresh")
                         }
-                    },
-                )
+                    })
             }
-        },
-    ) { padding ->
+        }) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-        ) {
+                .padding(padding)) {
             StorageCard(state.info)
             BreadcrumbBar(cwd = state.cwd, onNavigate = viewModel::openDirectory, onUp = viewModel::navigateUp)
             SearchBar(
                 query = state.query,
                 recursive = state.recursiveSearch,
                 onQuery = viewModel::setQuery,
-                onRecursiveToggle = viewModel::setRecursiveSearch,
-            )
+                onRecursiveToggle = viewModel::setRecursiveSearch)
 
             if (state.entries.isEmpty()) {
                 EmptyState(query = state.query)
@@ -166,8 +157,7 @@ fun WorkspaceScreen(
                                 }
                             },
                             onRename = { renameTarget = file },
-                            onDelete = { deleteTarget = file },
-                        )
+                            onDelete = { deleteTarget = file })
                     }
                 }
             }
@@ -179,8 +169,7 @@ fun WorkspaceScreen(
             current = state.sort,
             ascending = state.sortAscending,
             onPick = { viewModel.setSort(it); showSort = false },
-            onDismiss = { showSort = false },
-        )
+            onDismiss = { showSort = false })
     }
 
     newDialog?.let { kind ->
@@ -194,8 +183,7 @@ fun WorkspaceScreen(
                 if (name.isNotBlank()) {
                     if (kind == NewKind.FILE) viewModel.newFile(name) else viewModel.newFolder(name)
                 }
-            },
-        )
+            })
     }
 
     renameTarget?.let { item ->
@@ -208,8 +196,7 @@ fun WorkspaceScreen(
             onConfirm = { name ->
                 renameTarget = null
                 if (name.isNotBlank() && name != item.name) viewModel.rename(item, name)
-            },
-        )
+            })
     }
 
     deleteTarget?.let { item ->
@@ -223,8 +210,7 @@ fun WorkspaceScreen(
                     viewModel.deleteToTrash(t)
                 }) { Text("Move to trash") }
             },
-            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text("Cancel") } },
-        )
+            dismissButton = { TextButton(onClick = { deleteTarget = null }) { Text("Cancel") } })
     }
 }
 
@@ -238,17 +224,14 @@ private fun StorageCard(info: WorkspaceInfo) {
             Spacer(Modifier.height(4.dp))
             LinearProgressIndicator(
                 progress = { (info.usagePercent / 100f).coerceIn(0f, 1f) },
-                modifier = Modifier.fillMaxWidth(),
-            )
+                modifier = Modifier.fillMaxWidth())
             Spacer(Modifier.height(4.dp))
             Text(
                 "${info.totalSize / 1024}KB / ${info.maxSize / 1024 / 1024}MB (${"%.1f".format(info.usagePercent)}%)",
-                style = MaterialTheme.typography.bodySmall,
-            )
+                style = MaterialTheme.typography.bodySmall)
             Text(
                 "${info.totalFiles} files, ${info.totalDirs} directories",
-                style = MaterialTheme.typography.bodySmall,
-            )
+                style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -263,8 +246,7 @@ private fun BreadcrumbBar(cwd: String, onNavigate: (String) -> Unit, onUp: () ->
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+        verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onUp, enabled = parts.isNotEmpty()) {
             Icon(Icons.Default.ArrowUpward, "Up")
         }
@@ -272,8 +254,7 @@ private fun BreadcrumbBar(cwd: String, onNavigate: (String) -> Unit, onUp: () ->
             modifier = Modifier
                 .weight(1f)
                 .horizontalScroll(rememberScrollState()),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+            verticalAlignment = Alignment.CenterVertically) {
             AssistChip(onClick = { onNavigate("") }, label = { Text("workspace") })
             var acc = ""
             parts.forEach { p ->
@@ -282,8 +263,7 @@ private fun BreadcrumbBar(cwd: String, onNavigate: (String) -> Unit, onUp: () ->
                 val target = acc
                 AssistChip(
                     onClick = { onNavigate(target) },
-                    label = { Text(p, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-                )
+                    label = { Text(p, maxLines = 1, overflow = TextOverflow.Ellipsis) })
             }
             Spacer(Modifier.width(4.dp))
         }
@@ -296,8 +276,7 @@ private fun SearchBar(
     query: String,
     recursive: Boolean,
     onQuery: (String) -> Unit,
-    onRecursiveToggle: (Boolean) -> Unit,
-) {
+    onRecursiveToggle: (Boolean) -> Unit) {
     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
         OutlinedTextField(
             value = query,
@@ -308,8 +287,7 @@ private fun SearchBar(
             trailingIcon = {
                 if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Default.Close, "Clear") }
             },
-            modifier = Modifier.fillMaxWidth(),
-        )
+            modifier = Modifier.fillMaxWidth())
         Row(verticalAlignment = Alignment.CenterVertically) {
             Switch(checked = recursive, onCheckedChange = onRecursiveToggle, enabled = query.isNotBlank())
             Spacer(Modifier.width(8.dp))
@@ -324,8 +302,7 @@ private fun EmptyState(query: String) {
         Text(
             if (query.isBlank()) "Empty folder" else "No matches for \"$query\"",
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -338,16 +315,14 @@ private fun FileRow(
     onLongPress: () -> Unit,
     onShare: () -> Unit,
     onRename: () -> Unit,
-    onDelete: () -> Unit,
-) {
+    onDelete: () -> Unit) {
     var menuOpen by remember { mutableStateOf(false) }
     val bg = if (isSelected) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surface
     Surface(
         color = bg,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onTap),
-    ) {
+            .clickable(onClick = onTap)) {
         ListItem(
             headlineContent = {
                 Text(file.name, fontWeight = if (file.isDirectory) FontWeight.SemiBold else FontWeight.Normal)
@@ -364,8 +339,7 @@ private fun FileRow(
                     Icon(
                         imageVector = if (file.isDirectory) Icons.Default.Folder else Icons.Default.InsertDriveFile,
                         contentDescription = null,
-                        tint = if (file.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                        tint = if (file.isDirectory) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             },
             trailingContent = {
@@ -383,8 +357,7 @@ private fun FileRow(
                     }
                 }
             },
-            modifier = Modifier.background(bg),
-        )
+            modifier = Modifier.background(bg))
     }
 }
 
@@ -394,15 +367,13 @@ private fun SortSheet(
     current: WorkspaceSort,
     ascending: Boolean,
     onPick: (WorkspaceSort) -> Unit,
-    onDismiss: () -> Unit,
-) {
+    onDismiss: () -> Unit) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.padding(bottom = 16.dp)) {
             Text(
                 "Sort by",
                 style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(16.dp),
-            )
+                modifier = Modifier.padding(16.dp))
             WorkspaceSort.values().forEach { opt ->
                 ListItem(
                     headlineContent = { Text(opt.label) },
@@ -410,18 +381,15 @@ private fun SortSheet(
                     trailingContent = {
                         if (opt == current) Icon(
                             if (ascending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
-                            contentDescription = null,
-                        )
+                            contentDescription = null)
                     },
-                    modifier = Modifier.clickable { onPick(opt) },
-                )
+                    modifier = Modifier.clickable { onPick(opt) })
             }
             Text(
                 "Tap the active option again to flip direction.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
-            )
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
         }
     }
 }
@@ -433,8 +401,7 @@ private fun TextPromptDialog(
     confirm: String,
     initial: String = "",
     onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit,
-) {
+    onConfirm: (String) -> Unit) {
     var value by remember { mutableStateOf(initial) }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -445,12 +412,10 @@ private fun TextPromptDialog(
                 onValueChange = { value = it },
                 label = { Text(label) },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+                modifier = Modifier.fillMaxWidth())
         },
         confirmButton = { TextButton(onClick = { onConfirm(value) }) { Text(confirm) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
-    )
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } })
 }
 
 private fun humanSize(bytes: Long): String {

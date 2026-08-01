@@ -44,8 +44,7 @@ import java.util.Locale
 fun ConversationsScreen(
     onBack: () -> Unit,
     onOpened: () -> Unit,
-    viewModel: ConversationsViewModel = hiltViewModel(),
-) {
+    viewModel: ConversationsViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsState()
     var renameTarget: StoredConversation? by remember { mutableStateOf(null) }
     var deleteTarget: StoredConversation? by remember { mutableStateOf(null) }
@@ -62,19 +61,17 @@ fun ConversationsScreen(
             TextButton(onClick = {
                 viewModel.startNew(); onOpened()
             }) {
-                Text("+ NEW", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                Text("+ NEW", color = ForgeOsPalette.Orange, fontSize = 12.sp)
             }
         }
     ) {
         Column(Modifier.fillMaxSize()) {
             Text("${state.items.size} conversation(s) — tap to open",
-                color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace,
+                color = ForgeOsPalette.TextMuted,
                 fontSize = 11.sp, modifier = Modifier.padding(12.dp))
 
             if (state.items.isEmpty()) {
-                Text("No conversations yet.", color = ForgeOsPalette.TextMuted,
-                    fontFamily = FontFamily.Monospace, modifier = Modifier.padding(16.dp))
+                Text("No conversations yet.", color = ForgeOsPalette.TextMuted, modifier = Modifier.padding(16.dp))
             } else {
                 LazyColumn(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
                     items(state.items, key = { it.id }) { conv ->
@@ -83,8 +80,7 @@ fun ConversationsScreen(
                             isCurrent = conv.id == state.currentId,
                             onOpen = { viewModel.switchTo(conv.id); onOpened() },
                             onRename = { renameTarget = conv },
-                            onDelete = { deleteTarget = conv },
-                        )
+                            onDelete = { deleteTarget = conv })
                         Spacer(Modifier.height(8.dp))
                     }
                 }
@@ -101,8 +97,7 @@ fun ConversationsScreen(
             text = {
                 OutlinedTextField(
                     value = title, onValueChange = { title = it },
-                    label = { Text("Title") }, singleLine = true,
-                )
+                    label = { Text("Title") }, singleLine = true)
             },
             confirmButton = {
                 TextButton(onClick = {
@@ -134,8 +129,7 @@ private fun ConversationRow(
     isCurrent: Boolean,
     onOpen: () -> Unit,
     onRename: () -> Unit,
-    onDelete: () -> Unit,
-) {
+    onDelete: () -> Unit) {
     val borderColor = if (isCurrent) ForgeOsPalette.Orange else ForgeOsPalette.Border
     Column(
         Modifier.fillMaxWidth()
@@ -143,28 +137,23 @@ private fun ConversationRow(
             .border(1.dp, borderColor, RoundedCornerShape(6.dp))
             .clickable { onOpen() }
             .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
+        verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(conv.title.ifBlank { conv.id }, color = ForgeOsPalette.TextPrimary,
-                fontFamily = FontFamily.Monospace, fontSize = 13.sp,
+            Text(conv.title.ifBlank { conv.id }, color = ForgeOsPalette.TextPrimary, fontSize = 13.sp,
                 modifier = Modifier.weight(1f))
             if (isCurrent) {
                 Text("●", color = ForgeOsPalette.Orange, fontSize = 14.sp)
             }
         }
         Text("${conv.messages.size} msgs • ${tsFmt.format(Date(conv.updatedAt))}",
-            color = ForgeOsPalette.TextMuted, fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         conv.lastModel?.let {
-            Text("model: $it", color = ForgeOsPalette.TextMuted,
-                fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+            Text("model: $it", color = ForgeOsPalette.TextMuted, fontSize = 10.sp)
         }
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text("RENAME", color = ForgeOsPalette.Orange,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+            Text("RENAME", color = ForgeOsPalette.Orange, fontSize = 11.sp,
                 modifier = Modifier.clickable { onRename() })
-            Text("DELETE", color = ForgeOsPalette.Danger,
-                fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+            Text("DELETE", color = ForgeOsPalette.Danger, fontSize = 11.sp,
                 modifier = Modifier.clickable { onDelete() })
         }
     }

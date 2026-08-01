@@ -24,16 +24,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 
 private val Orange: Color
-    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = LocalForgePalette.current.orange
+    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.orange
 private val Surface: Color
-    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = LocalForgePalette.current.surface
+    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.surface
 private val TextPrimary: Color
-    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = LocalForgePalette.current.textPrimary
+    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.textPrimary
 private val TextMuted: Color
-    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = LocalForgePalette.current.textMuted
+    @Composable @androidx.compose.runtime.ReadOnlyComposable get() = forgePalette.textMuted
 
 /**
  * Voice input button with listening animation.
@@ -88,7 +88,7 @@ fun VoiceInputButton(
             },
             modifier = Modifier
                 .background(
-                    if (isListening) Color(0xFFef4444) else Color(0xFF333333),
+                    if (isListening) forgePalette.danger else forgePalette.borderSoft,
                     RoundedCornerShape(8.dp)
                 )
                 .size(48.dp)
@@ -153,7 +153,7 @@ fun VoiceInputStatus(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp),
-            color = Color(0xFF1a1a1a),
+            color = forgePalette.surface,
             shape = RoundedCornerShape(8.dp)
         ) {
             Row(
@@ -175,7 +175,7 @@ fun VoiceInputStatus(
                 Box(
                     modifier = Modifier
                         .size(12.dp)
-                        .background(Color(0xFFef4444).copy(alpha = alpha), CircleShape)
+                        .background(forgePalette.danger.copy(alpha = alpha), CircleShape)
                 )
                 
                 Spacer(Modifier.width(12.dp))
@@ -184,16 +184,14 @@ fun VoiceInputStatus(
                     Text(
                         "🎤 Listening...",
                         color = TextPrimary,
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace
+                        fontSize = 12.sp
                     )
                     if (lastRecognizedText.isNotBlank()) {
                         Spacer(Modifier.height(4.dp))
                         Text(
                             lastRecognizedText,
                             color = TextMuted,
-                            fontSize = 11.sp,
-                            fontFamily = FontFamily.Monospace
+                            fontSize = 11.sp
                         )
                     }
                 }

@@ -62,7 +62,7 @@ import com.forge.os.data.browser.Bookmark as BookmarkEntry
 import com.forge.os.data.browser.BrowserHistoryEntry
 import com.forge.os.data.browser.BrowserSessionManager
 import com.forge.os.data.browser.NavigationCommand
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 import com.forge.os.presentation.screens.browser.BrowserNavBar
 import com.forge.os.presentation.screens.browser.BrowserAddressBar
 import com.forge.os.presentation.screens.browser.BrowserTabStrip
@@ -74,17 +74,17 @@ import java.util.Date
 import java.util.Locale
 
 private val Orange: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.orange
+    @Composable @ReadOnlyComposable get() = forgePalette.orange
 private val Bg: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.bg
+    @Composable @ReadOnlyComposable get() = forgePalette.bg
 private val Surface: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.surface
+    @Composable @ReadOnlyComposable get() = forgePalette.surface
 private val Surface2: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.surface2
+    @Composable @ReadOnlyComposable get() = forgePalette.surface2
 private val TextPrimary: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textPrimary
+    @Composable @ReadOnlyComposable get() = forgePalette.textPrimary
 private val TextMuted: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textMuted
+    @Composable @ReadOnlyComposable get() = forgePalette.textMuted
 
 /**
  * In-app browser with persistent session (cookies/localStorage survive across
@@ -163,8 +163,7 @@ fun BrowserScreen(
                     showFileSourcePicker = false
                     deviceFileLauncher.launch(arrayOf("*/*"))
                 }) { Text("From device") }
-            },
-        )
+            })
     }
 
     if (showWorkspacePicker) {
@@ -183,8 +182,7 @@ fun BrowserScreen(
                     pendingFileChooser?.onReceiveValue(if (uri != null) arrayOf(uri) else null)
                     pendingFileChooser = null
                 }
-            },
-        )
+            })
     }
 
     // Dispatch agent commands to the WebView
@@ -293,28 +291,23 @@ fun BrowserScreen(
                 DropdownMenu(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false },
-                    modifier = Modifier.background(Surface),
-                ) {
+                    modifier = Modifier.background(Surface)) {
                     DropdownMenuItem(
                         text = { Text("Find in page", color = TextPrimary) },
                         leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null, tint = Orange) },
-                        onClick = { showMenu = false; findVisible = true },
-                    )
+                        onClick = { showMenu = false; findVisible = true })
                     DropdownMenuItem(
                         text = { Text("Bookmarks (${bookmarks.size})", color = TextPrimary) },
                         leadingIcon = { Icon(Icons.Filled.Bookmark, contentDescription = null, tint = Orange) },
-                        onClick = { showMenu = false; showBookmarks = true },
-                    )
+                        onClick = { showMenu = false; showBookmarks = true })
                     DropdownMenuItem(
                         text = { Text("History", color = TextPrimary) },
                         leadingIcon = { Icon(Icons.Filled.History, contentDescription = null, tint = Orange) },
-                        onClick = { showMenu = false; showHistory = true },
-                    )
+                        onClick = { showMenu = false; showHistory = true })
                     DropdownMenuItem(
                         text = { Text("Clear session…", color = TextPrimary) },
                         leadingIcon = { Icon(Icons.Filled.Close, contentDescription = null, tint = TextMuted) },
-                        onClick = { showMenu = false; showClearDialog = true },
-                    )
+                        onClick = { showMenu = false; showClearDialog = true })
                 }
             }
         }
@@ -326,8 +319,7 @@ fun BrowserScreen(
                     .fillMaxWidth()
                     .background(Surface)
                     .padding(horizontal = 8.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+                verticalAlignment = Alignment.CenterVertically) {
                 OutlinedTextField(
                     value = findQuery,
                     onValueChange = {
@@ -350,11 +342,10 @@ fun BrowserScreen(
                         focusedBorderColor = Orange,
                         unfocusedBorderColor = Surface2,
                         focusedContainerColor = Bg,
-                        unfocusedContainerColor = Bg,
-                    )
+                        unfocusedContainerColor = Bg)
                 )
                 Spacer(Modifier.width(6.dp))
-                Text(findCounter, color = TextMuted, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                Text(findCounter, color = TextMuted, fontSize = 11.sp)
                 IconButton(onClick = { webViewRef?.findNext(false) }) {
                     Icon(Icons.Filled.KeyboardArrowUp, contentDescription = "Previous", tint = TextPrimary)
                 }
@@ -392,8 +383,7 @@ fun BrowserScreen(
                 pendingFileChooser = cb
                 showFileSourcePicker = true
             },
-            onPageFinished = { url, title -> viewModel.rememberActiveTabUrl(url, title) },
-        )
+            onPageFinished = { url, title -> viewModel.rememberActiveTabUrl(url, title) })
     }
 
     if (showBookmarks) {
@@ -404,8 +394,7 @@ fun BrowserScreen(
                 showBookmarks = false
                 webViewRef?.loadUrl(url)
             },
-            onRemove = { url -> viewModel.bookmarksStore.remove(url) },
-        )
+            onRemove = { url -> viewModel.bookmarksStore.remove(url) })
     }
 
     if (showHistory) {
@@ -416,8 +405,7 @@ fun BrowserScreen(
                 showHistory = false
                 webViewRef?.loadUrl(url)
             },
-            onClear = { viewModel.clearHistory() },
-        )
+            onClear = { viewModel.clearHistory() })
     }
 
     if (showClearDialog) {
@@ -440,8 +428,7 @@ fun BrowserScreen(
             dismissButton = {
                 TextButton(onClick = { showClearDialog = false }) { Text("Cancel", color = TextMuted) }
             },
-            containerColor = Surface,
-        )
+            containerColor = Surface)
     }
 }
 
@@ -456,8 +443,7 @@ interface BrowserSandboxEntryPoint {
 private fun WorkspaceFilePickerDialog(
     sandbox: SandboxManager,
     onDismiss: () -> Unit,
-    onPicked: (String) -> Unit,
-) {
+    onPicked: (String) -> Unit) {
     var files by remember { mutableStateOf<List<SandboxManager.FileInfo>>(emptyList()) }
 
     LaunchedEffect(Unit) {
@@ -466,11 +452,11 @@ private fun WorkspaceFilePickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Workspace files", fontFamily = FontFamily.Monospace) },
+        title = { Text("Workspace files") },
         text = {
             Column {
                 if (files.isEmpty()) {
-                    Text("No files in workspace.", color = TextMuted, fontFamily = FontFamily.Monospace)
+                    Text("No files in workspace.", color = TextMuted)
                 } else {
                     LazyColumn {
                         items(files) { f ->
@@ -481,7 +467,6 @@ private fun WorkspaceFilePickerDialog(
                                     .clickable { onPicked(f.path) }
                                     .padding(vertical = 6.dp),
                                 color = Orange,
-                                fontFamily = FontFamily.Monospace,
                                 fontSize = 12.sp
                             )
                         }
@@ -493,8 +478,7 @@ private fun WorkspaceFilePickerDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel", color = TextMuted) }
         },
-        containerColor = Surface,
-    )
+        containerColor = Surface)
 }
 
 @Composable
@@ -502,19 +486,16 @@ private fun BookmarksDialog(
     bookmarks: List<BookmarkEntry>,
     onDismiss: () -> Unit,
     onOpen: (String) -> Unit,
-    onRemove: (String) -> Unit,
-) {
+    onRemove: (String) -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Bookmarks", color = TextPrimary, fontFamily = FontFamily.Monospace) },
+        title = { Text("Bookmarks", color = TextPrimary) },
         text = {
             if (bookmarks.isEmpty()) {
                 Text(
                     "No bookmarks yet — tap the star next to the URL bar to add one.",
                     color = TextMuted,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                )
+                    fontSize = 12.sp)
             } else {
                 LazyColumn(
                     modifier = Modifier
@@ -526,8 +507,7 @@ private fun BookmarksDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
+                            verticalAlignment = Alignment.CenterVertically) {
                             Column(
                                 modifier = Modifier
                                     .weight(1f)
@@ -538,15 +518,12 @@ private fun BookmarksDialog(
                                     color = TextPrimary,
                                     fontWeight = FontWeight.SemiBold,
                                     fontSize = 13.sp,
-                                    maxLines = 1,
-                                )
+                                    maxLines = 1)
                                 Text(
                                     b.url,
                                     color = TextMuted,
-                                    fontFamily = FontFamily.Monospace,
                                     fontSize = 11.sp,
-                                    maxLines = 1,
-                                )
+                                    maxLines = 1)
                             }
                             IconButton(onClick = { onRemove(b.url) }) {
                                 Icon(Icons.Filled.Close, contentDescription = "Remove", tint = TextMuted)
@@ -559,8 +536,7 @@ private fun BookmarksDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text("Close", color = Orange) }
         },
-        containerColor = Surface,
-    )
+        containerColor = Surface)
 }
 
 @Composable
@@ -568,14 +544,13 @@ private fun HistoryDialog(
     entries: List<BrowserHistoryEntry>,
     onDismiss: () -> Unit,
     onOpen: (String) -> Unit,
-    onClear: () -> Unit,
-) {
+    onClear: () -> Unit) {
     val fmt = remember { SimpleDateFormat("MMM d HH:mm", Locale.getDefault()) }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("History", color = TextPrimary, fontFamily = FontFamily.Monospace)
+                Text("History", color = TextPrimary)
                 Spacer(Modifier.weight(1f))
                 TextButton(onClick = onClear) { Text("Clear all", color = TextMuted, fontSize = 12.sp) }
             }
@@ -585,9 +560,7 @@ private fun HistoryDialog(
                 Text(
                     "Browser history is empty.",
                     color = TextMuted,
-                    fontFamily = FontFamily.Monospace,
-                    fontSize = 12.sp,
-                )
+                    fontSize = 12.sp)
             } else {
                 LazyColumn(
                     modifier = Modifier
@@ -599,21 +572,17 @@ private fun HistoryDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onOpen(e.url) }
-                                .padding(vertical = 6.dp),
-                        ) {
+                                .padding(vertical = 6.dp)) {
                             Text(
                                 e.title.ifBlank { e.url },
                                 color = TextPrimary,
                                 fontSize = 13.sp,
-                                maxLines = 1,
-                            )
+                                maxLines = 1)
                             Text(
                                 "${fmt.format(Date(e.ts))} · ${e.sessionId} · ${e.url}",
                                 color = TextMuted,
                                 fontSize = 11.sp,
-                                fontFamily = FontFamily.Monospace,
-                                maxLines = 1,
-                            )
+                                maxLines = 1)
                         }
                     }
                 }
@@ -622,8 +591,7 @@ private fun HistoryDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) { Text("Close", color = Orange) }
         },
-        containerColor = Surface,
-    )
+        containerColor = Surface)
 }
 
 /**
@@ -636,19 +604,15 @@ private fun WebViewUnavailablePanel(message: String, onRetry: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A0A0A)),
-        contentAlignment = Alignment.Center,
-    ) {
+            .background(forgePalette.bg),
+        contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier.padding(32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+            horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 "⚠ In-app browser unavailable",
                 color = Orange,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 16.sp,
-            )
+                fontSize = 16.sp)
             Spacer(Modifier.height(12.dp))
             Text(
                 "Android couldn't start the system WebView on this device. " +
@@ -656,21 +620,16 @@ private fun WebViewUnavailablePanel(message: String, onRetry: () -> Unit) {
                     "disabled, or another process is already using its data " +
                     "directory.",
                 color = TextPrimary,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 12.sp,
-            )
+                fontSize = 12.sp)
             Spacer(Modifier.height(8.dp))
             Text(
                 message,
                 color = TextMuted,
-                fontFamily = FontFamily.Monospace,
-                fontSize = 10.sp,
-            )
+                fontSize = 10.sp)
             Spacer(Modifier.height(16.dp))
             Button(
                 onClick = onRetry,
-                colors = ButtonDefaults.buttonColors(containerColor = Orange),
-            ) { Text("RETRY", fontFamily = FontFamily.Monospace) }
+                colors = ButtonDefaults.buttonColors(containerColor = Orange)) { Text("RETRY") }
         }
     }
 }
@@ -695,8 +654,7 @@ private fun BrowserWebPanel(
     onWebViewReady: (WebView) -> Unit,
     onWebViewReleased: (WebView) -> Unit,
     onFileChooserRequested: (ValueCallback<Array<Uri>>?) -> Unit,
-    onPageFinished: (url: String, title: String) -> Unit,
-) {
+    onPageFinished: (url: String, title: String) -> Unit) {
     val ctxForPreflight = LocalContext.current
     var webViewFatal by remember { mutableStateOf<String?>(null) }
     var retryNonce by remember { mutableStateOf(0) }
@@ -718,8 +676,7 @@ private fun BrowserWebPanel(
     if (fatal != null) {
         WebViewUnavailablePanel(
             message = fatal,
-            onRetry = { retryNonce += 1 },
-        )
+            onRetry = { retryNonce += 1 })
         return
     }
 
@@ -785,8 +742,7 @@ private fun BrowserWebPanel(
                 override fun onReceivedError(
                     view: WebView?,
                     request: WebResourceRequest?,
-                    error: WebResourceError?,
-                ) {
+                    error: WebResourceError?) {
                     val isMainFrame = request?.isForMainFrame == true
                     if (!isMainFrame || view == null) return
                     val failedUrl = request?.url?.toString() ?: ""

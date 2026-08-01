@@ -29,8 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AndroidScreenViewModel @Inject constructor(
-    private val controller: AndroidController,
-) : ViewModel() {
+    private val controller: AndroidController) : ViewModel() {
     private val _snapshot = MutableStateFlow<String>("Tap REFRESH to load device snapshot.")
     val snapshot: StateFlow<String> = _snapshot
 
@@ -53,8 +52,7 @@ fun AndroidScreen(onBack: () -> Unit, viewModel: AndroidScreenViewModel = hiltVi
             Button(
                 onClick = { viewModel.refresh() },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange),
-            ) { Text("REFRESH", fontFamily = FontFamily.Monospace) }
+                colors = ButtonDefaults.buttonColors(containerColor = ForgeOsPalette.Orange)) { Text("REFRESH") }
             Spacer(Modifier.height(12.dp))
             Column(
                 Modifier.fillMaxWidth()
@@ -62,11 +60,9 @@ fun AndroidScreen(onBack: () -> Unit, viewModel: AndroidScreenViewModel = hiltVi
                     .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
                     .padding(10.dp)
             ) {
-                Text("DEVICE SNAPSHOT", color = ForgeOsPalette.Orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 11.sp)
+                Text("DEVICE SNAPSHOT", color = ForgeOsPalette.Orange, fontSize = 11.sp)
                 Spacer(Modifier.height(4.dp))
-                Text(snapshot, color = ForgeOsPalette.TextPrimary,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text(snapshot, color = ForgeOsPalette.TextPrimary, fontSize = 10.sp)
             }
         }
     }

@@ -39,8 +39,7 @@ private val Accent = Color(0xFFf59e0b)
 @Composable
 fun PersonaScreen(
     onBack: () -> Unit,
-    vm: CompanionViewModel = hiltViewModel(),
-) {
+    vm: CompanionViewModel = hiltViewModel()) {
     val persona by vm.personaManager.persona.collectAsState()
 
     var name by remember { mutableStateOf(persona.name) }
@@ -52,21 +51,17 @@ fun PersonaScreen(
     ModuleScaffold(title = "PERSONA", onBack = onBack) {
         Column(
             Modifier.fillMaxWidth().padding(14.dp).verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
-        ) {
+            verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Text(
                 "Phase I — your companion's identity. Injected into every COMPANION-mode reply.",
-                color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
-            )
+                color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
 
             Field("Name", name) { name = it }
             Field("Pronouns", pronouns) { pronouns = it }
             Field("Core traits (comma-separated)", traits) { traits = it }
             Field("Backstory (optional)", backstory, multiline = true) { backstory = it }
 
-            Text("Voice", color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace)
+            Text("Voice", color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 PersonaVoice.values().forEach { v ->
                     val selected = v == voice
@@ -74,17 +69,14 @@ fun PersonaScreen(
                         Modifier
                             .background(
                                 if (selected) Accent else ForgeOsPalette.Surface,
-                                RoundedCornerShape(6.dp),
-                            )
+                                RoundedCornerShape(6.dp))
                             .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
                             .clickable { voice = v }
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
-                    ) {
+                            .padding(horizontal = 14.dp, vertical = 8.dp)) {
                         Text(
                             v.name.lowercase(),
                             color = if (selected) Color.Black else ForgeOsPalette.TextPrimary,
-                            fontSize = 12.sp, fontFamily = FontFamily.Monospace,
-                        )
+                            fontSize = 12.sp)
                     }
                 }
             }
@@ -103,15 +95,12 @@ fun PersonaScreen(
                                     pronouns = pronouns.ifBlank { "they/them" },
                                     coreTraits = cleanedTraits.take(5),
                                     backstory = backstory.trim(),
-                                    voice = voice,
-                                )
+                                    voice = voice)
                             }
                             onBack()
                         }
-                        .padding(horizontal = 18.dp, vertical = 10.dp),
-                ) {
-                    Text("save", color = Color.Black, fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace)
+                        .padding(horizontal = 18.dp, vertical = 10.dp)) {
+                    Text("save", color = Color.Black, fontSize = 13.sp)
                 }
                 Box(
                     Modifier.border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
@@ -122,27 +111,21 @@ fun PersonaScreen(
                             traits = p.coreTraits.joinToString(", ")
                             backstory = p.backstory; voice = p.voice
                         }
-                        .padding(horizontal = 18.dp, vertical = 10.dp),
-                ) {
-                    Text("reset", color = ForgeOsPalette.TextMuted, fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace)
+                        .padding(horizontal = 18.dp, vertical = 10.dp)) {
+                    Text("reset", color = ForgeOsPalette.TextMuted, fontSize = 13.sp)
                 }
             }
 
             Spacer(Modifier.height(8.dp))
-            Text("preview", color = ForgeOsPalette.TextMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+            Text("preview", color = ForgeOsPalette.TextMuted, fontSize = 10.sp, letterSpacing = 1.sp)
             Box(
                 Modifier.fillMaxWidth()
                     .background(ForgeOsPalette.Surface, RoundedCornerShape(6.dp))
                     .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-                    .padding(12.dp),
-            ) {
+                    .padding(12.dp)) {
                 Text(
                     vm.personaManager.buildSystemPreamble(),
-                    color = ForgeOsPalette.TextPrimary, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace,
-                )
+                    color = ForgeOsPalette.TextPrimary, fontSize = 11.sp)
             }
         }
     }
@@ -153,17 +136,14 @@ private fun Field(
     label: String,
     value: String,
     multiline: Boolean = false,
-    onChange: (String) -> Unit,
-) {
+    onChange: (String) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(label, color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace)
+        Text(label, color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
         Box(
             Modifier.fillMaxWidth()
                 .background(ForgeOsPalette.Surface2, RoundedCornerShape(6.dp))
                 .border(1.dp, ForgeOsPalette.Border, RoundedCornerShape(6.dp))
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-        ) {
+                .padding(horizontal = 12.dp, vertical = 10.dp)) {
             BasicTextField(
                 value = value, onValueChange = onChange,
                 textStyle = TextStyle(color = ForgeOsPalette.TextPrimary, fontSize = 13.sp),
@@ -171,8 +151,7 @@ private fun Field(
                 singleLine = !multiline,
                 modifier = Modifier.fillMaxWidth().let {
                     if (multiline) it.height(80.dp) else it
-                },
-            )
+                })
         }
     }
 }

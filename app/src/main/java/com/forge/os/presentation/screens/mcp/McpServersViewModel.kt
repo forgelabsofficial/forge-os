@@ -16,19 +16,16 @@ data class McpUiState(
     val servers: List<McpServer> = emptyList(),
     val tools: List<Pair<McpServer, McpToolSpec>> = emptyList(),
     val message: String? = null,
-    val busy: Boolean = false,
-)
+    val busy: Boolean = false)
 
 @HiltViewModel
 class McpServersViewModel @Inject constructor(
     private val repo: McpServerRepository,
-    private val client: McpClient,
-) : ViewModel() {
+    private val client: McpClient) : ViewModel() {
 
     private val _state = MutableStateFlow(McpUiState(
         servers = repo.list(),
-        tools = client.cachedToolsWithServer(),
-    ))
+        tools = client.cachedToolsWithServer()))
     val state: StateFlow<McpUiState> = _state
 
     fun add(name: String, url: String, token: String?) {
@@ -49,8 +46,7 @@ class McpServersViewModel @Inject constructor(
         _state.value = _state.value.copy(
             servers = repo.list(),
             tools = client.cachedToolsWithServer(),
-            message = "Removed",
-        )
+            message = "Removed")
     }
 
     fun refreshTools() {
@@ -63,8 +59,7 @@ class McpServersViewModel @Inject constructor(
             _state.value = _state.value.copy(
                 busy = false,
                 tools = client.cachedToolsWithServer(),
-                message = "Discovered ${tools.size} tool(s)",
-            )
+                message = "Discovered ${tools.size} tool(s)")
         }
     }
 

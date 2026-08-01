@@ -11,20 +11,17 @@ import javax.inject.Inject
 data class CompanionConversationsState(
     val items: List<StoredCompanionConversation> = emptyList(),
     val currentId: String? = null,
-    val message: String? = null,
-)
+    val message: String? = null)
 
 @HiltViewModel
 class CompanionConversationsViewModel @Inject constructor(
-    private val repo: CompanionConversationRepository,
-) : ViewModel() {
+    private val repo: CompanionConversationRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(load())
     val state: StateFlow<CompanionConversationsState> = _state
 
     private fun load() = CompanionConversationsState(
-        items = repo.list(), currentId = repo.currentId(),
-    )
+        items = repo.list(), currentId = repo.currentId())
 
     fun refresh() { _state.value = load() }
 

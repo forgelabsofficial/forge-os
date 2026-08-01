@@ -17,14 +17,12 @@ import javax.inject.Inject
 data class RoutingChainLink(
     val provider: String,
     val model: String,
-    val hasKey: Boolean,
-)
+    val hasKey: Boolean)
 
 data class EmbeddingSpecUi(
     val provider: String,
     val model: String,
-    val display: String,
-)
+    val display: String)
 
 data class ModelRoutingUiState(
     val chain: List<RoutingChainLink> = emptyList(),
@@ -56,15 +54,13 @@ data class ModelRoutingUiState(
     val ecoModeEnabled: Boolean = false,
     val dailyLimitUsd: Double = 1.0,
     val ecoProvider: String = "GROQ",
-    val ecoModel: String = "llama-3.3-70b-versatile",
-)
+    val ecoModel: String = "llama-3.3-70b-versatile")
 
 @HiltViewModel
 class ModelRoutingViewModel @Inject constructor(
     private val configRepository: ConfigRepository,
     private val keyStore: SecureKeyStore,
-    private val apiManager: com.forge.os.data.api.AiApiManager,
-) : ViewModel() {
+    private val apiManager: com.forge.os.data.api.AiApiManager) : ViewModel() {
 
     private val _state = MutableStateFlow(ModelRoutingUiState())
     val state: StateFlow<ModelRoutingUiState> = _state.asStateFlow()
@@ -80,8 +76,7 @@ class ModelRoutingViewModel @Inject constructor(
                 RoutingChainLink(
                     provider = link.provider,
                     model = link.model,
-                    hasKey = provider != null && keyStore.hasKey(provider),
-                )
+                    hasKey = provider != null && keyStore.hasKey(provider))
             },
             cronUsesFallback = bg.cron,
             alarmsUseFallback = bg.alarms,
@@ -106,8 +101,7 @@ class ModelRoutingViewModel @Inject constructor(
             ecoModeEnabled = configRepository.get().costBudget.enabled,
             dailyLimitUsd = configRepository.get().costBudget.dailyLimitUsd,
             ecoProvider = configRepository.get().costBudget.ecoProvider,
-            ecoModel = configRepository.get().costBudget.ecoModel,
-        )
+            ecoModel = configRepository.get().costBudget.ecoModel)
     }
 
     fun probeModels() = viewModelScope.launch {

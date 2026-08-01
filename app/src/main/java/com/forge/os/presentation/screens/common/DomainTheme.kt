@@ -22,85 +22,73 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.components.SimpleHeader
+import com.forge.os.presentation.theme.forgePalette
 
 /**
- * Shared "Forge OS" terminal palette accessor for all the Phase D module
- * screens. Each property reads from the active [LocalForgePalette], so
- * flipping the theme switcher in Settings repaints these screens too.
- *
- * The original implementation hard-coded a single dark palette as constants,
- * which is what made the theme switcher feel broken — toggling it re-rendered
- * the Material wrapper but every screen kept drawing dark hex literals.
+ * Shared palette accessor for module screens.
+ * Reads from the active [forgePalette] so theme switching works everywhere.
  */
 object ForgeOsPalette {
     val Orange: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.orange
+        @Composable @ReadOnlyComposable get() = forgePalette.orange
     val Bg: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.bg
+        @Composable @ReadOnlyComposable get() = forgePalette.bg
     val Surface: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.surface
+        @Composable @ReadOnlyComposable get() = forgePalette.surface
     val Surface2: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.surface2
+        @Composable @ReadOnlyComposable get() = forgePalette.surface2
     val Border: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.border
+        @Composable @ReadOnlyComposable get() = forgePalette.border
     val TextPrimary: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textPrimary
+        @Composable @ReadOnlyComposable get() = forgePalette.textPrimary
     val TextMuted: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textMuted
+        @Composable @ReadOnlyComposable get() = forgePalette.textMuted
     val TextDim: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textDim
+        @Composable @ReadOnlyComposable get() = forgePalette.textDim
     val Success: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.success
+        @Composable @ReadOnlyComposable get() = forgePalette.success
     val SuccessBg: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.successBg
+        @Composable @ReadOnlyComposable get() = forgePalette.successBg
     val Danger: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.danger
+        @Composable @ReadOnlyComposable get() = forgePalette.danger
     val DangerBg: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.dangerBg
+        @Composable @ReadOnlyComposable get() = forgePalette.dangerBg
     val Info: Color
-        @Composable @ReadOnlyComposable get() = LocalForgePalette.current.info
+        @Composable @ReadOnlyComposable get() = forgePalette.info
 }
 
+/**
+ * Modern module scaffold — uses SimpleHeader for consistent navigation.
+ */
 @Composable
 fun ModuleScaffold(
     title: String,
     onBack: () -> Unit,
     actions: @Composable () -> Unit = {},
-    content: @Composable () -> Unit,
-) {
+    content: @Composable () -> Unit) {
     Column(Modifier.fillMaxSize().background(ForgeOsPalette.Bg)) {
-        Row(
-            Modifier.fillMaxWidth().background(ForgeOsPalette.Surface).padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        SimpleHeader(
+            title = title,
+            onBackClick = onBack
         ) {
-            IconButton(onClick = onBack, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back",
-                    tint = ForgeOsPalette.TextMuted, modifier = Modifier.size(18.dp))
-            }
-            Spacer(Modifier.width(4.dp))
-            Text(title, color = ForgeOsPalette.Orange, fontSize = 14.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 2.sp)
-            Spacer(Modifier.width(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-            ) { actions() }
+            actions()
         }
         Box(Modifier.fillMaxSize()) { content() }
     }
 }
 
+/**
+ * Modern status pill — clean rounded badge.
+ */
 @Composable
 fun StatusPill(text: String, color: Color, bg: Color) {
     Box(
-        Modifier.background(bg, RoundedCornerShape(4.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp),
-    ) {
-        Text(text, color = color, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+        Modifier.background(bg, RoundedCornerShape(6.dp))
+            .padding(horizontal = 8.dp, vertical = 3.dp)) {
+        Text(text, color = color, fontSize = 11.sp, fontWeight = FontWeight.Medium)
     }
 }

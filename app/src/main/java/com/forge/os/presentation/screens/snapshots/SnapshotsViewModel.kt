@@ -15,13 +15,11 @@ import javax.inject.Inject
 data class SnapshotsState(
     val items: List<SnapshotInfo> = emptyList(),
     val message: String? = null,
-    val busy: Boolean = false,
-)
+    val busy: Boolean = false)
 
 @HiltViewModel
 class SnapshotsViewModel @Inject constructor(
-    private val manager: SnapshotManager,
-) : ViewModel() {
+    private val manager: SnapshotManager) : ViewModel() {
     private val _state = MutableStateFlow(SnapshotsState(items = manager.list()))
     val state: StateFlow<SnapshotsState> = _state
 
@@ -37,8 +35,7 @@ class SnapshotsViewModel @Inject constructor(
                     onSuccess = { "✅ Created ${it.id} (${it.fileCount} files)" },
                     onFailure = { "❌ ${it.message}" }
                 ),
-                busy = false,
-            )
+                busy = false)
         }
     }
 
@@ -51,8 +48,7 @@ class SnapshotsViewModel @Inject constructor(
                     onSuccess = { "✅ Restored $it files from $id" },
                     onFailure = { "❌ ${it.message}" }
                 ),
-                busy = false,
-            )
+                busy = false)
         }
     }
 

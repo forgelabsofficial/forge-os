@@ -15,13 +15,11 @@ data class AdvancedOverridesUiState(
     val lockAgentOut: Boolean = true,
     val blockedHosts: List<String> = emptyList(),
     val blockedExtensions: List<String> = emptyList(),
-    val blockedConfigPaths: List<String> = emptyList(),
-)
+    val blockedConfigPaths: List<String> = emptyList())
 
 @HiltViewModel
 class AdvancedOverridesViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
-) : ViewModel() {
+    private val configRepository: ConfigRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(AdvancedOverridesUiState())
     val state: StateFlow<AdvancedOverridesUiState> = _state.asStateFlow()
@@ -34,8 +32,7 @@ class AdvancedOverridesViewModel @Inject constructor(
             lockAgentOut = o.lockAgentOut,
             blockedHosts = o.extraBlockedHosts.sorted(),
             blockedExtensions = o.extraBlockedExtensions.sorted(),
-            blockedConfigPaths = o.extraBlockedConfigPaths.sorted(),
-        )
+            blockedConfigPaths = o.extraBlockedConfigPaths.sorted())
     }
 
     fun setLockAgentOut(value: Boolean) = mutate { it.copy(lockAgentOut = value) }

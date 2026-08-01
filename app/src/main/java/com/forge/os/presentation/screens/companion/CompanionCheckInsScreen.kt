@@ -33,8 +33,7 @@ private val Accent = Color(0xFFf59e0b)
 
 @HiltViewModel
 class CompanionCheckInsViewModel @Inject constructor(
-    private val configRepository: ConfigRepository,
-) : ViewModel() {
+    private val configRepository: ConfigRepository) : ViewModel() {
     private val _settings = MutableStateFlow(configRepository.get().friendMode)
     val settings: StateFlow<FriendModeSettings> = _settings
 
@@ -52,15 +51,13 @@ class CompanionCheckInsViewModel @Inject constructor(
 @Composable
 fun CompanionCheckInsScreen(
     onBack: () -> Unit,
-    vm: CompanionCheckInsViewModel = hiltViewModel(),
-) {
+    vm: CompanionCheckInsViewModel = hiltViewModel()) {
     val s by vm.settings.collectAsState()
 
     ModuleScaffold(title = "COMPANION · CHECK-INS", onBack = onBack) {
         Column(
             Modifier.fillMaxSize().background(ForgeOsPalette.Bg).padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
+            verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Header()
 
             SectionCard("MASTER SWITCHES") {
@@ -68,14 +65,12 @@ fun CompanionCheckInsScreen(
                     label = "Friend mode enabled",
                     sub = "Required before any companion check-in can fire.",
                     value = s.enabled,
-                    onChange = { vm.update { o -> o.copy(enabled = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(enabled = it) } })
                 ToggleRow(
                     label = "Proactive check-ins",
                     sub = "Allow the companion to reach out unprompted.",
                     value = s.proactiveCheckInsEnabled,
-                    onChange = { vm.update { o -> o.copy(proactiveCheckInsEnabled = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(proactiveCheckInsEnabled = it) } })
             }
 
             SectionCard("MORNING CHECK-IN") {
@@ -83,13 +78,11 @@ fun CompanionCheckInsScreen(
                     label = "Enabled",
                     sub = "Once per day, within 15 min of the time below.",
                     value = s.morningCheckInEnabled,
-                    onChange = { vm.update { o -> o.copy(morningCheckInEnabled = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(morningCheckInEnabled = it) } })
                 TimeRow(
                     label = "Time",
                     value = s.morningCheckInTime,
-                    onChange = { vm.update { o -> o.copy(morningCheckInTime = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(morningCheckInTime = it) } })
             }
 
             SectionCard("FOLLOW-UPS & ANNIVERSARIES") {
@@ -97,14 +90,12 @@ fun CompanionCheckInsScreen(
                     label = "Follow-ups",
                     sub = "Re-surface a question the companion saved during a past chat.",
                     value = s.followUpsEnabled,
-                    onChange = { vm.update { o -> o.copy(followUpsEnabled = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(followUpsEnabled = it) } })
                 ToggleRow(
                     label = "Anniversaries",
                     sub = "“A year ago today we talked about…”.",
                     value = s.anniversariesEnabled,
-                    onChange = { vm.update { o -> o.copy(anniversariesEnabled = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(anniversariesEnabled = it) } })
             }
 
             SectionCard("LIMITS & QUIET HOURS") {
@@ -114,18 +105,15 @@ fun CompanionCheckInsScreen(
                     value = s.maxProactivePerDay,
                     onChange = {
                         vm.update { o -> o.copy(maxProactivePerDay = it.coerceIn(0, 6)) }
-                    },
-                )
+                    })
                 TimeRow(
                     label = "Quiet hours start",
                     value = s.quietHoursStart,
-                    onChange = { vm.update { o -> o.copy(quietHoursStart = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(quietHoursStart = it) } })
                 TimeRow(
                     label = "Quiet hours end",
                     value = s.quietHoursEnd,
-                    onChange = { vm.update { o -> o.copy(quietHoursEnd = it) } },
-                )
+                    onChange = { vm.update { o -> o.copy(quietHoursEnd = it) } })
             }
         }
     }
@@ -136,9 +124,7 @@ private fun Header() {
     Text(
         "Notifications fire only while friend mode + proactive check-ins are both on, " +
             "outside quiet hours, and within the daily cap.",
-        color = ForgeOsPalette.TextMuted, fontSize = 11.sp,
-        fontFamily = FontFamily.Monospace,
-    )
+        color = ForgeOsPalette.TextMuted, fontSize = 11.sp)
 }
 
 @Composable
@@ -148,31 +134,27 @@ private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Un
             .fillMaxWidth()
             .background(ForgeOsPalette.Surface, RoundedCornerShape(8.dp))
             .padding(12.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        Text(title, color = Accent, fontSize = 11.sp,
-            fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
+        verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(title, color = Accent, fontSize = 11.sp, letterSpacing = 1.sp)
         content()
     }
 }
 
 @Composable
 private fun ToggleRow(
-    label: String, sub: String, value: Boolean, onChange: (Boolean) -> Unit,
-) {
+    label: String, sub: String, value: Boolean, onChange: (Boolean) -> Unit) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(label, color = ForgeOsPalette.TextPrimary,
-                fontSize = 13.sp, fontFamily = FontFamily.Monospace)
+                fontSize = 13.sp)
             Text(sub, color = ForgeOsPalette.TextMuted,
-                fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                fontSize = 10.sp)
         }
         Switch(
             checked = value, onCheckedChange = onChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Accent,
-                checkedTrackColor = Color(0xFF3a2a13),
-            )
+                checkedTrackColor = Color(0xFF3a2a13))
         )
     }
 }
@@ -182,14 +164,13 @@ private fun TimeRow(label: String, value: String, onChange: (String) -> Unit) {
     var local by remember(value) { mutableStateOf(value) }
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(label, color = ForgeOsPalette.TextPrimary,
-            fontSize = 13.sp, fontFamily = FontFamily.Monospace,
+            fontSize = 13.sp,
             modifier = Modifier.weight(1f))
         Box(
             Modifier.width(96.dp).height(36.dp)
                 .background(ForgeOsPalette.Surface2, RoundedCornerShape(6.dp))
                 .padding(horizontal = 10.dp),
-            contentAlignment = Alignment.CenterStart,
-        ) {
+            contentAlignment = Alignment.CenterStart) {
             BasicTextField(
                 value = local,
                 onValueChange = {
@@ -198,10 +179,9 @@ private fun TimeRow(label: String, value: String, onChange: (String) -> Unit) {
                 },
                 singleLine = true,
                 textStyle = TextStyle(color = ForgeOsPalette.TextPrimary,
-                    fontSize = 13.sp, fontFamily = FontFamily.Monospace),
+                    fontSize = 13.sp),
                 cursorBrush = SolidColor(Accent),
-                modifier = Modifier.fillMaxWidth(),
-            )
+                modifier = Modifier.fillMaxWidth())
         }
     }
 }
@@ -211,15 +191,15 @@ private fun IntRow(label: String, sub: String, value: Int, onChange: (Int) -> Un
     Row(verticalAlignment = Alignment.CenterVertically) {
         Column(Modifier.weight(1f)) {
             Text(label, color = ForgeOsPalette.TextPrimary,
-                fontSize = 13.sp, fontFamily = FontFamily.Monospace)
+                fontSize = 13.sp)
             Text(sub, color = ForgeOsPalette.TextMuted,
-                fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                fontSize = 10.sp)
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             StepperButton("−") { onChange((value - 1).coerceAtLeast(0)) }
             Text(value.toString(),
                 color = ForgeOsPalette.TextPrimary,
-                fontSize = 14.sp, fontFamily = FontFamily.Monospace,
+                fontSize = 14.sp,
                 modifier = Modifier.padding(horizontal = 12.dp))
             StepperButton("+") { onChange((value + 1).coerceAtMost(6)) }
         }
@@ -232,15 +212,12 @@ private fun StepperButton(label: String, onClick: () -> Unit) {
         Modifier.size(28.dp)
             .background(ForgeOsPalette.Surface2, RoundedCornerShape(6.dp))
             .padding(2.dp),
-        contentAlignment = Alignment.Center,
-    ) {
+        contentAlignment = Alignment.Center) {
         TextButton(
             onClick = onClick,
             contentPadding = PaddingValues(0.dp),
-            modifier = Modifier.fillMaxSize(),
-        ) {
-            Text(label, color = Accent, fontSize = 14.sp,
-                fontFamily = FontFamily.Monospace)
+            modifier = Modifier.fillMaxSize()) {
+            Text(label, color = Accent, fontSize = 14.sp)
         }
     }
 }

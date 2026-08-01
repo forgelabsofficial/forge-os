@@ -13,8 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DoctorViewModel @Inject constructor(
-    private val service: DoctorService,
-) : ViewModel() {
+    private val service: DoctorService) : ViewModel() {
 
     private val _report = MutableStateFlow<DoctorReport?>(null)
     val report: StateFlow<DoctorReport?> = _report

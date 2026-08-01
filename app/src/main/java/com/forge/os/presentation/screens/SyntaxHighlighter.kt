@@ -25,8 +25,7 @@ private data class HiColors(
     val string: Color,
     val number: Color,
     val comment: Color,
-    val punct: Color,
-)
+    val punct: Color)
 
 @Composable
 private fun highlightColors(): HiColors {
@@ -39,8 +38,7 @@ private fun highlightColors(): HiColors {
         string = tertiary,
         number = onSurface.copy(alpha = 0.85f),
         comment = muted,
-        punct = onSurface,
-    )
+        punct = onSurface)
 }
 
 private fun highlight(text: String, lang: String, c: HiColors): AnnotatedString {
@@ -82,34 +80,29 @@ private fun rulesFor(lang: String): List<Rule>? {
         "json" -> listOf(
             Rule(Regex("\"(?:\\\\.|[^\"\\\\])*\""), Kind.STRING),
             Rule(Regex("\\b-?\\d+(?:\\.\\d+)?\\b"), Kind.NUMBER),
-            Rule(Regex("\\b(?:true|false|null)\\b"), Kind.KEYWORD),
-        )
+            Rule(Regex("\\b(?:true|false|null)\\b"), Kind.KEYWORD))
         "py" -> listOf(
             Rule(Regex("#.*", ml), Kind.COMMENT),
             Rule(Regex("(?:'''[\\s\\S]*?'''|\"\"\"[\\s\\S]*?\"\"\"|\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*')"), Kind.STRING),
             Rule(Regex("\\b\\d+(?:\\.\\d+)?\\b"), Kind.NUMBER),
-            Rule(Regex("\\b(?:def|class|if|elif|else|for|while|return|import|from|as|with|try|except|finally|raise|yield|in|not|and|or|is|None|True|False|lambda|pass|break|continue|global|nonlocal|async|await)\\b"), Kind.KEYWORD),
-        )
+            Rule(Regex("\\b(?:def|class|if|elif|else|for|while|return|import|from|as|with|try|except|finally|raise|yield|in|not|and|or|is|None|True|False|lambda|pass|break|continue|global|nonlocal|async|await)\\b"), Kind.KEYWORD))
         "kt" -> listOf(
             Rule(Regex("//.*", ml), Kind.COMMENT),
             Rule(Regex("/\\*[\\s\\S]*?\\*/"), Kind.COMMENT),
             Rule(Regex("\"(?:\\\\.|[^\"\\\\])*\""), Kind.STRING),
             Rule(Regex("\\b\\d+(?:\\.\\d+)?[fLuU]?\\b"), Kind.NUMBER),
-            Rule(Regex("\\b(?:fun|val|var|class|object|interface|package|import|return|if|else|when|for|while|do|try|catch|finally|throw|in|is|as|by|out|in|null|true|false|this|super|sealed|data|enum|companion|override|open|abstract|private|public|protected|internal|suspend|inline|operator|infix|tailrec|const|lateinit|init|typealias|where)\\b"), Kind.KEYWORD),
-        )
+            Rule(Regex("\\b(?:fun|val|var|class|object|interface|package|import|return|if|else|when|for|while|do|try|catch|finally|throw|in|is|as|by|out|in|null|true|false|this|super|sealed|data|enum|companion|override|open|abstract|private|public|protected|internal|suspend|inline|operator|infix|tailrec|const|lateinit|init|typealias|where)\\b"), Kind.KEYWORD))
         "md" -> listOf(
             Rule(Regex("^#{1,6} .*", ml), Kind.KEYWORD),
             Rule(Regex("\\*\\*[^*]+\\*\\*"), Kind.KEYWORD),
             Rule(Regex("`[^`]+`"), Kind.STRING),
             Rule(Regex("^>.*", ml), Kind.COMMENT),
-            Rule(Regex("\\[[^\\]]+]\\([^)]+\\)"), Kind.STRING),
-        )
+            Rule(Regex("\\[[^\\]]+]\\([^)]+\\)"), Kind.STRING))
         "yaml" -> listOf(
             Rule(Regex("#.*", ml), Kind.COMMENT),
             Rule(Regex("^[\\s-]*[A-Za-z_][\\w-]*(?=\\s*:)", ml), Kind.KEYWORD),
             Rule(Regex("\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'"), Kind.STRING),
-            Rule(Regex("\\b-?\\d+(?:\\.\\d+)?\\b"), Kind.NUMBER),
-        )
+            Rule(Regex("\\b-?\\d+(?:\\.\\d+)?\\b"), Kind.NUMBER))
         else -> null
     }
 }

@@ -34,8 +34,7 @@ data class CustomEndpointStatus(
  */
 data class NamedSecretStatus(
     val secret: NamedSecret,
-    val hasValue: Boolean,
-)
+    val hasValue: Boolean)
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -321,8 +320,7 @@ class SettingsViewModel @Inject constructor(
         authStyle: String,
         headerName: String,
         queryParam: String,
-        value: String,
-    ) {
+        value: String) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 namedSecrets.save(
@@ -330,10 +328,8 @@ class SettingsViewModel @Inject constructor(
                         name = name, description = description,
                         authStyle = authStyle,
                         headerName = headerName.ifBlank { "Authorization" },
-                        queryParam = queryParam.ifBlank { "key" },
-                    ),
-                    value = value,
-                )
+                        queryParam = queryParam.ifBlank { "key" }),
+                    value = value)
             }
             loadAll()
             _saveMessage.value = "✅ Custom API key '${name.trim()}' saved"

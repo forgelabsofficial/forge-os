@@ -66,8 +66,7 @@ data class CompanionMessage(
     val isError: Boolean = false,
     val tags: MessageTags? = null,    // K-4: set on user messages after classify
     val isCrisisResponse: Boolean = false,
-    val isSafetyBlocked: Boolean = false,
-)
+    val isSafetyBlocked: Boolean = false)
 
 enum class CompanionPhase { IDLE, LISTENING, RESPONDING }
 
@@ -87,8 +86,7 @@ class CompanionViewModel @Inject constructor(
     private val dependencyMonitor: DependencyMonitor,
     private val conversationRepo: CompanionConversationRepository,
     private val conversationIndex: com.forge.os.domain.memory.ConversationIndex,
-    @ApplicationContext private val context: Context,
-) : ViewModel() {
+    @ApplicationContext private val context: Context) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<CompanionMessage>>(emptyList())
     val messages: StateFlow<List<CompanionMessage>> = _messages
@@ -175,8 +173,7 @@ class CompanionViewModel @Inject constructor(
             title = firstUser ?: currentConversation.title,
             updatedAt = System.currentTimeMillis(),
             messages = _messages.value.map { it.toStored() },
-            apiHistory = apiHistory.map { it.toStored() },
-        )
+            apiHistory = apiHistory.map { it.toStored() })
         conversationRepo.save(currentConversation)
     }
 
@@ -209,8 +206,7 @@ class CompanionViewModel @Inject constructor(
                     CompanionMessage(
                         role = "assistant",
                         content = crisisText,
-                        isCrisisResponse = true,
-                    )
+                        isCrisisResponse = true)
                 )
                 sessionTurns.add(TranscriptTurn("assistant", crisisText))
                 _phase.value = CompanionPhase.IDLE
@@ -281,8 +277,7 @@ class CompanionViewModel @Inject constructor(
                             CompanionMessage(
                                 id = streamId, role = "assistant",
                                 content = finalText, isStreaming = false,
-                                isSafetyBlocked = safetyBlocked,
-                            )
+                                isSafetyBlocked = safetyBlocked)
                         )
                         sessionTurns.add(TranscriptTurn("assistant", finalText))
                         apiHistory.add(ApiMessage(role = "user", content = input))

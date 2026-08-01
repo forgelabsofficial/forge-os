@@ -19,15 +19,13 @@ import javax.inject.Inject
 data class BrowserTab(
     val id: String,
     val url: String,
-    val title: String = "",
-)
+    val title: String = "")
 
 @HiltViewModel
 class BrowserViewModel @Inject constructor(
     val sessionManager: BrowserSessionManager,
     val bookmarksStore: BrowserBookmarks,
-    val historyStore: BrowserHistory,
-) : ViewModel() {
+    val historyStore: BrowserHistory) : ViewModel() {
 
     val currentUrl: StateFlow<String> = sessionManager.currentUrl
     val pageTitle: StateFlow<String> = sessionManager.pageTitle

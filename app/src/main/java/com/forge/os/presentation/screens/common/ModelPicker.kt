@@ -29,8 +29,7 @@ fun ModelPickerRow(
     defaultLabel: String = "(default route — auto-pick + fallback)",
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
-    onClear: (() -> Unit)? = null,
-) {
+    onClear: (() -> Unit)? = null) {
     Row(
         modifier
             .fillMaxWidth()
@@ -39,26 +38,21 @@ fun ModelPickerRow(
             .border(1.dp, forgePalette.border, RoundedCornerShape(4.dp))
             .clickable(onClick = onClick)
             .padding(horizontal = 10.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(labelPrefix, color = forgePalette.textMuted,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+        verticalAlignment = Alignment.CenterVertically) {
+        Text(labelPrefix, color = forgePalette.textMuted, fontSize = 10.sp)
         Spacer(Modifier.width(8.dp))
         val label = override?.let {
             val providerLabel = if (it.first.startsWith("custom:")) "custom" else it.first
             "$providerLabel · ${it.second}"
         } ?: defaultLabel
-        Text(label, color = forgePalette.textPrimary,
-            fontFamily = FontFamily.Monospace, fontSize = 11.sp,
+        Text(label, color = forgePalette.textPrimary, fontSize = 11.sp,
             modifier = Modifier.weight(1f))
         if (override != null && onClear != null) {
             TextButton(onClick = onClear) {
-                Text("CLEAR", color = forgePalette.orange,
-                    fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+                Text("CLEAR", color = forgePalette.orange, fontSize = 10.sp)
             }
         }
-        Text("CHANGE ▸", color = forgePalette.orange,
-            fontFamily = FontFamily.Monospace, fontSize = 10.sp)
+        Text("CHANGE ▸", color = forgePalette.orange, fontSize = 10.sp)
     }
 }
 
@@ -69,8 +63,7 @@ fun ModelPickerDialog(
     availableModels: suspend () -> List<AiApiManager.Quad>,
     initial: Pair<String, String>?,
     onDismiss: () -> Unit,
-    onSave: (providerKey: String, model: String) -> Unit,
-) {
+    onSave: (providerKey: String, model: String) -> Unit) {
     var loading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
     var catalog by remember { mutableStateOf<List<AiApiManager.Quad>>(emptyList()) }
@@ -93,7 +86,7 @@ fun ModelPickerDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         containerColor = forgePalette.surface,
-        title = { Text(title, color = forgePalette.textPrimary, fontFamily = FontFamily.Monospace, fontSize = 16.sp) },
+        title = { Text(title, color = forgePalette.textPrimary, fontSize = 16.sp) },
         text = {
             Column(modifier = Modifier.heightIn(max = 480.dp)) {
                 when {
@@ -102,28 +95,22 @@ fun ModelPickerDialog(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
                                 strokeWidth = 2.dp,
-                                color = forgePalette.orange,
-                            )
+                                color = forgePalette.orange)
                             Spacer(Modifier.width(12.dp))
                             Text("Probing catalogs…",
-                                color = forgePalette.textMuted,
-                                fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                                color = forgePalette.textMuted, fontSize = 12.sp)
                         }
                     }
                     catalog.isEmpty() -> {
                         Text(
                             error?.let { "Error: $it" } ?:
                                 "No providers with keys found. Add keys in Settings first.",
-                            color = forgePalette.textMuted,
-                            fontFamily = FontFamily.Monospace, fontSize = 12.sp,
-                        )
+                            color = forgePalette.textMuted, fontSize = 12.sp)
                     }
                     else -> {
                         Text(
                             "Forge will try this model first, falling back to the global route on any error.",
-                            color = forgePalette.textMuted,
-                            fontFamily = FontFamily.Monospace, fontSize = 10.sp,
-                        )
+                            color = forgePalette.textMuted, fontSize = 10.sp)
                         Spacer(Modifier.height(12.dp))
                         val groups = remember(catalog) {
                             catalog.groupBy {
@@ -131,24 +118,20 @@ fun ModelPickerDialog(
                             }.toList().sortedWith(
                                 compareBy(
                                     { it.first.third != "builtin" },
-                                    { it.first.second.lowercase() },
-                                )
+                                    { it.first.second.lowercase() })
                             )
                         }
                         LazyColumn(
                             modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
-                            verticalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
+                            verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             groups.forEach { (header, models) ->
                                 val (providerKey, providerLabel, kind) = header
                                 item("h_${providerKey}") {
                                     Text(
                                         "${providerLabel.uppercase()} · $kind",
                                         color = forgePalette.orange,
-                                        fontFamily = FontFamily.Monospace,
                                         fontSize = 10.sp,
-                                        modifier = Modifier.padding(top = 10.dp, bottom = 4.dp),
-                                    )
+                                        modifier = Modifier.padding(top = 10.dp, bottom = 4.dp))
                                 }
                                 models.distinctBy { it.model }.forEach { m ->
                                     item("m_${providerKey}_${m.model}") {
@@ -159,25 +142,20 @@ fun ModelPickerDialog(
                                                 .background(
                                                     if (selected) forgePalette.orange.copy(alpha = 0.15f)
                                                     else Color.Transparent,
-                                                    RoundedCornerShape(4.dp),
-                                                )
+                                                    RoundedCornerShape(4.dp))
                                                 .border(
                                                     1.dp,
                                                     if (selected) forgePalette.orange else forgePalette.border,
-                                                    RoundedCornerShape(4.dp),
-                                                )
+                                                    RoundedCornerShape(4.dp))
                                                 .clickable {
                                                     selectedProviderKey = providerKey
                                                     selectedModel = m.model
                                                 }
-                                                .padding(horizontal = 12.dp, vertical = 10.dp),
-                                        ) {
+                                                .padding(horizontal = 12.dp, vertical = 10.dp)) {
                                             Text(
                                                 m.model,
                                                 color = if (selected) forgePalette.textPrimary else forgePalette.textMuted,
-                                                fontFamily = FontFamily.Monospace,
-                                                fontSize = 12.sp,
-                                            )
+                                                fontSize = 12.sp)
                                         }
                                     }
                                 }
@@ -194,13 +172,11 @@ fun ModelPickerDialog(
                         onSave(selectedProviderKey, selectedModel)
                     }
                 },
-                enabled = selectedProviderKey.isNotBlank() && selectedModel.isNotBlank(),
-            ) { Text("SELECT", color = forgePalette.success, fontFamily = FontFamily.Monospace) }
+                enabled = selectedProviderKey.isNotBlank() && selectedModel.isNotBlank()) { Text("SELECT", color = forgePalette.success) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("CANCEL", color = forgePalette.textMuted, fontFamily = FontFamily.Monospace)
+                Text("CANCEL", color = forgePalette.textMuted)
             }
-        },
-    )
+        })
 }

@@ -42,7 +42,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 
 /**
  * Phase S — the "padlock you can't open" UI.
@@ -54,9 +54,8 @@ import com.forge.os.presentation.theme.LocalForgePalette
 @Composable
 fun AdvancedOverridesScreen(
     onBack: () -> Unit,
-    viewModel: AdvancedOverridesViewModel = hiltViewModel(),
-) {
-    val palette = LocalForgePalette.current
+    viewModel: AdvancedOverridesViewModel = hiltViewModel()) {
+    val palette = forgePalette
     val state by viewModel.state.collectAsState()
 
     Column(Modifier.fillMaxSize().background(palette.bg).padding(16.dp)) {
@@ -69,29 +68,25 @@ fun AdvancedOverridesScreen(
             }
             Spacer(Modifier.width(4.dp))
             Text(
-                "🔒  ADVANCED OVERRIDES", color = palette.orange, fontSize = 16.sp,
-                fontFamily = FontFamily.Monospace, letterSpacing = 2.sp
+                "🔒  ADVANCED OVERRIDES", color = palette.orange, fontSize = 16.sp, letterSpacing = 2.sp
             )
         }
         Spacer(Modifier.height(8.dp))
         Text(
             "Edit the per-category block lists the agent's PermissionManager enforces. " +
                 "These are the policies you couldn't reach from the Tools switches.",
-            color = palette.textMuted, fontSize = 11.sp, lineHeight = 16.sp,
-            fontFamily = FontFamily.Monospace
+            color = palette.textMuted, fontSize = 11.sp, lineHeight = 16.sp
         )
 
         Spacer(Modifier.height(12.dp))
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(bottom = 32.dp),
-        ) {
+            contentPadding = PaddingValues(bottom = 32.dp)) {
             item {
                 AgentLockCard(
                     locked = state.lockAgentOut,
-                    onChange = viewModel::setLockAgentOut,
-                )
+                    onChange = viewModel::setLockAgentOut)
             }
             item {
                 ListEditorCard(
@@ -100,8 +95,7 @@ fun AdvancedOverridesScreen(
                     items = state.blockedHosts,
                     onAdd = viewModel::addHost,
                     onRemove = viewModel::removeHost,
-                    onReset = viewModel::resetHosts,
-                )
+                    onReset = viewModel::resetHosts)
             }
             item {
                 ListEditorCard(
@@ -110,8 +104,7 @@ fun AdvancedOverridesScreen(
                     items = state.blockedExtensions,
                     onAdd = viewModel::addExtension,
                     onRemove = viewModel::removeExtension,
-                    onReset = viewModel::resetExtensions,
-                )
+                    onReset = viewModel::resetExtensions)
             }
             item {
                 ListEditorCard(
@@ -120,8 +113,7 @@ fun AdvancedOverridesScreen(
                     items = state.blockedConfigPaths,
                     onAdd = viewModel::addConfigPath,
                     onRemove = viewModel::removeConfigPath,
-                    onReset = viewModel::resetConfigPaths,
-                )
+                    onReset = viewModel::resetConfigPaths)
             }
         }
     }
@@ -129,7 +121,7 @@ fun AdvancedOverridesScreen(
 
 @Composable
 private fun AgentLockCard(locked: Boolean, onChange: (Boolean) -> Unit) {
-    val palette = LocalForgePalette.current
+    val palette = forgePalette
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = palette.surface),
@@ -142,14 +134,13 @@ private fun AgentLockCard(locked: Boolean, onChange: (Boolean) -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(
                     "Lock agent out of these overrides",
-                    color = palette.textPrimary, fontSize = 12.sp,
-                    fontFamily = FontFamily.Monospace
+                    color = palette.textPrimary, fontSize = 12.sp
                 )
                 Text(
                     if (locked) "ON — control_set cannot modify policy.* paths"
                     else        "OFF — agent's control_set may widen these lists",
-                    color = if (locked) Color(0xFF4ade80) else palette.textMuted,
-                    fontSize = 10.sp, fontFamily = FontFamily.Monospace
+                    color = if (locked) forgePalette.success else palette.textMuted,
+                    fontSize = 10.sp
                 )
             }
             Switch(
@@ -157,9 +148,8 @@ private fun AgentLockCard(locked: Boolean, onChange: (Boolean) -> Unit) {
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = Color.White,
                     checkedTrackColor = palette.orange,
-                    uncheckedThumbColor = Color(0xFF737373),
-                    uncheckedTrackColor = Color(0xFF333333),
-                )
+                    uncheckedThumbColor = forgePalette.textMuted,
+                    uncheckedTrackColor = forgePalette.borderSoft)
             )
         }
     }
@@ -172,9 +162,8 @@ private fun ListEditorCard(
     items: List<String>,
     onAdd: (String) -> Unit,
     onRemove: (String) -> Unit,
-    onReset: () -> Unit,
-) {
-    val palette = LocalForgePalette.current
+    onReset: () -> Unit) {
+    val palette = forgePalette
     var input by remember { mutableStateOf("") }
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -184,22 +173,20 @@ private fun ListEditorCard(
         Column(Modifier.padding(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    title, color = palette.textMuted, fontSize = 11.sp,
-                    fontFamily = FontFamily.Monospace, letterSpacing = 1.sp
+                    title, color = palette.textMuted, fontSize = 11.sp, letterSpacing = 1.sp
                 )
                 Spacer(Modifier.weight(1f))
                 Text(
                     "reset",
                     color = palette.textMuted, fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace,
                     modifier = Modifier
                         .padding(4.dp)
-                        .background(Color(0xFF222222), RoundedCornerShape(4.dp))
+                        .background(forgePalette.surface, RoundedCornerShape(4.dp))
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
             }
             Spacer(Modifier.height(6.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
+            HorizontalDivider(color = forgePalette.borderSoft)
             Spacer(Modifier.height(6.dp))
             for (entry in items) {
                 Row(
@@ -208,7 +195,7 @@ private fun ListEditorCard(
                 ) {
                     Text(
                         entry, color = palette.textPrimary, fontSize = 12.sp,
-                        modifier = Modifier.weight(1f), fontFamily = FontFamily.Monospace
+                        modifier = Modifier.weight(1f)
                     )
                     IconButton(onClick = { onRemove(entry) }, modifier = Modifier.size(28.dp)) {
                         Icon(Icons.Default.Close, "Remove", tint = palette.textMuted, modifier = Modifier.size(14.dp))
@@ -230,15 +217,15 @@ private fun ListEditorCard(
                 ) {
                     Icon(Icons.Default.Add, null, modifier = Modifier.size(14.dp))
                     Spacer(Modifier.width(4.dp))
-                    Text("ADD", color = Color.Black, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    Text("ADD", color = Color.Black, fontSize = 12.sp)
                 }
                 Spacer(Modifier.width(8.dp))
                 Button(
                     onClick = onReset,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                    colors = ButtonDefaults.buttonColors(containerColor = forgePalette.borderSoft),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Text("RESET", color = palette.textPrimary, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                    Text("RESET", color = palette.textPrimary, fontSize = 12.sp)
                 }
             }
         }

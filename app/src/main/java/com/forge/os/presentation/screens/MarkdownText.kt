@@ -28,12 +28,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.theme.forgePalette
 
 private val TextPrimary: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textPrimary
+    @Composable @ReadOnlyComposable get() = forgePalette.textPrimary
 private val Orange: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.orange
+    @Composable @ReadOnlyComposable get() = forgePalette.orange
 
 /**
  * Renders a Markdown string inside a chat bubble.
@@ -62,7 +62,6 @@ fun MarkdownText(
                         Text(
                             seg.code,
                             color = Color(0xFF79c0ff),
-                            fontFamily = FontFamily.Monospace,
                             fontSize = (baseFontSize - 1).sp,
                             lineHeight = (baseFontSize + 4).sp
                         )
@@ -75,7 +74,6 @@ fun MarkdownText(
                         Text(
                             buildInlineAnnotated(seg.content, baseFontSize, baseColor),
                             color = Color(0xFFa0a0a0),
-                            fontFamily = FontFamily.Monospace,
                             fontSize = baseFontSize.sp,
                             lineHeight = (baseFontSize + 5).sp,
                             fontStyle = FontStyle.Italic
@@ -92,7 +90,6 @@ fun MarkdownText(
                     Text(
                         seg.content,
                         color = Orange,
-                        fontFamily = FontFamily.Monospace,
                         fontSize = size.sp,
                         fontWeight = FontWeight.Bold,
                         lineHeight = (size + 6).sp
@@ -102,14 +99,12 @@ fun MarkdownText(
                     val context = LocalContext.current
                     val annotated = buildInlineAnnotated(seg.content, baseFontSize, baseColor)
                     Row {
-                        Text("• ", color = Orange, fontFamily = FontFamily.Monospace, fontSize = baseFontSize.sp)
+                        Text("• ", color = Orange, fontSize = baseFontSize.sp)
                         ClickableText(
                             text = annotated,
-                            style = androidx.compose.ui.text.TextStyle(
-                                fontFamily = FontFamily.Monospace,
+                            style = androidx.compose.ui.text.TextStyle(,
                                 fontSize = baseFontSize.sp,
-                                lineHeight = (baseFontSize + 5).sp,
-                            ),
+                                lineHeight = (baseFontSize + 5).sp),
                             onClick = { offset ->
                                 annotated.getStringAnnotations("URL", offset, offset)
                                     .firstOrNull()?.let { ann ->
@@ -128,14 +123,12 @@ fun MarkdownText(
                     val context = LocalContext.current
                     val annotated = buildInlineAnnotated(seg.content, baseFontSize, baseColor)
                     Row {
-                        Text("${seg.number}. ", color = Orange, fontFamily = FontFamily.Monospace, fontSize = baseFontSize.sp)
+                        Text("${seg.number}. ", color = Orange, fontSize = baseFontSize.sp)
                         ClickableText(
                             text = annotated,
-                            style = androidx.compose.ui.text.TextStyle(
-                                fontFamily = FontFamily.Monospace,
+                            style = androidx.compose.ui.text.TextStyle(,
                                 fontSize = baseFontSize.sp,
-                                lineHeight = (baseFontSize + 5).sp,
-                            ),
+                                lineHeight = (baseFontSize + 5).sp),
                             onClick = { offset ->
                                 annotated.getStringAnnotations("URL", offset, offset)
                                     .firstOrNull()?.let { ann ->
@@ -153,7 +146,7 @@ fun MarkdownText(
                 is MdSegment.HorizontalRule -> {
                     Box(
                         Modifier.fillMaxWidth().height(1.dp)
-                            .background(Color(0xFF333333))
+                            .background(forgePalette.borderSoft)
                     )
                 }
                 is MdSegment.Table -> {
@@ -165,11 +158,9 @@ fun MarkdownText(
                         val annotated = buildInlineAnnotated(seg.content, baseFontSize, baseColor)
                         ClickableText(
                             text = annotated,
-                            style = androidx.compose.ui.text.TextStyle(
-                                fontFamily = FontFamily.Monospace,
+                            style = androidx.compose.ui.text.TextStyle(,
                                 fontSize = baseFontSize.sp,
-                                lineHeight = (baseFontSize + 5).sp,
-                            ),
+                                lineHeight = (baseFontSize + 5).sp),
                             onClick = { offset ->
                                 annotated.getStringAnnotations("URL", offset, offset)
                                     .firstOrNull()?.let { ann ->
@@ -202,7 +193,7 @@ sealed class MdSegment {
 
 @Composable
 private fun MarkdownTable(table: MdSegment.Table, baseFontSize: Float, baseColor: Color) {
-    val palette = LocalForgePalette.current
+    val palette = forgePalette
     val colCount = maxOf(table.headers.size, table.rows.maxOfOrNull { it.size } ?: 0)
     if (colCount == 0) return
 
@@ -215,7 +206,7 @@ private fun MarkdownTable(table: MdSegment.Table, baseFontSize: Float, baseColor
         (maxLen * 8 + 16).coerceIn(60, 200).dp
     }
 
-    val borderColor = Color(0xFF333333)
+    val borderColor = forgePalette.borderSoft
     val headerBg   = Color(0xFF1a1a2e)
     val rowBg      = Color(0xFF0f0f1a)
     val altRowBg   = Color(0xFF141420)
@@ -240,12 +231,10 @@ private fun MarkdownTable(table: MdSegment.Table, baseFontSize: Float, baseColor
                         Text(
                             text = table.headers.getOrElse(col) { "" },
                             color = palette.orange,
-                            fontFamily = FontFamily.Monospace,
                             fontSize = (baseFontSize - 1).sp,
                             fontWeight = FontWeight.Bold,
                             maxLines = 2,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                            overflow = TextOverflow.Ellipsis)
                     }
                     if (col < colCount - 1) {
                         Box(Modifier.width(1.dp).height(IntrinsicSize.Max).background(borderColor))
@@ -268,12 +257,10 @@ private fun MarkdownTable(table: MdSegment.Table, baseFontSize: Float, baseColor
                             Text(
                                 text = row.getOrElse(col) { "" },
                                 color = baseColor,
-                                fontFamily = FontFamily.Monospace,
                                 fontSize = (baseFontSize - 1).sp,
                                 lineHeight = (baseFontSize + 3).sp,
                                 maxLines = 3,
-                                overflow = TextOverflow.Ellipsis,
-                            )
+                                overflow = TextOverflow.Ellipsis)
                         }
                         if (col < colCount - 1) {
                             Box(Modifier.width(1.dp).height(IntrinsicSize.Max).background(borderColor))
@@ -381,7 +368,7 @@ fun buildInlineAnnotated(text: String, baseFontSize: Float, baseColor: Color): A
             // Markdown link [label](url)
             val mdLinkMatch = Regex("\\[([^]]+)]\\(([^)]+)\\)").find(remaining)
             // Raw URL https?://...
-            val urlMatch = Regex("https?://[^\\s,)>\"']+").find(remaining)
+            val urlMatch = Regex("https?://[^\\s)>\"']+").find(remaining)
 
             // Bold+italic ***text***
             val boldItalicIdx = remaining.indexOf("***")
@@ -428,8 +415,7 @@ fun buildInlineAnnotated(text: String, baseFontSize: Float, baseColor: Color): A
                     pushStringAnnotation("URL", url)
                     withStyle(SpanStyle(
                         color = Color(0xFF60A5FA),
-                        textDecoration = TextDecoration.Underline,
-                    )) { append(label) }
+                        textDecoration = TextDecoration.Underline)) { append(label) }
                     pop()
                     remaining = remaining.substring(m.range.last + 1)
                 }
@@ -439,8 +425,7 @@ fun buildInlineAnnotated(text: String, baseFontSize: Float, baseColor: Color): A
                     pushStringAnnotation("URL", url)
                     withStyle(SpanStyle(
                         color = Color(0xFF60A5FA),
-                        textDecoration = TextDecoration.Underline,
-                    )) { append(url) }
+                        textDecoration = TextDecoration.Underline)) { append(url) }
                     pop()
                     remaining = remaining.substring(m.range.last + 1)
                 }
@@ -456,12 +441,10 @@ fun buildInlineAnnotated(text: String, baseFontSize: Float, baseColor: Color): A
                         "***" -> withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontStyle = FontStyle.Italic, color = baseColor)) { append(inner) }
                         "**"  -> withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = baseColor)) { append(inner) }
                         "*"   -> withStyle(SpanStyle(fontStyle = FontStyle.Italic, color = baseColor)) { append(inner) }
-                        "`"   -> withStyle(SpanStyle(
-                            fontFamily = FontFamily.Monospace,
+                        "`"   -> withStyle(SpanStyle(,
                             background = Color(0xFF1e1e2e),
                             color = Color(0xFF89dceb),
-                            fontSize = (baseFontSize - 1).sp,
-                        )) { append(inner) }
+                            fontSize = (baseFontSize - 1).sp)) { append(inner) }
                         "~~"  -> withStyle(SpanStyle(color = Color(0xFF666666), textDecoration = TextDecoration.LineThrough)) { append(inner) }
                     }
                     remaining = afterMarker.substring(endIdx + marker.length)

@@ -9,8 +9,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CostStatsViewModel @Inject constructor(
-    private val costMeter: CostMeter,
-) : ViewModel() {
+    private val costMeter: CostMeter) : ViewModel() {
 
     val snapshot: StateFlow<CostMeter.CostSnapshot> = costMeter.snapshot
     val prices: StateFlow<Map<String, CostMeter.PricePoint>> = costMeter.prices
