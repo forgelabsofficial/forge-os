@@ -6,23 +6,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Backup
-import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.CloudDownload
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -31,28 +26,18 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import com.forge.os.domain.security.ApiKeyProvider
 import com.forge.os.domain.security.KeyStatus
 import com.forge.os.domain.security.ProviderSchema
-import androidx.compose.runtime.ReadOnlyComposable
-import com.forge.os.presentation.theme.LocalForgePalette
+import com.forge.os.presentation.components.*
+import com.forge.os.presentation.theme.forgePalette
 import com.forge.os.presentation.theme.ThemeMode
 import kotlinx.coroutines.delay
 
-// Theme-aware accessors. These resolve from the active [LocalForgePalette]
-// every recomposition so flipping the theme switcher actually changes colours.
-private val Orange: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.orange
-private val Bg: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.bg
-private val Surface: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.surface
-private val TextPrimary: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textPrimary
-private val TextMuted: Color
-    @Composable @ReadOnlyComposable get() = LocalForgePalette.current.textMuted
-
+/**
+ * Modern Settings screen — Quiet Power design.
+ * Clean card-based layout with consistent typography and palette colors.
+ */
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
@@ -88,293 +73,284 @@ fun SettingsScreen(
         if (saveMessage != null) { delay(3000); viewModel.clearSaveMessage() }
     }
 
-    Column(Modifier.fillMaxSize().background(Bg).padding(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onNavigateBack, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back",
-                     tint = TextMuted, modifier = Modifier.size(18.dp))
-            }
-            Spacer(Modifier.width(4.dp))
-            Text("⚙  SETTINGS", color = Orange, fontSize = 16.sp,
-                 fontFamily = FontFamily.Monospace, letterSpacing = 2.sp)
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = onNavigateToDiagnostics, modifier = Modifier.size(32.dp)) {
-                Icon(Icons.Default.BugReport, "Diagnostics",
-                     tint = TextMuted, modifier = Modifier.size(18.dp))
-            }
-        }
-        Spacer(Modifier.height(4.dp))
-        Text("Keys stored in Android Keystore (AES-256-GCM)",
-             color = TextMuted, fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-
-        AnimatedVisibility(visible = saveMessage != null) {
-            saveMessage?.let {
-                Spacer(Modifier.height(8.dp))
-                Box(
-                    Modifier.fillMaxWidth()
-                        .background(Color(0xFF052e16), RoundedCornerShape(6.dp))
-                        .padding(10.dp, 8.dp)
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(ModernBg)
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            SimpleHeader(
+                title = "Settings",
+                subtitle = "Keys stored in Android Keystore",
+                onBackClick = onNavigateBack
+            ) {
+                IconButton(
+                    onClick = onNavigateToDiagnostics,
+                    modifier = Modifier.size(36.dp)
                 ) {
-                    Text(it, color = Color(0xFF4ade80), fontSize = 12.sp,
-                         fontFamily = FontFamily.Monospace)
+                    Icon(
+                        Icons.Outlined.BugReport,
+                        "Diagnostics",
+                        tint = ModernTextSecondary,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
-        }
 
-        Spacer(Modifier.height(16.dp))
-
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-
-            // ── Appearance ───────────────────────────────────────────────────
-            item {
-                Text("APPEARANCE", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                AppearanceCard(
-                    selected = themeMode,
-                    onSelect = { viewModel.setThemeMode(it) },
-                    hapticEnabled = hapticFeedbackEnabled,
-                    onHapticToggle = { viewModel.setHapticFeedbackEnabled(it) }
-                )
-            }
-
-            item { Spacer(Modifier.height(8.dp)) }
-
-            // ── Model ────────────────────────────────────────────────────────
-            item {
-                Text("MODEL", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                CompactModeCard(
-                    enabled = compactModeEnabled,
-                    onToggle = { viewModel.setCompactModeEnabled(it) }
-                )
-            }
-
-            item { Spacer(Modifier.height(8.dp)) }
-
-            // ── Built-in Providers ───────────────────────────────────────────
-            item {
-                Text("BUILT-IN PROVIDERS", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            items(keyStatuses) { status ->
-                ApiKeyCard(
-                    status = status,
-                    onSave = { key -> viewModel.saveKey(status.provider, key) },
-                    onDelete = { viewModel.deleteKey(status.provider) }
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("CUSTOM ENDPOINTS", color = TextMuted, fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                    Spacer(Modifier.weight(1f))
-                    TextButton(
-                        onClick = { showAddDialog = true },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Orange)
+            // Save message toast
+            AnimatedVisibility(visible = saveMessage != null) {
+                saveMessage?.let {
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 4.dp),
+                        color = forgePalette.success.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Icon(Icons.Default.Add, null, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("Add", fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                        Text(
+                            it,
+                            color = forgePalette.success,
+                            fontSize = 13.sp,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)
+                        )
                     }
                 }
             }
-            if (customStatuses.isEmpty()) {
-                item {
-                    Text("None yet. Use Add to wire any OpenAI- or Anthropic-compatible URL.",
-                         color = Color(0xFF404040), fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace, lineHeight = 16.sp)
-                }
-            }
-            items(customStatuses) { cs ->
-                CustomEndpointCard(
-                    status = cs,
-                    onSetKey = { k -> viewModel.setCustomKey(cs.endpoint.id, k) },
-                    onDelete = { viewModel.deleteCustomEndpoint(cs.endpoint.id) }
-                )
-            }
 
-            // ── Custom API Keys (named-secret extension) ─────────────────────
-            item {
-                Spacer(Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("CUSTOM API KEYS", color = TextMuted, fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                    Spacer(Modifier.weight(1f))
-                    TextButton(
-                        onClick = { showAddSecretDialog = true },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Orange)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // ── Appearance ───────────────────────────────────────────
+                item { SectionHeader(title = "APPEARANCE") }
+                item {
+                    AppearanceCard(
+                        selected = themeMode,
+                        onSelect = { viewModel.setThemeMode(it) },
+                        hapticEnabled = hapticFeedbackEnabled,
+                        onHapticToggle = { viewModel.setHapticFeedbackEnabled(it) }
+                    )
+                }
+
+                // ── Model ────────────────────────────────────────────────
+                item { SectionHeader(title = "MODEL") }
+                item {
+                    CompactModeCard(
+                        enabled = compactModeEnabled,
+                        onToggle = { viewModel.setCompactModeEnabled(it) }
+                    )
+                }
+
+                // ── Built-in Providers ───────────────────────────────────
+                item { SectionHeader(title = "BUILT-IN PROVIDERS") }
+                items(keyStatuses) { status ->
+                    ApiKeyCard(
+                        status = status,
+                        onSave = { key -> viewModel.saveKey(status.provider, key) },
+                        onDelete = { viewModel.deleteKey(status.provider) }
+                    )
+                }
+
+                // ── Custom Endpoints ─────────────────────────────────────
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Add, null, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(4.dp))
-                        Text("Add", fontSize = 11.sp, fontFamily = FontFamily.Monospace)
-                    }
-                }
-                Spacer(Modifier.height(4.dp))
-                Text(
-                    "Register an API key by name (e.g. github_pat). The agent " +
-                    "references it by name only — the raw value never enters " +
-                    "the model. Use it via the secret_list / secret_request tools.",
-                    color = Color(0xFF707070), fontSize = 10.sp,
-                    fontFamily = FontFamily.Monospace, lineHeight = 14.sp,
-                )
-            }
-            if (namedSecretStatuses.isEmpty()) {
-                item {
-                    Text("None yet.",
-                         color = Color(0xFF404040), fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace)
-                }
-            }
-            items(namedSecretStatuses) { ns ->
-                NamedSecretCard(
-                    status = ns,
-                    onDelete = { viewModel.deleteNamedSecret(ns.secret.name) },
-                )
-            }
-
-            // ── Advanced Execution (Phase 3) ─────────────────────────────────
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("ADVANCED EXECUTION", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                AdvancedExecutionCard(
-                    costThreshold = costThresholdUsd,
-                    onSetCostThreshold = { viewModel.setCostThresholdUsd(it) },
-                    remoteUrl = remotePythonWorkerUrl,
-                    remoteToken = remotePythonWorkerAuthToken,
-                    onSetHybrid = { url, token -> viewModel.setHybridExecution(url, token) }
-                )
-            }
-
-            // ── Predictive Prefetch ───────────────────────────────────────
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("PREDICTIVE PREFETCH", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                PredictivePrefetchCard(
-                    enabled = prefetchEnabled,
-                    onToggleEnabled = { viewModel.setPrefetchEnabled(it) },
-                    allowUnsafe = prefetchAllowUnsafe,
-                    onToggleAllowUnsafe = { viewModel.setPrefetchAllowUnsafe(it) }
-                )
-            }
-
-            // ── Intelligence Upgrades (Phase 4) ───────────────────────────
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("INTELLIGENCE UPGRADES", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                IntelligenceUpgradesCard(
-                    reflection = reflectionEnabled,
-                    onReflectionToggle = { viewModel.setReflectionEnabled(it) },
-                    memoryRag = memoryRagEnabled,
-                    onMemoryRagToggle = { viewModel.setMemoryRagEnabled(it) },
-                    vision = visionEnabled,
-                    onVisionToggle = { viewModel.setVisionEnabled(it) },
-                    reasoning = reasoningEnabled,
-                    onReasoningToggle = { viewModel.setReasoningEnabled(it) }
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("BACKUP", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                Spacer(Modifier.height(8.dp))
-                BackupCard(
-                    loading = backupLoading,
-                    onBackup = {
-                        viewModel.performBackup { file ->
-                            // Use androidx.core.content.FileProvider to get a shareable URI
-                            val uri = androidx.core.content.FileProvider.getUriForFile(
-                                context,
-                                "${context.packageName}.fileprovider",
-                                file
-                            )
-                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                type = "application/zip"
-                                putExtra(android.content.Intent.EXTRA_STREAM, uri)
-                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                            }
-                            context.startActivity(android.content.Intent.createChooser(intent, "Save Forge Backup"))
+                        SectionHeader(title = "CUSTOM ENDPOINTS", modifier = Modifier.weight(1f))
+                        TextButton(onClick = { showAddDialog = true }) {
+                            Icon(Icons.Outlined.Add, null, tint = ModernAccent, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("Add", color = ModernAccent, fontSize = 13.sp)
                         }
                     }
-                )
-            }
+                }
+                if (customStatuses.isEmpty()) {
+                    item {
+                        Text(
+                            "None yet. Use Add to wire any OpenAI- or Anthropic-compatible URL.",
+                            color = forgePalette.textDim,
+                            fontSize = 12.sp,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+                items(customStatuses) { cs ->
+                    CustomEndpointCard(
+                        status = cs,
+                        onSetKey = { k -> viewModel.setCustomKey(cs.endpoint.id, k) },
+                        onDelete = { viewModel.deleteCustomEndpoint(cs.endpoint.id) }
+                    )
+                }
 
-            item {
-                Spacer(Modifier.height(16.dp))
-                Text("OLLAMA NOTE", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-                Spacer(Modifier.height(4.dp))
-                Text("For local Ollama, the \"key\" field is the host URL,\ne.g. http://192.168.1.x:11434/v1/",
-                     color = Color(0xFF404040), fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, lineHeight = 16.sp)
-            }
+                // ── Custom API Keys ──────────────────────────────────────
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SectionHeader(title = "CUSTOM API KEYS", modifier = Modifier.weight(1f))
+                        TextButton(onClick = { showAddSecretDialog = true }) {
+                            Icon(Icons.Outlined.Add, null, tint = ModernAccent, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text("Add", color = ModernAccent, fontSize = 13.sp)
+                        }
+                    }
+                }
+                item {
+                    Text(
+                        "Register an API key by name. The agent references it by name only — the raw value never enters the model.",
+                        color = forgePalette.textDim,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    )
+                }
+                if (namedSecretStatuses.isEmpty()) {
+                    item {
+                        Text("None yet.", color = forgePalette.textDim, fontSize = 12.sp)
+                    }
+                }
+                items(namedSecretStatuses) { ns ->
+                    NamedSecretCard(
+                        status = ns,
+                        onDelete = { viewModel.deleteNamedSecret(ns.secret.name) },
+                    )
+                }
 
-            item { CapabilityPadlocksCard() }
+                // ── Advanced Execution ───────────────────────────────────
+                item { SectionHeader(title = "ADVANCED EXECUTION") }
+                item {
+                    AdvancedExecutionCard(
+                        costThreshold = costThresholdUsd,
+                        onSetCostThreshold = { viewModel.setCostThresholdUsd(it) },
+                        remoteUrl = remotePythonWorkerUrl,
+                        remoteToken = remotePythonWorkerAuthToken,
+                        onSetHybrid = { url, token -> viewModel.setHybridExecution(url, token) }
+                    )
+                }
 
-            item { Spacer(Modifier.height(8.dp)) }
+                // ── Predictive Prefetch ──────────────────────────────────
+                item { SectionHeader(title = "PREDICTIVE PREFETCH") }
+                item {
+                    PredictivePrefetchCard(
+                        enabled = prefetchEnabled,
+                        onToggleEnabled = { viewModel.setPrefetchEnabled(it) },
+                        allowUnsafe = prefetchAllowUnsafe,
+                        onToggleAllowUnsafe = { viewModel.setPrefetchAllowUnsafe(it) }
+                    )
+                }
 
-            // ── Wishlist Features ──────────────────────────────────────────
-            item {
-                Spacer(Modifier.height(8.dp))
-                Text("WISHLIST FEATURES", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                WishlistFeaturesCard()
-            }
+                // ── Intelligence Upgrades ────────────────────────────────
+                item { SectionHeader(title = "INTELLIGENCE UPGRADES") }
+                item {
+                    IntelligenceUpgradesCard(
+                        reflection = reflectionEnabled,
+                        onReflectionToggle = { viewModel.setReflectionEnabled(it) },
+                        memoryRag = memoryRagEnabled,
+                        onMemoryRagToggle = { viewModel.setMemoryRagEnabled(it) },
+                        vision = visionEnabled,
+                        onVisionToggle = { viewModel.setVisionEnabled(it) },
+                        reasoning = reasoningEnabled,
+                        onReasoningToggle = { viewModel.setReasoningEnabled(it) }
+                    )
+                }
 
-            item { Spacer(Modifier.height(8.dp)) }
+                // ── Backup ───────────────────────────────────────────────
+                item { SectionHeader(title = "BACKUP") }
+                item {
+                    BackupCard(
+                        loading = backupLoading,
+                        onBackup = {
+                            viewModel.performBackup { file ->
+                                val uri = androidx.core.content.FileProvider.getUriForFile(
+                                    context,
+                                    "${context.packageName}.fileprovider",
+                                    file
+                                )
+                                val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                    type = "application/zip"
+                                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                }
+                                context.startActivity(android.content.Intent.createChooser(intent, "Save Forge Backup"))
+                            }
+                        }
+                    )
+                }
 
-            // ── Phase S: Routing & advanced overrides ────────────────────────
-            item {
-                Text("ROUTING & SECURITY", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, letterSpacing = 1.sp)
-            }
-            item {
-                NavRow(
-                    title = "🧭  Model routing",
-                    subtitle = "Edit fallback chain & background-caller toggles",
-                    onClick = onNavigateToModelRouting,
-                )
-            }
-            item {
-                NavRow(
-                    title = "🔒  Advanced overrides",
-                    subtitle = "Per-tool blocked hosts/extensions/configs (the padlock the agent can't open)",
-                    onClick = onNavigateToOverrides,
-                )
-            }
-            item {
-                NavRow(
-                    title = "🎭  Personality",
-                    subtitle = "Customize agent name, traits, communication style and manage profiles",
-                    onClick = onNavigateToPersonality,
-                )
-            }
-            item {
-                NavRow(
-                    title = "💾  Backup & Restore",
-                    subtitle = "Create system snapshot or restore from previous backup",
-                    onClick = onNavigateToBackup,
-                )
-            }
+                // ── Ollama Note ──────────────────────────────────────────
+                item {
+                    Surface(
+                        color = ModernSurface,
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, forgePalette.borderSoft)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(14.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            verticalAlignment = Alignment.Top
+                        ) {
+                            Icon(
+                                Icons.Outlined.Info,
+                                contentDescription = null,
+                                tint = ModernTextSecondary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Text(
+                                "For local Ollama, the \"key\" field is the host URL, e.g. http://192.168.1.x:11434/v1/",
+                                color = ModernTextSecondary,
+                                fontSize = 12.sp,
+                                lineHeight = 16.sp
+                            )
+                        }
+                    }
+                }
 
-            item { Spacer(Modifier.height(32.dp)) }
+                // ── Capability Padlocks ──────────────────────────────────
+                item { CapabilityPadlocksCard() }
+
+                // ── Wishlist Features ────────────────────────────────────
+                item { SectionHeader(title = "FEATURES") }
+                item { WishlistFeaturesCard() }
+
+                // ── Routing & Security ───────────────────────────────────
+                item { SectionHeader(title = "ROUTING & SECURITY") }
+                item {
+                    SettingsNavRow(
+                        icon = Icons.Outlined.AltRoute,
+                        title = "Model routing",
+                        subtitle = "Edit fallback chain & background-caller toggles",
+                        onClick = onNavigateToModelRouting
+                    )
+                }
+                item {
+                    SettingsNavRow(
+                        icon = Icons.Outlined.Lock,
+                        title = "Advanced overrides",
+                        subtitle = "Per-tool blocked hosts/extensions/configs",
+                        onClick = onNavigateToOverrides
+                    )
+                }
+                item {
+                    SettingsNavRow(
+                        icon = Icons.Outlined.Person,
+                        title = "Personality",
+                        subtitle = "Customize agent name, traits, communication style",
+                        onClick = onNavigateToPersonality
+                    )
+                }
+                item {
+                    SettingsNavRow(
+                        icon = Icons.Outlined.Backup,
+                        title = "Backup & Restore",
+                        subtitle = "Create system snapshot or restore from backup",
+                        onClick = onNavigateToBackup
+                    )
+                }
+
+                item { Spacer(Modifier.height(32.dp)) }
+            }
         }
     }
 
@@ -399,69 +375,59 @@ fun SettingsScreen(
     }
 }
 
+// ── Backup Card ─────────────────────────────────────────────────────────────
+
 @Composable
-fun BackupCard(
+private fun BackupCard(
     loading: Boolean,
     onBackup: () -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
-    ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    Icons.Default.CloudDownload,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp)
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    "System Backup",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "Create a full ZIP archive of your workspace, agent memory, and settings. " +
-                "Export this file to safely migrate or restore your OS state later.",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-            )
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            Button(
-                onClick = onBackup,
-                enabled = !loading,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                contentPadding = PaddingValues(16.dp)
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(ModernAccent.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Outlined.CloudDownload,
+                        contentDescription = null,
+                        tint = ModernAccent,
+                        modifier = Modifier.size(20.dp)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("Zipping System Data...")
-                } else {
-                    Icon(Icons.Default.Backup, contentDescription = null)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text("Generate Full Backup")
+                }
+                Column {
+                    Text(
+                        "System Backup",
+                        color = ModernTextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        "Full ZIP archive of workspace, memory, and settings",
+                        color = ModernTextSecondary,
+                        fontSize = 12.sp
+                    )
                 }
             }
+
+            ModernButton(
+                text = if (loading) "Creating Backup..." else "Generate Full Backup",
+                onClick = onBackup,
+                enabled = !loading,
+                icon = Icons.Outlined.Backup,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
 
-// ── Named-secret row + add dialog ──────────────────────────────────────────
+// ── Named Secret Card ───────────────────────────────────────────────────────
 
 @Composable
 private fun NamedSecretCard(
@@ -469,44 +435,59 @@ private fun NamedSecretCard(
     onDelete: () -> Unit,
 ) {
     val s = status.secret
-    Box(
-        Modifier.fillMaxWidth()
-            .background(Surface, RoundedCornerShape(6.dp))
-            .padding(12.dp)
-    ) {
-        Column {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(s.name, color = Orange, fontSize = 13.sp,
-                     fontFamily = FontFamily.Monospace)
-                Spacer(Modifier.width(8.dp))
-                Text("[${s.authStyle}]", color = TextMuted, fontSize = 10.sp,
-                     fontFamily = FontFamily.Monospace)
-                Spacer(Modifier.weight(1f))
-                Text(if (status.hasValue) "✓ stored" else "⚠ no value",
-                     color = if (status.hasValue) Color(0xFF4ade80) else Color(0xFFef4444),
-                     fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
-                    Icon(Icons.Default.Delete, "Delete",
-                         tint = Color(0xFFef4444), modifier = Modifier.size(14.dp))
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        s.name,
+                        color = ModernAccent,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        "[${s.authStyle}]",
+                        color = ModernTextSecondary,
+                        fontSize = 11.sp
+                    )
+                }
+                StatusBadge(
+                    status = if (status.hasValue) "Stored" else "No value",
+                    color = if (status.hasValue) forgePalette.success else forgePalette.danger
+                )
+                Spacer(Modifier.width(4.dp))
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        Icons.Outlined.Delete,
+                        "Delete",
+                        tint = forgePalette.danger,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
             if (s.description.isNotBlank()) {
-                Spacer(Modifier.height(2.dp))
-                Text(s.description, color = TextPrimary, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace, lineHeight = 14.sp)
+                Text(
+                    s.description,
+                    color = ModernTextPrimary,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp
+                )
             }
             val attach = when (s.authStyle) {
-                "bearer" -> "Authorization: Bearer …"
-                "header" -> "${s.headerName}: …"
-                "query"  -> "?${s.queryParam}=…"
+                "bearer" -> "Authorization: Bearer ..."
+                "header" -> "${s.headerName}: ..."
+                "query"  -> "?${s.queryParam}=..."
                 else     -> s.authStyle
             }
-            Spacer(Modifier.height(2.dp))
-            Text(attach, color = TextMuted, fontSize = 10.sp,
-                 fontFamily = FontFamily.Monospace)
+            Text(attach, color = ModernTextSecondary, fontSize = 11.sp)
         }
     }
 }
+
+// ── Add Named Secret Dialog ─────────────────────────────────────────────────
 
 @Composable
 private fun AddNamedSecretDialog(
@@ -524,63 +505,54 @@ private fun AddNamedSecretDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Add custom API key", fontFamily = FontFamily.Monospace) },
+        containerColor = ModernSurface,
+        titleContentColor = ModernTextPrimary,
+        textContentColor = ModernTextPrimary,
+        title = { Text("Add custom API key", fontWeight = FontWeight.SemiBold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    value = name, onValueChange = { name = it },
-                    label = { Text("Name (e.g. github_pat)") },
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 13.sp),
-                )
-                OutlinedTextField(
-                    value = description, onValueChange = { description = it },
-                    label = { Text("What is it for?") },
-                    singleLine = true,
-                    textStyle = LocalTextStyle.current.copy(fontSize = 12.sp),
-                )
-                Text("How to attach it:", color = TextMuted, fontSize = 11.sp,
-                     fontFamily = FontFamily.Monospace)
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                SettingsTextField(value = name, onValueChange = { name = it }, label = "Name (e.g. github_pat)")
+                SettingsTextField(value = description, onValueChange = { description = it }, label = "What is it for?")
+                Text("How to attach it:", color = ModernTextSecondary, fontSize = 12.sp)
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     listOf("bearer", "header", "query").forEach { opt ->
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .clickable { style = opt }
-                                .padding(end = 8.dp)
+                            modifier = Modifier.clickable { style = opt }
                         ) {
-                            RadioButton(selected = style == opt, onClick = { style = opt })
-                            Text(opt, fontFamily = FontFamily.Monospace, fontSize = 12.sp)
+                            RadioButton(
+                                selected = style == opt,
+                                onClick = { style = opt },
+                                colors = RadioButtonDefaults.colors(selectedColor = ModernAccent)
+                            )
+                            Text(opt, fontSize = 13.sp, color = ModernTextPrimary)
                         }
                     }
                 }
                 if (style == "header") {
-                    OutlinedTextField(
-                        value = headerName, onValueChange = { headerName = it },
-                        label = { Text("Header name") }, singleLine = true,
-                        textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-                    )
+                    SettingsTextField(value = headerName, onValueChange = { headerName = it }, label = "Header name")
                 }
                 if (style == "query") {
-                    OutlinedTextField(
-                        value = queryParam, onValueChange = { queryParam = it },
-                        label = { Text("Query parameter name") }, singleLine = true,
-                        textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-                    )
+                    SettingsTextField(value = queryParam, onValueChange = { queryParam = it }, label = "Query parameter name")
                 }
                 OutlinedTextField(
-                    value = value, onValueChange = { value = it },
+                    value = value,
+                    onValueChange = { value = it },
                     label = { Text("Secret value (stored encrypted)") },
                     singleLine = true,
                     visualTransformation = if (showValue) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showValue = !showValue }) {
                             Icon(
-                                if (showValue) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                "Toggle visibility", modifier = Modifier.size(16.dp),
+                                if (showValue) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                "Toggle visibility",
+                                tint = ModernTextSecondary,
+                                modifier = Modifier.size(18.dp)
                             )
                         }
                     },
+                    colors = settingsTextFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         },
@@ -588,124 +560,64 @@ private fun AddNamedSecretDialog(
             TextButton(
                 onClick = { onConfirm(name, description, style, headerName, queryParam, value) },
                 enabled = name.isNotBlank() && value.isNotBlank(),
-            ) { Text("Save", color = Orange) }
+            ) { Text("Save", color = ModernAccent) }
         },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel", color = ModernTextSecondary) } },
     )
 }
 
-// ── Compact Mode Card ─────────────────────────────────────────────────────────
+// ── Compact Mode Card ───────────────────────────────────────────────────────
 
-/**
- * Compact Mode toggle card.
- *
- * The card explains both sides of the choice so users can decide for themselves:
- *   - Enable it  → faster, cheaper, fewer tokens per message
- *   - Leave it off → thorough, full-length replies using your chosen model
- */
 @Composable
 private fun CompactModeCard(enabled: Boolean, onToggle: (Boolean) -> Unit) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "Compact Mode",
-                        color = TextPrimary,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Spacer(Modifier.height(1.dp))
-                    Text(
-                        if (enabled) "ON  —  shorter replies, lower token cost"
-                        else         "OFF  —  full replies, normal model routing",
-                        color = if (enabled) Color(0xFF4ade80) else TextMuted,
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Switch(
-                    checked = enabled,
-                    onCheckedChange = onToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Orange,
-                        uncheckedThumbColor = Color(0xFF737373),
-                        uncheckedTrackColor = Color(0xFF333333)
-                    )
-                )
-            }
-
-            Spacer(Modifier.height(10.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            Spacer(Modifier.height(10.dp))
-
-            // "Enable it if" column
-            Text(
-                "Turn ON if you:",
-                color = Color(0xFF4ade80),
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SettingsToggleRow(
+                title = "Compact Mode",
+                subtitle = if (enabled) "ON — shorter replies, lower token cost"
+                           else "OFF — full replies, normal model routing",
+                subtitleColor = if (enabled) forgePalette.success else ModernTextSecondary,
+                checked = enabled,
+                onCheckedChange = onToggle
             )
-            Spacer(Modifier.height(4.dp))
+
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+
+            Text("Turn ON if you:", color = forgePalette.success, fontSize = 12.sp, fontWeight = FontWeight.Medium)
             listOf(
                 "Want quick, to-the-point answers",
                 "Are watching your API spend",
                 "Use a provider with a small free quota",
                 "Don't need long explanations or code blocks"
             ).forEach { line ->
-                Row(Modifier.padding(start = 8.dp, top = 2.dp)) {
-                    Text("·  ", color = Color(0xFF4ade80), fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace)
-                    Text(line, color = TextMuted, fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace, lineHeight = 15.sp)
-                }
+                SettingsBullet(text = line, color = ModernTextSecondary)
             }
 
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(2.dp))
 
-            // "Leave it off if" column
-            Text(
-                "Leave OFF if you:",
-                color = Color(0xFF737373),
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace
-            )
-            Spacer(Modifier.height(4.dp))
+            Text("Leave OFF if you:", color = ModernTextSecondary, fontSize = 12.sp, fontWeight = FontWeight.Medium)
             listOf(
                 "Want thorough, detailed responses",
                 "Do complex coding or writing tasks",
                 "Have an unlimited or high-quota API key",
                 "Want the agent to use your chosen model fully"
             ).forEach { line ->
-                Row(Modifier.padding(start = 8.dp, top = 2.dp)) {
-                    Text("·  ", color = Color(0xFF404040), fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace)
-                    Text(line, color = Color(0xFF404040), fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace, lineHeight = 15.sp)
-                }
+                SettingsBullet(text = line, color = forgePalette.textDim)
             }
 
-            Spacer(Modifier.height(10.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            Spacer(Modifier.height(8.dp))
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
 
             Text(
                 "When on: replies capped at 512 tokens · last 8 messages sent · routes to Groq by default.",
-                color = Color(0xFF404040),
-                fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace,
-                lineHeight = 14.sp
+                color = forgePalette.textDim,
+                fontSize = 11.sp,
+                lineHeight = 15.sp
             )
         }
     }
 }
 
-// ── API Key Card ──────────────────────────────────────────────────────────────
+// ── API Key Card ────────────────────────────────────────────────────────────
 
 @Composable
 private fun ApiKeyCard(
@@ -717,87 +629,102 @@ private fun ApiKeyCard(
     var showKey by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf(!status.hasKey) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Column(Modifier.weight(1f)) {
-                    Text(status.provider.displayName, color = TextPrimary, fontSize = 13.sp,
-                         fontFamily = FontFamily.Monospace)
-                    Text(status.provider.baseUrl, color = TextMuted, fontSize = 10.sp,
-                         fontFamily = FontFamily.Monospace)
+                    Text(
+                        status.provider.displayName,
+                        color = ModernTextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        status.provider.baseUrl,
+                        color = ModernTextSecondary,
+                        fontSize = 11.sp
+                    )
                 }
-                StatusPill(status.hasKey)
+                StatusBadge(
+                    status = if (status.hasKey) "Set" else "Empty",
+                    color = if (status.hasKey) forgePalette.success else forgePalette.textMuted
+                )
                 if (status.hasKey) {
-                    Spacer(Modifier.width(6.dp))
-                    IconButton(onClick = onDelete, modifier = Modifier.size(30.dp)) {
-                        Icon(Icons.Default.Delete, "Delete key",
-                             tint = Color(0xFF737373), modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(4.dp))
+                    IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                        Icon(
+                            Icons.Outlined.Delete,
+                            "Delete key",
+                            tint = ModernTextSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
                     }
                 }
             }
 
             if (status.hasKey && !editing) {
-                Spacer(Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(status.maskedKey, color = TextMuted, fontSize = 12.sp,
-                         fontFamily = FontFamily.Monospace)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        status.maskedKey,
+                        color = ModernTextSecondary,
+                        fontSize = 13.sp
+                    )
                     Spacer(Modifier.weight(1f))
-                    TextButton(onClick = { editing = true },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Orange)) {
-                        Text("Change", fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                    TextButton(onClick = { editing = true }) {
+                        Text("Change", color = ModernAccent, fontSize = 13.sp)
                     }
                 }
             }
 
             if (editing || !status.hasKey) {
-                Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = inputKey, onValueChange = { inputKey = it },
+                    value = inputKey,
+                    onValueChange = { inputKey = it },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
-                        Text(if (status.provider == ApiKeyProvider.OLLAMA)
-                                "http://host:11434/v1/" else "sk-...",
-                             color = TextMuted, fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                        Text(
+                            if (status.provider == ApiKeyProvider.OLLAMA) "http://host:11434/v1/" else "sk-...",
+                            color = forgePalette.textDim,
+                            fontSize = 13.sp
+                        )
                     },
-                    visualTransformation = if (showKey) VisualTransformation.None
-                                           else PasswordVisualTransformation(),
+                    visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showKey = !showKey }) {
-                            Icon(if (showKey) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                 null, tint = TextMuted, modifier = Modifier.size(18.dp))
+                            Icon(
+                                if (showKey) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                null,
+                                tint = ModernTextSecondary,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Orange, unfocusedBorderColor = Color(0xFF333333),
-                        focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
-                        cursorColor = Orange
-                    ),
-                    textStyle = LocalTextStyle.current.copy(
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp),
+                    colors = settingsTextFieldColors(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true, shape = RoundedCornerShape(6.dp)
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp)
                 )
-                Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (status.hasKey) {
                         OutlinedButton(
                             onClick = { editing = false; inputKey = "" },
                             modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = TextMuted)
-                        ) { Text("Cancel", fontSize = 12.sp, fontFamily = FontFamily.Monospace) }
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = ModernTextSecondary)
+                        ) { Text("Cancel", fontSize = 13.sp) }
                     }
                     Button(
                         onClick = { onSave(inputKey); editing = false; inputKey = "" },
                         enabled = inputKey.isNotBlank(),
                         modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(containerColor = Orange)
+                        colors = ButtonDefaults.buttonColors(containerColor = ModernAccent)
                     ) {
-                        Text("Save Key", fontSize = 12.sp,
-                             fontFamily = FontFamily.Monospace, color = Color.White)
+                        Text("Save Key", fontSize = 13.sp, color = Color.White)
                     }
                 }
             }
@@ -805,7 +732,7 @@ private fun ApiKeyCard(
     }
 }
 
-// ── Custom Endpoint Card ──────────────────────────────────────────────────────
+// ── Custom Endpoint Card ────────────────────────────────────────────────────
 
 @Composable
 private fun CustomEndpointCard(
@@ -817,79 +744,87 @@ private fun CustomEndpointCard(
     var editing by remember { mutableStateOf(!status.hasKey) }
     var showKey by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Column(Modifier.weight(1f)) {
-                    Text(status.endpoint.name, color = TextPrimary, fontSize = 13.sp,
-                         fontFamily = FontFamily.Monospace)
-                    Text("${status.endpoint.baseUrl}  •  ${status.endpoint.schema.name}  •  ${status.endpoint.defaultModel}",
-                         color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
+                    Text(
+                        status.endpoint.name,
+                        color = ModernTextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        "${status.endpoint.baseUrl} · ${status.endpoint.schema.name} · ${status.endpoint.defaultModel}",
+                        color = ModernTextSecondary,
+                        fontSize = 11.sp
+                    )
                 }
-                StatusPill(status.hasKey)
-                Spacer(Modifier.width(6.dp))
-                IconButton(onClick = onDelete, modifier = Modifier.size(30.dp)) {
-                    Icon(Icons.Default.Delete, "Delete endpoint",
-                         tint = Color(0xFF737373), modifier = Modifier.size(16.dp))
+                StatusBadge(
+                    status = if (status.hasKey) "Set" else "Empty",
+                    color = if (status.hasKey) forgePalette.success else forgePalette.textMuted
+                )
+                Spacer(Modifier.width(4.dp))
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        Icons.Outlined.Delete,
+                        "Delete endpoint",
+                        tint = ModernTextSecondary,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
             if (status.hasKey && !editing) {
-                Spacer(Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(status.maskedKey, color = TextMuted, fontSize = 12.sp,
-                         fontFamily = FontFamily.Monospace)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(status.maskedKey, color = ModernTextSecondary, fontSize = 13.sp)
                     Spacer(Modifier.weight(1f))
-                    TextButton(onClick = { editing = true },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Orange)) {
-                        Text("Change", fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                    TextButton(onClick = { editing = true }) {
+                        Text("Change", color = ModernAccent, fontSize = 13.sp)
                     }
                 }
             }
             if (editing) {
-                Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = inputKey, onValueChange = { inputKey = it },
+                    value = inputKey,
+                    onValueChange = { inputKey = it },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("API key", color = TextMuted, fontSize = 12.sp,
-                                         fontFamily = FontFamily.Monospace) },
-                    visualTransformation = if (showKey) VisualTransformation.None
-                                           else PasswordVisualTransformation(),
+                    placeholder = { Text("API key", color = forgePalette.textDim, fontSize = 13.sp) },
+                    visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showKey = !showKey }) {
-                            Icon(if (showKey) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                 null, tint = TextMuted, modifier = Modifier.size(18.dp))
+                            Icon(
+                                if (showKey) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                null,
+                                tint = ModernTextSecondary,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Orange, unfocusedBorderColor = Color(0xFF333333),
-                        focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
-                        cursorColor = Orange
-                    ),
-                    textStyle = LocalTextStyle.current.copy(
-                        fontFamily = FontFamily.Monospace, fontSize = 12.sp),
+                    colors = settingsTextFieldColors(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    singleLine = true, shape = RoundedCornerShape(6.dp)
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp)
                 )
-                Spacer(Modifier.height(6.dp))
                 Button(
                     onClick = { onSetKey(inputKey); editing = false; inputKey = "" },
                     enabled = inputKey.isNotBlank(),
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Orange)
+                    colors = ButtonDefaults.buttonColors(containerColor = ModernAccent)
                 ) {
-                    Text("Save Key", fontSize = 12.sp,
-                         fontFamily = FontFamily.Monospace, color = Color.White)
+                    Text("Save Key", fontSize = 13.sp, color = Color.White)
                 }
             }
         }
     }
 }
 
-// ── Appearance Card ───────────────────────────────────────────────────────────
+// ── Appearance Card ─────────────────────────────────────────────────────────
 
 @Composable
 private fun AppearanceCard(
@@ -898,76 +833,53 @@ private fun AppearanceCard(
     hapticEnabled: Boolean,
     onHapticToggle: (Boolean) -> Unit
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Text("Theme", color = TextPrimary, fontSize = 13.sp,
-                 fontFamily = FontFamily.Monospace)
-            Spacer(Modifier.height(2.dp))
-            Text("Applies immediately across the app",
-                 color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-            Spacer(Modifier.height(8.dp))
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(
+                "Theme",
+                color = ModernTextPrimary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                "Applies immediately across the app",
+                color = ModernTextSecondary,
+                fontSize = 12.sp
+            )
             ThemeMode.entries.forEach { mode ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onSelect(mode) }
+                        .padding(vertical = 2.dp)
                 ) {
                     RadioButton(
                         selected = selected == mode,
                         onClick = { onSelect(mode) },
                         colors = RadioButtonDefaults.colors(
-                            selectedColor = Orange,
-                            unselectedColor = Color(0xFF404040)
+                            selectedColor = ModernAccent,
+                            unselectedColor = forgePalette.textDim
                         )
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text(mode.displayName, color = TextPrimary, fontSize = 12.sp,
-                         fontFamily = FontFamily.Monospace)
+                    Text(mode.displayName, color = ModernTextPrimary, fontSize = 13.sp)
                 }
             }
 
-            Spacer(Modifier.height(12.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            Spacer(Modifier.height(12.dp))
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text("Haptic Feedback", color = TextPrimary, fontSize = 13.sp,
-                         fontFamily = FontFamily.Monospace)
-                    Text("Tactile response when agent is active",
-                         color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                }
-                Switch(
-                    checked = hapticEnabled,
-                    onCheckedChange = onHapticToggle,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Orange,
-                    )
-                )
-            }
+            SettingsToggleRow(
+                title = "Haptic Feedback",
+                subtitle = "Tactile response when agent is active",
+                checked = hapticEnabled,
+                onCheckedChange = onHapticToggle
+            )
         }
     }
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-@Composable
-private fun StatusPill(set: Boolean) {
-    val (bg, fg, label) = if (set)
-        Triple(Color(0xFF052e16), Color(0xFF4ade80), "● SET")
-    else
-        Triple(Color(0xFF1a0a0a), Color(0xFF737373), "○ EMPTY")
-    Box(
-        Modifier.background(bg, RoundedCornerShape(4.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    ) {
-        Text(label, color = fg, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-    }
-}
+// ── Add Custom Endpoint Dialog ──────────────────────────────────────────────
 
 @Composable
 private fun AddCustomEndpointDialog(
@@ -982,32 +894,29 @@ private fun AddCustomEndpointDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = Surface,
-        titleContentColor = Orange,
-        textContentColor = TextPrimary,
-        title = { Text("Add custom endpoint", fontFamily = FontFamily.Monospace, fontSize = 14.sp) },
+        containerColor = ModernSurface,
+        titleContentColor = ModernTextPrimary,
+        textContentColor = ModernTextPrimary,
+        title = { Text("Add custom endpoint", fontWeight = FontWeight.SemiBold) },
         text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                DialogField("Name", name, "e.g. Local LM Studio") { name = it }
-                DialogField("Base URL", url, "https://host/v1/") { url = it }
-                DialogField("Default model", model, "model-id") { model = it }
-                DialogField("API key", key, "sk-...", isSecret = true) { key = it }
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                SettingsTextField(value = name, onValueChange = { name = it }, label = "Name", placeholder = "e.g. Local LM Studio")
+                SettingsTextField(value = url, onValueChange = { url = it }, label = "Base URL", placeholder = "https://host/v1/")
+                SettingsTextField(value = model, onValueChange = { model = it }, label = "Default model", placeholder = "model-id")
+                SettingsTextField(value = key, onValueChange = { key = it }, label = "API key", placeholder = "sk-...", isSecret = true)
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Schema: ", color = TextMuted, fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace)
+                    Text("Schema:", color = ModernTextSecondary, fontSize = 13.sp)
                     Spacer(Modifier.width(8.dp))
                     FilterChip(
                         selected = schema == ProviderSchema.OPENAI,
                         onClick = { schema = ProviderSchema.OPENAI },
-                        label = { Text("OpenAI", fontSize = 11.sp,
-                                        fontFamily = FontFamily.Monospace) }
+                        label = { Text("OpenAI", fontSize = 12.sp) }
                     )
                     Spacer(Modifier.width(6.dp))
                     FilterChip(
                         selected = schema == ProviderSchema.ANTHROPIC,
                         onClick = { schema = ProviderSchema.ANTHROPIC },
-                        label = { Text("Anthropic", fontSize = 11.sp,
-                                        fontFamily = FontFamily.Monospace) }
+                        label = { Text("Anthropic", fontSize = 12.sp) }
                     )
                 }
             }
@@ -1016,52 +925,16 @@ private fun AddCustomEndpointDialog(
             TextButton(
                 onClick = { onConfirm(name, url, schema, model, key) },
                 enabled = name.isNotBlank() && url.isNotBlank() && model.isNotBlank()
-            ) {
-                Text("Add", color = Orange, fontFamily = FontFamily.Monospace)
-            }
+            ) { Text("Add", color = ModernAccent) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = TextMuted, fontFamily = FontFamily.Monospace)
-            }
+            TextButton(onClick = onDismiss) { Text("Cancel", color = ModernTextSecondary) }
         }
     )
 }
 
-@Composable
-private fun DialogField(
-    label: String, value: String, placeholder: String,
-    isSecret: Boolean = false, onChange: (String) -> Unit
-) {
-    Column {
-        Text(label, color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-        OutlinedTextField(
-            value = value, onValueChange = onChange,
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text(placeholder, color = TextMuted, fontSize = 12.sp,
-                                 fontFamily = FontFamily.Monospace) },
-            visualTransformation = if (isSecret) PasswordVisualTransformation()
-                                   else VisualTransformation.None,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Orange, unfocusedBorderColor = Color(0xFF333333),
-                focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
-                cursorColor = Orange
-            ),
-            textStyle = LocalTextStyle.current.copy(
-                fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-            singleLine = true, shape = RoundedCornerShape(6.dp)
-        )
-    }
-}
+// ── Capability Padlocks ─────────────────────────────────────────────────────
 
-// ── Padlock / Capabilities ────────────────────────────────────────────────────
-
-/**
- * Phase R — surface the agent control plane's capability padlocks. Every
- * capability is shown with its category, current state, and a switch that
- * calls `setByUser`. Toggling a switch counts as explicit user consent for
- * the underlying gated tool.
- */
 @dagger.hilt.EntryPoint
 @dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
 private interface ControlPlaneEntryPoint {
@@ -1070,7 +943,7 @@ private interface ControlPlaneEntryPoint {
 
 @Composable
 private fun CapabilityPadlocksCard() {
-    val ctx = androidx.compose.ui.platform.LocalContext.current
+    val ctx = LocalContext.current
     val plane = remember {
         dagger.hilt.android.EntryPointAccessors
             .fromApplication(ctx.applicationContext, ControlPlaneEntryPoint::class.java)
@@ -1079,53 +952,62 @@ private fun CapabilityPadlocksCard() {
     val states by plane.states.collectAsState()
     var expanded by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp),
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("🔒 PADLOCKS", color = Orange, fontFamily = FontFamily.Monospace,
-                     fontSize = 12.sp, letterSpacing = 1.sp)
-                Spacer(Modifier.weight(1f))
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        Icons.Outlined.Lock,
+                        contentDescription = null,
+                        tint = ModernAccent,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Text(
+                        "Capability Padlocks",
+                        color = ModernTextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
                 TextButton(onClick = { expanded = !expanded }) {
-                    Text(if (expanded) "Hide" else "Show",
-                         color = TextMuted, fontSize = 11.sp,
-                         fontFamily = FontFamily.Monospace)
+                    Text(
+                        if (expanded) "Hide" else "Show",
+                        color = ModernTextSecondary,
+                        fontSize = 13.sp
+                    )
                 }
             }
-            Text("Per-tool consent gates. Toggle on to grant the agent permission " +
-                 "for that capability; toggle off to revoke. Switches persist.",
-                 color = TextMuted, fontSize = 11.sp, fontFamily = FontFamily.Monospace,
-                 lineHeight = 15.sp)
+            Text(
+                "Per-tool consent gates. Toggle on to grant the agent permission; toggle off to revoke.",
+                color = ModernTextSecondary,
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            )
             if (expanded) {
-                Spacer(Modifier.height(8.dp))
                 plane.capabilities.groupBy { it.category }.forEach { (cat, caps) ->
-                    Text(cat.uppercase(), color = Orange,
-                         fontFamily = FontFamily.Monospace, fontSize = 11.sp,
-                         letterSpacing = 1.sp,
-                         modifier = Modifier.padding(top = 6.dp, bottom = 2.dp))
+                    Text(
+                        cat.uppercase(),
+                        color = ModernAccent,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 1.sp,
+                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
+                    )
                     caps.forEach { cap ->
                         val on = states[cap.id]?.enabled ?: cap.defaultEnabled
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
-                        ) {
-                            Column(Modifier.weight(1f)) {
-                                Text(cap.title.ifBlank { cap.id }, color = TextPrimary,
-                                     fontFamily = FontFamily.Monospace, fontSize = 12.sp)
-                                if (cap.description.isNotBlank()) {
-                                    Text(cap.description, color = TextMuted,
-                                         fontFamily = FontFamily.Monospace, fontSize = 10.sp,
-                                         lineHeight = 13.sp)
-                                }
-                            }
-                            Switch(
-                                checked = on,
-                                onCheckedChange = { wanted -> plane.setByUser(cap.id, wanted) },
-                            )
-                        }
+                        SettingsToggleRow(
+                            title = cap.title.ifBlank { cap.id },
+                            subtitle = cap.description,
+                            checked = on,
+                            onCheckedChange = { wanted -> plane.setByUser(cap.id, wanted) }
+                        )
                     }
                 }
             }
@@ -1142,119 +1024,99 @@ private fun PredictivePrefetchCard(
     allowUnsafe: Boolean,
     onToggleAllowUnsafe: (Boolean) -> Unit,
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "Predictive Prefetch",
-                        color = TextPrimary,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Spacer(Modifier.height(1.dp))
-                    Text(
-                        if (enabled) "ON  —  agent anticipates your next request"
-                        else         "OFF  —  no background prediction",
-                        color = if (enabled) Color(0xFF4ade80) else TextMuted,
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Switch(
-                    checked = enabled,
-                    onCheckedChange = onToggleEnabled,
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = Orange,
-                        uncheckedThumbColor = Color(0xFF737373),
-                        uncheckedTrackColor = Color(0xFF333333)
-                    )
-                )
-            }
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            SettingsToggleRow(
+                title = "Predictive Prefetch",
+                subtitle = if (enabled) "ON — agent anticipates your next request"
+                           else "OFF — no background prediction",
+                subtitleColor = if (enabled) forgePalette.success else ModernTextSecondary,
+                checked = enabled,
+                onCheckedChange = onToggleEnabled
+            )
 
-            Spacer(Modifier.height(8.dp))
             Text(
-                "When enabled, Forge analyses your recent activity and proactively " +
-                "executes predicted tool calls in the background. Results are cached " +
-                "so the next matching request returns instantly.",
-                color = TextMuted, fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace, lineHeight = 14.sp
+                "When enabled, Forge analyses your recent activity and proactively executes predicted tool calls in the background.",
+                color = ModernTextSecondary,
+                fontSize = 12.sp,
+                lineHeight = 16.sp
             )
 
             AnimatedVisibility(visible = enabled) {
                 Column {
+                    HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
                     Spacer(Modifier.height(10.dp))
-                    HorizontalDivider(color = Color(0xFF1f1f1f))
-                    Spacer(Modifier.height(10.dp))
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text(
-                                "Allow Unsafe Tools",
-                                color = TextPrimary,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily.Monospace
-                            )
-                            Text(
-                                if (allowUnsafe)
-                                    "⚠ Prefetch may run write/mutating tools (git_push, file_delete, etc.)"
-                                else
-                                    "Safe mode — only read-only tools (browser_get_html, git_log, etc.)",
-                                color = if (allowUnsafe) Color(0xFFfbbf24) else TextMuted,
-                                fontSize = 10.sp,
-                                fontFamily = FontFamily.Monospace,
-                                lineHeight = 14.sp
-                            )
-                        }
-                        Switch(
-                            checked = allowUnsafe,
-                            onCheckedChange = onToggleAllowUnsafe,
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFFfbbf24),
-                                uncheckedThumbColor = Color(0xFF737373),
-                                uncheckedTrackColor = Color(0xFF333333)
-                            )
-                        )
-                    }
+                    SettingsToggleRow(
+                        title = "Allow Unsafe Tools",
+                        subtitle = if (allowUnsafe)
+                            "Prefetch may run write/mutating tools"
+                        else
+                            "Safe mode — only read-only tools",
+                        subtitleColor = if (allowUnsafe) forgePalette.warning else ModernTextSecondary,
+                        checked = allowUnsafe,
+                        onCheckedChange = onToggleAllowUnsafe
+                    )
                 }
             }
         }
     }
 }
 
-// ── Phase S: NavRow ─────────────────────────────────────────────────────────
+// ── Intelligence Upgrades Card ──────────────────────────────────────────────
 
 @Composable
-private fun NavRow(title: String, subtitle: String, onClick: () -> Unit) {
-    val palette = LocalForgePalette.current
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = palette.surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(12.dp).fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(title, color = palette.textPrimary, fontSize = 13.sp,
-                     fontFamily = FontFamily.Monospace)
-                Text(subtitle, color = palette.textMuted, fontSize = 10.sp,
-                     fontFamily = FontFamily.Monospace, lineHeight = 14.sp)
-            }
-            Text("›", color = palette.textMuted, fontSize = 18.sp,
-                 fontFamily = FontFamily.Monospace)
+private fun IntelligenceUpgradesCard(
+    reflection: Boolean,
+    onReflectionToggle: (Boolean) -> Unit,
+    memoryRag: Boolean,
+    onMemoryRagToggle: (Boolean) -> Unit,
+    vision: Boolean,
+    onVisionToggle: (Boolean) -> Unit,
+    reasoning: Boolean,
+    onReasoningToggle: (Boolean) -> Unit,
+) {
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            SettingsToggleRow(
+                title = "Autonomous Learning (Reflection)",
+                subtitle = "Agent analyzes errors and circular loops to improve",
+                checked = reflection,
+                onCheckedChange = onReflectionToggle
+            )
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+            SettingsToggleRow(
+                title = "Long-term Memory (RAG)",
+                subtitle = "Prioritizes past project knowledge in every prompt",
+                checked = memoryRag,
+                onCheckedChange = onMemoryRagToggle
+            )
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+            SettingsToggleRow(
+                title = "Vision Processing",
+                subtitle = "Allows agent to see and reason about screenshots/images",
+                checked = vision,
+                onCheckedChange = onVisionToggle
+            )
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+            SettingsToggleRow(
+                title = "Advanced Reasoning",
+                subtitle = "Uses specialized deep-thought models for complex tasks",
+                checked = reasoning,
+                onCheckedChange = onReasoningToggle
+            )
+
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "These features may increase token usage and response latency.",
+                color = forgePalette.textDim,
+                fontSize = 11.sp,
+                lineHeight = 15.sp
+            )
         }
     }
 }
+
+// ── Advanced Execution Card ─────────────────────────────────────────────────
 
 @Composable
 private fun AdvancedExecutionCard(
@@ -1269,335 +1131,296 @@ private fun AdvancedExecutionCard(
     var inputToken by remember(remoteToken) { mutableStateOf(remoteToken) }
     var showToken by remember { mutableStateOf(false) }
 
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             // Cost Threshold
-            Column {
-                Text("Budget Gate (USD)", color = TextPrimary, fontSize = 13.sp,
-                     fontFamily = FontFamily.Monospace)
-                Text("Agent pauses for approval if estimated run cost exceeds this. 0.0 = disabled.",
-                     color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                Spacer(Modifier.height(6.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    "Budget Gate (USD)",
+                    color = ModernTextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    "Agent pauses for approval if estimated run cost exceeds this. 0.0 = disabled.",
+                    color = ModernTextSecondary,
+                    fontSize = 12.sp
+                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     OutlinedTextField(
-                        value = inputThreshold, onValueChange = { inputThreshold = it },
+                        value = inputThreshold,
+                        onValueChange = { inputThreshold = it },
                         modifier = Modifier.weight(1f),
-                        placeholder = { Text("0.05", color = TextMuted) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Orange, unfocusedBorderColor = Color(0xFF333333),
-                            focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
-                            cursorColor = Orange
-                        ),
-                        textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
+                        placeholder = { Text("0.05", color = forgePalette.textDim) },
+                        colors = settingsTextFieldColors(),
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                        shape = RoundedCornerShape(8.dp)
                     )
-                    Spacer(Modifier.width(8.dp))
                     Button(
                         onClick = { onSetCostThreshold(inputThreshold.replace(',', '.').toDoubleOrNull() ?: 0.0) },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1f1f1f), contentColor = Orange),
-                        shape = RoundedCornerShape(6.dp),
-                        contentPadding = PaddingValues(12.dp, 4.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = ModernAccent),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
-                        Text("Set", fontSize = 11.sp, fontFamily = FontFamily.Monospace)
+                        Text("Set", fontSize = 13.sp, color = Color.White)
                     }
                 }
             }
 
-            HorizontalDivider(color = Color(0xFF1f1f1f))
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
 
             // Hybrid Execution
-            Column {
-                Text("Remote Python Worker (GPU)", color = TextPrimary, fontSize = 13.sp,
-                     fontFamily = FontFamily.Monospace)
-                Text("Auto-routes heavy ML scripts to this endpoint instead of on-device Chaquopy.",
-                     color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace)
-                Spacer(Modifier.height(6.dp))
-                OutlinedTextField(
-                    value = inputUrl, onValueChange = { inputUrl = it },
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Worker URL (e.g. https://gpu.lab/run)") },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Orange, unfocusedBorderColor = Color(0xFF333333),
-                        focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
-                        cursorColor = Orange
-                    ),
-                    textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-                    singleLine = true
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text(
+                    "Remote Python Worker (GPU)",
+                    color = ModernTextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
                 )
-                Spacer(Modifier.height(6.dp))
+                Text(
+                    "Auto-routes heavy ML scripts to this endpoint instead of on-device Chaquopy.",
+                    color = ModernTextSecondary,
+                    fontSize = 12.sp
+                )
                 OutlinedTextField(
-                    value = inputToken, onValueChange = { inputToken = it },
+                    value = inputUrl,
+                    onValueChange = { inputUrl = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Worker URL") },
+                    colors = settingsTextFieldColors(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                OutlinedTextField(
+                    value = inputToken,
+                    onValueChange = { inputToken = it },
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text("Auth Token (Optional)") },
                     visualTransformation = if (showToken) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showToken = !showToken }) {
-                            Icon(if (showToken) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                 null, tint = TextMuted, modifier = Modifier.size(16.dp))
+                            Icon(
+                                if (showToken) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility,
+                                null,
+                                tint = ModernTextSecondary,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Orange, unfocusedBorderColor = Color(0xFF333333),
-                        focusedTextColor = TextPrimary, unfocusedTextColor = TextPrimary,
-                        cursorColor = Orange
-                    ),
-                    textStyle = LocalTextStyle.current.copy(fontFamily = FontFamily.Monospace, fontSize = 12.sp),
-                    singleLine = true
+                    colors = settingsTextFieldColors(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp)
                 )
-                Spacer(Modifier.height(8.dp))
                 Button(
                     onClick = { onSetHybrid(inputUrl, inputToken) },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Orange, contentColor = Color.Black),
-                    shape = RoundedCornerShape(6.dp)
+                    colors = ButtonDefaults.buttonColors(containerColor = ModernAccent),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Save Hybrid Settings", fontSize = 12.sp, fontFamily = FontFamily.Monospace)
+                    Text("Save Hybrid Settings", fontSize = 13.sp, color = Color.White)
                 }
             }
         }
     }
 }
+
+// ── Wishlist Features Card ──────────────────────────────────────────────────
+
 @Composable
-private fun IntelligenceUpgradesCard(
-    reflection: Boolean,
-    onReflectionToggle: (Boolean) -> Unit,
-    memoryRag: Boolean,
-    onMemoryRagToggle: (Boolean) -> Unit,
-    vision: Boolean,
-    onVisionToggle: (Boolean) -> Unit,
-    reasoning: Boolean,
-    onReasoningToggle: (Boolean) -> Unit,
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Surface),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            IntelToggleRow(
-                title = "Autonomous Learning (Reflection)",
-                subtitle = "Agent analyzes errors and circular loops to improve next time",
-                enabled = reflection,
-                onToggle = onReflectionToggle
+private fun WishlistFeaturesCard() {
+    ModernCard {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            FeatureRow(
+                icon = Icons.Outlined.Mic,
+                title = "Voice Input",
+                subtitle = "Hands-free control via speech"
             )
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            IntelToggleRow(
-                title = "Long-term Memory (RAG)",
-                subtitle = "Prioritizes past project knowledge in every prompt",
-                enabled = memoryRag,
-                onToggle = onMemoryRagToggle
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+            FeatureRow(
+                icon = Icons.Outlined.Sync,
+                title = "Multi-Device Sync",
+                subtitle = "Sync projects & memory across devices"
             )
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            IntelToggleRow(
-                title = "Vision Processing",
-                subtitle = "Allows agent to see and reason about screenshots/images",
-                enabled = vision,
-                onToggle = onVisionToggle
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+            FeatureRow(
+                icon = Icons.Outlined.AutoAwesome,
+                title = "AI Code Review",
+                subtitle = "Automated code quality & security checks"
             )
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            IntelToggleRow(
-                title = "Advanced Reasoning",
-                subtitle = "Uses specialized deep-thought models for complex tasks",
-                enabled = reasoning,
-                onToggle = onReasoningToggle
+            HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+            FeatureRow(
+                icon = Icons.Outlined.MonitorHeart,
+                title = "Project Health Dashboard",
+                subtitle = "Monitor tests, builds, & code quality"
             )
-            
+
             Spacer(Modifier.height(4.dp))
             Text(
-                "NOTE: These features may increase token usage and response latency.",
-                color = Color(0xFF404040), fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace, lineHeight = 14.sp
+                "All features are accessible via agent tools.",
+                color = forgePalette.textDim,
+                fontSize = 11.sp,
+                lineHeight = 15.sp
             )
         }
     }
 }
 
 @Composable
-private fun IntelToggleRow(
+private fun FeatureRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .background(ModernAccent.copy(alpha = 0.12f), RoundedCornerShape(8.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(icon, contentDescription = null, tint = ModernAccent, modifier = Modifier.size(16.dp))
+        }
+        Column(Modifier.weight(1f)) {
+            Text(title, color = ModernTextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+            Text(subtitle, color = ModernTextSecondary, fontSize = 11.sp)
+        }
+        Icon(
+            Icons.Outlined.CheckCircle,
+            contentDescription = "Available",
+            tint = forgePalette.success,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+// ── Settings Nav Row ────────────────────────────────────────────────────────
+
+@Composable
+private fun SettingsNavRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     subtitle: String,
-    enabled: Boolean,
-    onToggle: (Boolean) -> Unit
+    onClick: () -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Surface(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        color = ModernSurface,
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, forgePalette.borderSoft)
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(ModernAccent.copy(alpha = 0.12f), RoundedCornerShape(10.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(icon, contentDescription = null, tint = ModernAccent, modifier = Modifier.size(18.dp))
+            }
+            Column(Modifier.weight(1f)) {
+                Text(title, color = ModernTextPrimary, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                Text(subtitle, color = ModernTextSecondary, fontSize = 12.sp, lineHeight = 16.sp)
+            }
+            Icon(
+                Icons.Outlined.ChevronRight,
+                contentDescription = null,
+                tint = forgePalette.textDim,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+// ── Shared Settings Components ──────────────────────────────────────────────
+
+@Composable
+private fun SettingsToggleRow(
+    title: String,
+    subtitle: String,
+    subtitleColor: Color = ModernTextSecondary,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Column(Modifier.weight(1f)) {
-            Text(title, color = TextPrimary, fontSize = 13.sp, fontFamily = FontFamily.Monospace)
-            Text(subtitle, color = TextMuted, fontSize = 10.sp, fontFamily = FontFamily.Monospace, lineHeight = 14.sp)
+            Text(title, color = ModernTextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Medium)
+            Text(subtitle, color = subtitleColor, fontSize = 11.sp, lineHeight = 15.sp)
         }
         Switch(
-            checked = enabled,
-            onCheckedChange = onToggle,
+            checked = checked,
+            onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
-                checkedTrackColor = Orange,
-                uncheckedThumbColor = Color(0xFF737373),
-                uncheckedTrackColor = Color(0xFF333333)
+                checkedTrackColor = ModernAccent,
+                uncheckedThumbColor = forgePalette.textDim,
+                uncheckedTrackColor = forgePalette.borderSoft
             )
         )
     }
 }
 
-
-// ── Wishlist Features Card ────────────────────────────────────────────────────
 @Composable
-private fun WishlistFeaturesCard() {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color(0xFF0f0f0f),
-        shape = RoundedCornerShape(8.dp)
+private fun SettingsBullet(text: String, color: Color) {
+    Row(
+        modifier = Modifier.padding(start = 8.dp, top = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        Column(Modifier.padding(14.dp)) {
-            Text(
-                "NEW FEATURES",
-                color = Color(0xFFfb923c),
-                fontSize = 11.sp,
-                fontFamily = FontFamily.Monospace,
-                letterSpacing = 1.sp
-            )
-            Spacer(Modifier.height(10.dp))
-            
-            // Voice Input
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("🎤", fontSize = 16.sp)
-                Spacer(Modifier.width(8.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "Voice Input",
-                        color = Color(0xFFe5e5e5),
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Text(
-                        "Hands-free control via speech",
-                        color = Color(0xFF737373),
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Text(
-                    "✓",
-                    color = Color(0xFF22c55e),
-                    fontSize = 14.sp
-                )
-            }
-            
-            Spacer(Modifier.height(12.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            Spacer(Modifier.height(12.dp))
-            
-            // Multi-Device Sync
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("🔄", fontSize = 16.sp)
-                Spacer(Modifier.width(8.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "Multi-Device Sync",
-                        color = Color(0xFFe5e5e5),
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Text(
-                        "Sync projects & memory across devices",
-                        color = Color(0xFF737373),
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Text(
-                    "✓",
-                    color = Color(0xFF22c55e),
-                    fontSize = 14.sp
-                )
-            }
-            
-            Spacer(Modifier.height(12.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            Spacer(Modifier.height(12.dp))
-            
-            // AI Code Review
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("✨", fontSize = 16.sp)
-                Spacer(Modifier.width(8.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "AI Code Review",
-                        color = Color(0xFFe5e5e5),
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Text(
-                        "Automated code quality & security checks",
-                        color = Color(0xFF737373),
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Text(
-                    "✓",
-                    color = Color(0xFF22c55e),
-                    fontSize = 14.sp
-                )
-            }
-            
-            Spacer(Modifier.height(12.dp))
-            HorizontalDivider(color = Color(0xFF1f1f1f))
-            Spacer(Modifier.height(12.dp))
-            
-            // Project Health Dashboard
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("🏥", fontSize = 16.sp)
-                Spacer(Modifier.width(8.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        "Project Health Dashboard",
-                        color = Color(0xFFe5e5e5),
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Text(
-                        "Monitor tests, builds, & code quality",
-                        color = Color(0xFF737373),
-                        fontSize = 10.sp,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
-                Text(
-                    "✓",
-                    color = Color(0xFF22c55e),
-                    fontSize = 14.sp
-                )
-            }
-            
-            Spacer(Modifier.height(12.dp))
-            
-            Text(
-                "All features are accessible via agent tools. Try:\n" +
-                "• voice_start_listening\n" +
-                "• sync_export / sync_import\n" +
-                "• code_review_project\n" +
-                "• project_health",
-                color = Color(0xFF525252),
-                fontSize = 10.sp,
-                fontFamily = FontFamily.Monospace,
-                lineHeight = 14.sp
-            )
-        }
+        Box(
+            modifier = Modifier
+                .size(4.dp)
+                .offset(y = 6.dp)
+                .background(color, CircleShape)
+        )
+        Text(text, color = color, fontSize = 12.sp, lineHeight = 16.sp)
     }
 }
+
+@Composable
+private fun SettingsTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    placeholder: String = "",
+    isSecret: Boolean = false
+) {
+    Column {
+        Text(label, color = ModernTextSecondary, fontSize = 11.sp)
+        Spacer(Modifier.height(4.dp))
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier.fillMaxWidth(),
+            placeholder = { Text(placeholder, color = forgePalette.textDim, fontSize = 13.sp) },
+            visualTransformation = if (isSecret) PasswordVisualTransformation() else VisualTransformation.None,
+            colors = settingsTextFieldColors(),
+            singleLine = true,
+            shape = RoundedCornerShape(8.dp)
+        )
+    }
+}
+
+@Composable
+private fun settingsTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = ModernAccent,
+    unfocusedBorderColor = forgePalette.borderSoft,
+    focusedTextColor = ModernTextPrimary,
+    unfocusedTextColor = ModernTextPrimary,
+    cursorColor = ModernAccent,
+    focusedLabelColor = ModernAccent,
+    unfocusedLabelColor = ModernTextSecondary
+)

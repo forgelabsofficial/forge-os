@@ -16,23 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.forge.os.domain.heartbeat.HealthLevel
 import com.forge.os.presentation.components.*
+import com.forge.os.presentation.theme.forgePalette
 
 /**
- * Modern system status dashboard with real-time health monitoring.
- * Features:
- * - Card-based layout
- * - Animated status indicators
- * - Color-coded health levels
- * - Real-time metrics
- * - Quick actions
+ * Modern system status dashboard — Quiet Power design.
+ * Clean list-row layout with semantic health indicators.
  */
 @Composable
 fun ModernStatusScreen(
@@ -40,82 +34,73 @@ fun ModernStatusScreen(
     viewModel: StatusViewModel = hiltViewModel()
 ) {
     val status by viewModel.status.collectAsState()
-    
+
     LaunchedEffect(Unit) {
         viewModel.refresh()
     }
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(ModernBg)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // Modern Header
-            ModernHeader(
+            SimpleHeader(
                 title = "System Status",
                 subtitle = "Last check: ${formatTime(status.timestamp)}",
                 onBackClick = onNavigateBack
             ) {
-                // Overall health badge
                 HealthStatusBadge(status.overallHealth)
             }
-            
-            // Content
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Alerts section
+                // Alerts
                 if (status.alerts.isNotEmpty()) {
                     item {
                         AlertsSection(alerts = status.alerts)
                     }
                 }
-                
-                // Overall health card
+
+                // Overall health
                 item {
                     OverallHealthCard(
                         health = status.overallHealth,
                         onRefresh = { viewModel.refresh() }
                     )
                 }
-                
-                // Components section
+
+                // Components
                 item {
                     SectionHeader(title = "COMPONENTS")
                 }
-                
+
                 items(status.components.entries.toList()) { (name, component) ->
-                    AnimatedVisibility(
-                        visible = true,
-                        enter = fadeIn() + slideInVertically { it / 4 }
-                    ) {
-                        ComponentCard(
-                            name = name,
-                            health = HealthLevel.valueOf(component.health),
-                            metrics = component.metrics,
-                            message = component.message
-                        )
-                    }
+                    ComponentRow(
+                        name = name,
+                        health = HealthLevel.valueOf(component.health),
+                        metrics = component.metrics,
+                        message = component.message
+                    )
                 }
-                
-                // Recommendations section
+
+                // Recommendations
                 if (status.recommendations.isNotEmpty()) {
                     item {
-                        Spacer(Modifier.height(8.dp))
+                        Spacer(Modifier.height(4.dp))
                         SectionHeader(title = "RECOMMENDATIONS")
                     }
-                    
                     item {
                         RecommendationsCard(recommendations = status.recommendations)
                     }
                 }
-                
-                // Refresh button
+
+                // Refresh
                 item {
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(4.dp))
                     ModernButton(
                         text = "Refresh Status",
                         onClick = { viewModel.refresh() },
@@ -129,11 +114,12 @@ fun ModernStatusScreen(
     }
 }
 
+// ── Health Badge ────────────────────────────────────────────────────────────
+
 @Composable
 private fun HealthStatusBadge(health: HealthLevel) {
     val (color, text) = getHealthColorAndText(health)
-    
-    // Animated pulse for non-healthy states
+
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val alpha by infiniteTransition.animateFloat(
         initialValue = if (health == HealthLevel.HEALTHY) 1f else 0.5f,
@@ -144,19 +130,19 @@ private fun HealthStatusBadge(health: HealthLevel) {
         ),
         label = "alpha"
     )
-    
+
     Surface(
-        color = color.copy(alpha = 0.15f),
+        color = color.copy(alpha = 0.12f),
         shape = RoundedCornerShape(8.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(8.dp)
+                    .size(7.dp)
                     .clip(CircleShape)
                     .background(color.copy(alpha = alpha))
             )
@@ -164,7 +150,7 @@ private fun HealthStatusBadge(health: HealthLevel) {
                 text,
                 color = color,
                 fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -173,32 +159,36 @@ private fun HealthStatusBadge(health: HealthLevel) {
 @Composable
 private fun getHealthColorAndText(health: HealthLevel): Pair<Color, String> {
     return when (health) {
-        HealthLevel.HEALTHY -> ModernSuccess to "Healthy"
-        HealthLevel.WARNING -> ModernWarning to "Warning"
-        HealthLevel.CRITICAL -> ModernError to "Critical"
-        HealthLevel.DOWN -> ModernTextSecondary to "Down"
+        HealthLevel.HEALTHY -> forgePalette.success to "Healthy"
+        HealthLevel.WARNING -> forgePalette.warning to "Warning"
+        HealthLevel.CRITICAL -> forgePalette.danger to "Critical"
+        HealthLevel.DOWN -> forgePalette.textMuted to "Down"
     }
 }
+
+// ── Alerts ──────────────────────────────────────────────────────────────────
 
 @Composable
 private fun AlertsSection(alerts: List<com.forge.os.domain.heartbeat.AlertInfo>) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         alerts.forEach { alert ->
             Surface(
-                color = ModernWarning.copy(alpha = 0.1f),
+                color = forgePalette.warning.copy(alpha = 0.08f),
                 shape = RoundedCornerShape(12.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, ModernWarning.copy(alpha = 0.3f))
+                border = androidx.compose.foundation.BorderStroke(
+                    1.dp, forgePalette.warning.copy(alpha = 0.2f)
+                )
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.padding(14.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.Top
                 ) {
                     Icon(
                         Icons.Outlined.Warning,
                         contentDescription = null,
-                        tint = ModernWarning,
-                        modifier = Modifier.size(20.dp)
+                        tint = forgePalette.warning,
+                        modifier = Modifier.size(18.dp)
                     )
                     Text(
                         alert.message,
@@ -212,140 +202,158 @@ private fun AlertsSection(alerts: List<com.forge.os.domain.heartbeat.AlertInfo>)
     }
 }
 
+// ── Overall Health Card ─────────────────────────────────────────────────────
+
 @Composable
 private fun OverallHealthCard(
     health: HealthLevel,
     onRefresh: () -> Unit
 ) {
+    val healthColor = when (health) {
+        HealthLevel.HEALTHY -> forgePalette.success
+        HealthLevel.WARNING -> forgePalette.warning
+        HealthLevel.CRITICAL -> forgePalette.danger
+        HealthLevel.DOWN -> forgePalette.textMuted
+    }
+
+    val healthFraction = when (health) {
+        HealthLevel.HEALTHY -> 1f
+        HealthLevel.WARNING -> 0.6f
+        HealthLevel.CRITICAL -> 0.3f
+        HealthLevel.DOWN -> 0f
+    }
+
+    val animatedFraction by animateFloatAsState(
+        targetValue = healthFraction,
+        animationSpec = tween(600, easing = FastOutSlowInEasing),
+        label = "health_bar"
+    )
+
     ModernCard {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    "Overall Health",
-                    color = ModernTextSecondary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val (icon, color, text) = when (health) {
-                        HealthLevel.HEALTHY -> Triple(Icons.Outlined.CheckCircle, ModernSuccess, "All Systems Operational")
-                        HealthLevel.WARNING -> Triple(Icons.Outlined.Warning, ModernWarning, "Some Issues Detected")
-                        HealthLevel.CRITICAL -> Triple(Icons.Outlined.Error, ModernError, "Critical Issues")
-                        HealthLevel.DOWN -> Triple(Icons.Outlined.Cancel, ModernTextSecondary, "System Down")
-                    }
-                    
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        tint = color,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text,
-                        color = ModernTextPrimary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
+                        "Overall Health",
+                        color = ModernTextSecondary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(healthColor)
+                        )
+                        Text(
+                            when (health) {
+                                HealthLevel.HEALTHY -> "All Systems Operational"
+                                HealthLevel.WARNING -> "Some Issues Detected"
+                                HealthLevel.CRITICAL -> "Critical Issues"
+                                HealthLevel.DOWN -> "System Down"
+                            },
+                            color = ModernTextPrimary,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+
+                IconButton(
+                    onClick = onRefresh,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .background(ModernAccent.copy(alpha = 0.12f), CircleShape)
+                ) {
+                    Icon(
+                        Icons.Outlined.Refresh,
+                        contentDescription = "Refresh",
+                        tint = ModernAccent,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
-            
-            IconButton(
-                onClick = onRefresh,
+
+            // Health progress bar
+            Box(
                 modifier = Modifier
-                    .size(40.dp)
-                    .background(ModernAccent.copy(alpha = 0.15f), CircleShape)
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp))
+                    .background(forgePalette.borderSoft)
             ) {
-                Icon(
-                    Icons.Outlined.Refresh,
-                    contentDescription = "Refresh",
-                    tint = ModernAccent,
-                    modifier = Modifier.size(20.dp)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(animatedFraction)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(2.dp))
+                        .background(healthColor)
                 )
             }
         }
     }
 }
 
+// ── Component Row ───────────────────────────────────────────────────────────
+
 @Composable
-private fun ComponentCard(
+private fun ComponentRow(
     name: String,
     health: HealthLevel,
     metrics: Map<String, String>,
     message: String?
 ) {
-    val (icon, iconColor) = getComponentIcon(name)
     val healthColor = when (health) {
-        HealthLevel.HEALTHY -> ModernSuccess
-        HealthLevel.WARNING -> ModernWarning
-        HealthLevel.CRITICAL -> ModernError
-        HealthLevel.DOWN -> ModernTextSecondary
+        HealthLevel.HEALTHY -> forgePalette.success
+        HealthLevel.WARNING -> forgePalette.warning
+        HealthLevel.CRITICAL -> forgePalette.danger
+        HealthLevel.DOWN -> forgePalette.textMuted
     }
-    
+
     ModernCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Header
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            // Header row: dot + name + status
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(40.dp)
-                            .background(iconColor.copy(alpha = 0.15f), RoundedCornerShape(8.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            icon,
-                            contentDescription = null,
-                            tint = iconColor,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    
-                    Column {
-                        Text(
-                            name.uppercase(),
-                            color = ModernTextPrimary,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            letterSpacing = 0.5.sp
-                        )
-                        Text(
-                            health.name,
-                            color = healthColor,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(healthColor)
+                    )
+                    Text(
+                        name.replaceFirstChar { it.uppercase() },
+                        color = ModernTextPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                 }
-                
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(healthColor)
+
+                StatusBadge(
+                    status = health.name.lowercase().replaceFirstChar { it.uppercase() },
+                    color = healthColor
                 )
             }
-            
+
             // Metrics
             if (metrics.isNotEmpty()) {
-                Divider(color = ModernBorder)
-                
-                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                HorizontalDivider(color = forgePalette.divider, thickness = 0.5.dp)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     metrics.forEach { (key, value) ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -354,33 +362,30 @@ private fun ComponentCard(
                             Text(
                                 key,
                                 color = ModernTextSecondary,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily.Monospace
+                                fontSize = 12.sp
                             )
                             Text(
                                 value,
                                 color = ModernTextPrimary,
                                 fontSize = 12.sp,
-                                fontFamily = FontFamily.Monospace,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                     }
                 }
             }
-            
+
             // Message
             if (message != null) {
                 Surface(
-                    color = ModernWarning.copy(alpha = 0.1f),
+                    color = forgePalette.warning.copy(alpha = 0.08f),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         message,
-                        color = ModernWarning,
+                        color = forgePalette.warning,
                         fontSize = 12.sp,
-                        fontFamily = FontFamily.Monospace,
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(10.dp)
                     )
                 }
             }
@@ -388,10 +393,12 @@ private fun ComponentCard(
     }
 }
 
+// ── Recommendations ─────────────────────────────────────────────────────────
+
 @Composable
 private fun RecommendationsCard(recommendations: List<String>) {
     ModernCard {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -400,7 +407,7 @@ private fun RecommendationsCard(recommendations: List<String>) {
                     Icons.Outlined.Lightbulb,
                     contentDescription = null,
                     tint = ModernAccent,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
                 Text(
                     "Recommendations",
@@ -409,8 +416,8 @@ private fun RecommendationsCard(recommendations: List<String>) {
                     fontWeight = FontWeight.SemiBold
                 )
             }
-            
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 recommendations.forEach { recommendation ->
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -418,7 +425,7 @@ private fun RecommendationsCard(recommendations: List<String>) {
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(6.dp)
+                                .size(5.dp)
                                 .offset(y = 6.dp)
                                 .background(ModernAccent, CircleShape)
                         )
@@ -435,21 +442,7 @@ private fun RecommendationsCard(recommendations: List<String>) {
     }
 }
 
-@Composable
-private fun getComponentIcon(name: String): Pair<ImageVector, Color> {
-    return when (name.lowercase()) {
-        "storage" -> Icons.Outlined.Storage to Color(0xFF8B5CF6)
-        "memory" -> Icons.Outlined.Memory to Color(0xFFEC4899)
-        "api" -> Icons.Outlined.Api to Color(0xFF3B82F6)
-        "workspace" -> Icons.Outlined.Folder to Color(0xFF10B981)
-        "config" -> Icons.Outlined.Settings to Color(0xFFF59E0B)
-        "cron" -> Icons.Outlined.Schedule to Color(0xFF06B6D4)
-        "database" -> Icons.Outlined.Storage to Color(0xFF8B5CF6)
-        "network" -> Icons.Outlined.Wifi to Color(0xFF3B82F6)
-        "security" -> Icons.Outlined.Security to Color(0xFFEF4444)
-        else -> Icons.Outlined.Build to ModernAccent
-    }
-}
+// ── Helpers ─────────────────────────────────────────────────────────────────
 
 private fun formatTime(ts: Long): String {
     val fmt = java.text.SimpleDateFormat("HH:mm:ss", java.util.Locale.US)
