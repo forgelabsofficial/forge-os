@@ -75,7 +75,7 @@ fun ForgeLogo(
         )
 
         Image(
-            painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.ic_forge_logo),
             contentDescription = "Forge OS",
             modifier = modifier
                 .size(size)
@@ -83,7 +83,7 @@ fun ForgeLogo(
         )
     } else {
         Image(
-            painter = painterResource(id = R.mipmap.ic_launcher_foreground),
+            painter = painterResource(id = R.drawable.ic_forge_logo),
             contentDescription = "Forge OS",
             modifier = modifier.size(size)
         )
